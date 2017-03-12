@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-#include "../../Rendering/utils.inl"
+#include "Rendering/utils.inl"
 
 /**
  * @brief Camera::Camera

@@ -1,44 +1,4 @@
-sandbox3d
+sandbox3d-editor
 =========
 
-[![Build Status](https://travis-ci.org/magestik/sandbox3d.svg?branch=master)](https://travis-ci.org/magestik/sandbox3d)
-
-### Introduction
-
-A sandbox that I use to test some graphic techniques.
-
-Implemented :
-- Light Prepass,
-- Simple Fog,
-- Normal mapping,
-- Shadow mapping (PCF),
-- Tone Mapping (the scene is first rendered in HDR format),
-- Bloom,
-- FXAA (just plugged Timothy Lottes implementation),
-- Cel Shading,
-- Pick Buffer.
-
-### Build
-
-Compile C++ code, and preprocess shaders :
-```
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
-```
-
-### Dependencies
-
-This project is designed to run on GNU/Linux and does not support Windows (maybe using GLEW would be enough to make it work).
-
-Libraries needed :
-- Qt 5
-- Assimp
-- TinyXML2
-- jansson
-- OpenGL 3.3 / Vulkan 1.0.4
-
-Other requierements :
-- glslc (to preprocess shaders)
-- xmllint (to check render.xml)
+An editor for [sandbox3d](https://github.com/magestik/sandbox3d)

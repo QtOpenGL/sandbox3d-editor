@@ -2,7 +2,7 @@
 #include <QGLFormat>
 #include <QSplashScreen>
 
-#include "GUI/MainWindow.h"
+#include "MainWindow.h"
 #include "Remotery.h"
 
 bool setDefaultFormatOpenGL(void)
