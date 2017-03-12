@@ -29,9 +29,6 @@ qt5_wrap_ui(UI_HEADER_FILES ${UI_FILES})
 # Assimp
 find_package(assimp REQUIRED)
 
-# TinyXML
-find_package(TinyXML2 REQUIRED)
-
 # Jansson
 find_library(JANSSON_LIBRARY jansson)
 
