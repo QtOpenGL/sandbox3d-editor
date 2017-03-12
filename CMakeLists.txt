@@ -11,7 +11,7 @@ endif ()
 add_subdirectory(external)
 include_directories(external/qt5-node-editor/src)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

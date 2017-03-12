@@ -35,6 +35,4 @@ find_library(JANSSON_LIBRARY jansson)
 # Compile application
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${UI_FILES} ${SHADERS_FILES})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${CMAKE_CURRENT_BINARY_DIR}/config.h")
-
 target_link_libraries(${PROJECT_NAME} Sandbox3D ${assimp_LIBRARIES} ${JANSSON_LIBRARY} Qt5::Core Qt5::Widgets Qt5::Gui Qt5::OpenGL Qt5NodeEditor)
