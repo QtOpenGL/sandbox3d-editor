@@ -13,6 +13,13 @@
 #include <QMessageBox>
 #include <QLabel>
 
+#include <QGLWidget>
+#include <QOpenGLWidget>
+
+#include <QOpenGLBuffer>
+#include <QOpenGLTexture>
+#include <QOpenGLShaderProgram>
+
 #include <graphicsnodescene.hpp>
 #include <graphicsnodeview.hpp>
 
@@ -33,6 +40,38 @@
 #define SCENE_SIZE_X 20000.0
 #define SCENE_SIZE_Y 20000.0
 
+class GraphicsNodeTexture : public GraphicsNode
+{
+public:
+
+	GraphicsNodeTexture(QGraphicsItem *parent = nullptr) : GraphicsNode(parent)
+	{
+		_title_item->hide();
+	}
+
+	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override
+	{
+		painter->beginNativePainting();
+
+		glEnable(GL_TEXTURE_2D);
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+		glBindTexture(GL_TEXTURE_2D, 3);
+		glBegin(GL_QUADS);
+		glTexCoord2d(0.0,1.0); glVertex2d(0, 0);
+		glTexCoord2d(1.0,1.0); glVertex2d(_width, 0);
+		glTexCoord2d(1.0,0.0); glVertex2d(_width, _height);
+		glTexCoord2d(0.0,0.0); glVertex2d(0, _height);
+		glEnd();
+
+		painter->endNativePainting();
+
+		painter->setPen(isSelected() ? _pen_selected : _pen_default);
+		painter->setBrush(Qt::NoBrush);
+		painter->drawRect(QRectF(0.0f, 0.0f, _width, _height));
+	}
+
+};
+
 /**
  * @brief Constructor
  * @param Parent widget (usually the main window)
@@ -48,6 +87,8 @@ NodeEditorWindow::NodeEditorWindow(QWidget * pParent)
 	// Custom Widgets
 	m_pMenuBar				= new QMenuBar(this); // can't add a Menu bar from Designer
 	m_pStatusBar			= new QStatusBar(this); // can't add a Status bar from Designer
+
+	m_pWidgetGL				= new QOpenGLWidget(this);
 
 	m_pScene				= new GraphicsNodeScene(this);
 	m_pView					= new GraphicsNodeView(m_pScene, this);
@@ -66,6 +107,14 @@ NodeEditorWindow::NodeEditorWindow(QWidget * pParent)
 	// Node Widget
 	m_pScene->setSceneRect(-(SCENE_SIZE_X*0.5), -(SCENE_SIZE_Y*0.5), SCENE_SIZE_X, SCENE_SIZE_Y);
 
+	// Enable OpenGL rendering for the Node View
+	QSurfaceFormat format;
+	format.setSamples(4);
+
+	m_pWidgetGL->setFormat(format);
+
+	m_pView->setViewport(m_pWidgetGL);
+	m_pView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
 	// Load descriptors (to create nodes)
 	{
@@ -240,6 +289,12 @@ bool NodeEditorWindow::loadGraph(void)
 			json_t * pNodePosY = json_object_get(pNodeMetada, "yloc");
 			assert(nullptr != pNodePosY);
 
+			json_t * pNodeSizeX = json_object_get(pNodeMetada, "width");
+			assert(nullptr != pNodeSizeX);
+
+			json_t * pNodeSizeY = json_object_get(pNodeMetada, "height");
+			assert(nullptr != pNodeSizeY);
+
 			// Create Node
 			GraphicsNode * n = nullptr;
 
@@ -271,6 +326,7 @@ bool NodeEditorWindow::loadGraph(void)
 			}
 
 			n->setPos(json_real_value(pNodePosX), json_real_value(pNodePosY));
+			n->setSize(json_real_value(pNodeSizeX), json_real_value(pNodeSizeY));
 			n->setTitle(json_string_value(pNodeLabel)); // currently useless
 
 			mapUID[uid] = n;
@@ -515,7 +571,7 @@ GraphicsNode * NodeEditorWindow::createOperationNode(const NodeDescriptor & desc
  */
 GraphicsNode * NodeEditorWindow::createTextureNode(unsigned int format, unsigned int width, unsigned int height)
 {
-	GraphicsNode * n = new GraphicsNode();
+	GraphicsNode * n = new GraphicsNodeTexture();
 
 	n->setTitle(QString("Texture"));
 
@@ -528,7 +584,7 @@ GraphicsNode * NodeEditorWindow::createTextureNode(unsigned int format, unsigned
 	QLabel * pLabel = new QLabel();
 	pLabel->setPixmap(*pPixmap);
 
-	n->setCentralWidget(pLabel);
+	//n->setCentralWidget(pLabel);
 
 	m_pScene->addItem(n);
 

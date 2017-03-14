@@ -4,6 +4,9 @@
 
 #include <QDialog>
 
+class QOpenGLWidget;
+class QOpenGLContext;
+
 class QMenuBar;
 class QStatusBar;
 class QMenu;
@@ -52,6 +55,8 @@ protected:
 
 	GraphicsNodeView *		m_pView;
 	GraphicsNodeScene *		m_pScene;
+
+	QOpenGLWidget *			m_pWidgetGL;
 
 	QMenu *					m_pContextMenuScene;
 	QMenu *					m_pContextMenuNode;
