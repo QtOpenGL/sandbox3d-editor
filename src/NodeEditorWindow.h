@@ -18,6 +18,8 @@ class GraphicsNodeView;
 class GraphicsNodeScene;
 class GraphicsNode;
 
+class MainWindow;
+
 namespace Ui {
 	class NodeEditorWindow;
 }
@@ -28,7 +30,7 @@ class NodeEditorWindow : public QDialog
 
 public:
 
-	explicit	NodeEditorWindow		(QWidget * parent = nullptr);
+	explicit	NodeEditorWindow		(MainWindow * pMainWindow);
 	virtual		~NodeEditorWindow		(void);
 
 	void		closeEvent				(QCloseEvent * event) Q_DECL_OVERRIDE;
@@ -70,6 +72,11 @@ protected:
 	std::map<const GraphicsNode*, std::string> m_mapNodeType;
 
 private slots:
+
+
+public slots:
+
+	void onSceneFrameSwapped(void);
 
 	void on_actionSave_triggered();
 

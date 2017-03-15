@@ -13,12 +13,8 @@
 #include <QMessageBox>
 #include <QLabel>
 
-#include <QGLWidget>
-#include <QOpenGLWidget>
-
-#include <QOpenGLBuffer>
-#include <QOpenGLTexture>
-#include <QOpenGLShaderProgram>
+#include "MainWindow.h"
+#include "DrawableSurface.h"
 
 #include <graphicsnodescene.hpp>
 #include <graphicsnodeview.hpp>
@@ -53,6 +49,8 @@ public:
 	{
 		painter->beginNativePainting();
 
+		// Draw Render Target using OpenGL
+		// MUST use old OpenGL because it seems that QGraphicsView does NOT support OpenGL > 3
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		glBindTexture(GL_TEXTURE_2D, 3);
@@ -74,10 +72,10 @@ public:
 
 /**
  * @brief Constructor
- * @param Parent widget (usually the main window)
+ * @param Main Window
  */
-NodeEditorWindow::NodeEditorWindow(QWidget * pParent)
-: QDialog(pParent)
+NodeEditorWindow::NodeEditorWindow(MainWindow * pMainWindow)
+: QDialog(pMainWindow)
 , ui(new Ui::NodeEditorWindow)
 , m_pView(nullptr)
 , m_pScene(nullptr)
@@ -144,6 +142,8 @@ NodeEditorWindow::NodeEditorWindow(QWidget * pParent)
 	{
 		createPresentNode();
 	}
+
+	connect(pMainWindow->m_pDrawable, &QOpenGLWidget::frameSwapped, this, &NodeEditorWindow::onSceneFrameSwapped);
 }
 
 /**
@@ -592,6 +592,14 @@ GraphicsNode * NodeEditorWindow::createTextureNode(unsigned int format, unsigned
 	m_mapNodeType.insert(std::pair<const GraphicsNode*, std::string>(n, "texture"));
 
 	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::onSceneFrameSwapped
+ */
+void NodeEditorWindow::onSceneFrameSwapped(void)
+{
+	m_pWidgetGL->update();
 }
 
 /**
