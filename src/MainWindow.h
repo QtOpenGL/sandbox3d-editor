@@ -57,8 +57,6 @@ private slots:
 	void on_actionClear_color_triggered();
 	void on_actionNode_Editor_triggered();
 
-	void on_actionWireframe_toggled(bool checked);
-	void on_actionFaceCulling_changed();
 	void on_actionResetCamera_triggered();
 
 };

@@ -159,29 +159,6 @@ void MainWindow::on_actionImport_triggered()
 }
 
 /**
- * @brief MainWindow::on_actionWireframe_changed
- */
-void MainWindow::on_actionWireframe_toggled(bool checked)
-{
-	static_cast<DrawableSurface*>(m_pDrawable)->DebugWireframe(checked);
-}
-
-/**
- * @brief MainWindow::on_actionFaceCulling_changed
- */
-void MainWindow::on_actionFaceCulling_changed()
-{
-	if (ui->actionFaceCulling->isChecked())
-	{
-		glEnable(GL_CULL_FACE);
-	}
-	else
-	{
-		glDisable(GL_CULL_FACE);
-	}
-}
-
-/**
  * @brief MainWindow::on_actionClear_color_clicked
  */
 void MainWindow::on_actionClear_color_triggered()
