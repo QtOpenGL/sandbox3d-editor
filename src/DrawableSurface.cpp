@@ -33,8 +33,6 @@ DrawableSurface::DrawableSurface(QWidget *parent)
 : QOpenGLWidget(parent)
 , m_camera()
 , m_vLastPos(0, 0)
-, m_eRenderType(Rendering::FINAL)
-, m_bDebugWireframe(false)
 , m_vClearColor(0.0f, 0.0f, 0.0f, 0.0f)
 , m_vAmbientColor(0.0f, 0.0f, 0.0f, 0.0f)
 , m_pSelectedObject(nullptr)
@@ -60,89 +58,6 @@ DrawableSurface::~DrawableSurface(void)
 void DrawableSurface::ResetCamera(void)
 {
 	m_camera = Camera();
-	update();
-}
-
-/**
- * @brief DrawableSurface::DebugNormal
- */
-void DrawableSurface::DebugNormal()
-{
-	m_eRenderType = Rendering::NORMAL_BUFFER;
-	update();
-}
-
-/**
- * @brief DrawableSurface::DebugDiffuseLights
- */
-void DrawableSurface::DebugDiffuseLights()
-{
-	m_eRenderType = Rendering::DIFFUSE_LIGHTS;
-	update();
-}
-
-/**
- * @brief DrawableSurface::DebugPosition
- */
-void DrawableSurface::DebugSpecularLights()
-{
-	m_eRenderType = Rendering::SPECULAR_LIGHTS;
-	update();
-}
-
-/**
- * @brief DrawableSurface::DebugDepth
- */
-void DrawableSurface::DebugDepth()
-{
-	m_eRenderType = Rendering::DEPTH;
-	update();
-}
-
-/**
- * @brief DrawableSurface::DebugShadows
- */
-void DrawableSurface::DebugShadows()
-{
-	m_eRenderType = Rendering::SHADOWS;
-	update();
-}
-
-/**
- * @brief DrawableSurface::DebugLuminance
- * @param num
- */
-void DrawableSurface::DebugLuminance(int num)
-{
-	m_eRenderType = (Rendering::ERenderType)(Rendering::LUMINANCE1 + (num - 1));
-	update();
-}
-
-/**
- * @brief DrawableSurface::DebugBloom
- */
-void DrawableSurface::DebugBloom()
-{
-	m_eRenderType = Rendering::BLOOM;
-	update();
-}
-
-/**
- * @brief DrawableSurface::DebugWireframe
- * @param d
- */
-void DrawableSurface::DebugWireframe(bool d)
-{
-	m_bDebugWireframe = d;
-	update();
-}
-
-/**
- * @brief DrawableSurface::DebugNone
- */
-void DrawableSurface::DebugFinal()
-{
-	m_eRenderType = Rendering::FINAL;
 	update();
 }
 
@@ -194,7 +109,7 @@ void DrawableSurface::paintGL(void)
 	t.Start();
 	{
 		const mat4x4 & matView = m_camera.getViewMatrix();
-		m_renderer.onUpdate(matView, m_vClearColor, m_bDebugWireframe, m_eRenderType, m_pSelectedObject);
+		m_renderer.onUpdate(matView, m_vClearColor, m_pSelectedObject);
 	}
 	t.Stop();
 

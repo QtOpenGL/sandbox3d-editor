@@ -36,17 +36,6 @@ public:
 
 	void	ResetCamera			(void);
 
-	void	DebugFinal			(void);
-	void	DebugNormal			(void);
-	void	DebugDiffuseLights	(void);
-	void	DebugSpecularLights	(void);
-	void	DebugDepth			(void);
-	void	DebugShadows		(void);
-	void	DebugLuminance		(int num);
-	void	DebugBloom          (void);
-
-	void	DebugWireframe		(bool d);
-
 protected:
 
 	void	initializeGL		(void);
@@ -89,10 +78,6 @@ private:
 	// Navigation
 	ivec2		m_vLastPos;
 	bool		m_bMoved;
-
-	// Debug
-	Rendering::ERenderType	m_eRenderType;
-	bool					m_bDebugWireframe;
 
 	//
 	unsigned int m_query;
