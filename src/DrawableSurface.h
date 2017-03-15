@@ -105,5 +105,6 @@ public slots:
 	void setClearColor(const QColor & color);
 	void setAmbientColor(const QColor & color);
 
+	void	onFrameSwapped			(void);
 	void	onResized				(void);
 };

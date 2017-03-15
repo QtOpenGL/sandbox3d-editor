@@ -26,7 +26,7 @@
 #define _max(x, y) ((x > y) ? x : y)
 
 /**
- * @brief drawable::drawable
+ * @brief Constructor
  * @param parent
  */
 DrawableSurface::DrawableSurface(QWidget *parent)
@@ -41,15 +41,16 @@ DrawableSurface::DrawableSurface(QWidget *parent)
 	setFocusPolicy(Qt::StrongFocus);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
 	connect(this, &QOpenGLWidget::resized, this, &DrawableSurface::onResized);
+	connect(this, &QOpenGLWidget::frameSwapped, this, &DrawableSurface::onFrameSwapped);
 #endif // (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
 }
 
 /**
- * @brief drawable::~drawable
+ * @brief Destructor
  */
 DrawableSurface::~DrawableSurface(void)
 {
-
+	// ...
 }
 
 /**
@@ -125,6 +126,14 @@ void DrawableSurface::paintGL(void)
 	glGetQueryObjectuiv(m_query, GL_QUERY_RESULT, &elapsed_time);
 
 	static_cast<MainWindow*>(parent())->SetRenderTime(t.getElapsedTimeInMs(), elapsed_time / 1000000.0);
+}
+
+/**
+ * @brief DrawableSurface::onFrameSwapped
+ */
+void DrawableSurface::onFrameSwapped(void)
+{
+	//update();
 }
 
 /**
