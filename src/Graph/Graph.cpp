@@ -245,6 +245,103 @@ bool Graph::loadFromFile(const std::string & filename)
 }
 
 /**
+ * @brief Graph::saveToFile
+ * @param filename
+ * @return
+ */
+bool Graph::saveToFile(const std::string & filename)
+{
+	json_t * pRoot = json_object();
+
+	// Add the graph
+	json_t * pGraph = json_object();
+	json_object_set(pRoot, "graph", pGraph);
+
+	// Directed
+	json_t * pGraphDirected = directed ? json_true() : json_false();
+	json_object_set(pGraph, "directed", pGraphDirected);
+
+	// Type
+	json_t * pGraphType = json_string(type.c_str());
+	json_object_set(pGraph, "type", pGraphType);
+
+	// Label
+	json_t * pGraphLabel = json_string(label.c_str());
+	json_object_set(pGraph, "label", pGraphLabel);
+
+	// Metadata
+	json_t * pGraphMetadata = json_object();
+	json_object_set(pGraph, "metadata", pGraphMetadata);
+
+	// Add the nodes/edges
+	json_t * pGraphNodes = json_array();
+	json_object_set(pGraph, "nodes", pGraphNodes);
+
+	json_t * pGraphEdges = json_array();
+	json_object_set(pGraph, "edges", pGraphEdges);
+
+	for (Node * node : nodes)
+	{
+		json_t * pNode = json_object();
+		json_array_append(pGraphNodes, pNode);
+
+		// ID
+		json_t * pNodeID = json_string(node->getId().c_str());
+		json_object_set(pNode, "id", pNodeID);
+
+		// Type
+		json_t * pNodeType = json_string(node->getType().c_str());
+		json_object_set(pNode, "type", pNodeType);
+
+		// Label
+		json_t * pNodeLabel = json_string(node->getLabel().c_str());
+		json_object_set(pNode, "label", pNodeLabel);
+
+		// Metadata
+		json_t * pNodeMetada = json_object();
+		json_object_set(pNode, "metadata", pNodeMetada);
+
+		for (auto pair : *node)
+		{
+			json_t * pMeta = json_string(pair.second.c_str());
+			json_object_set(pNodeMetada, pair.first.c_str(), pMeta);
+		}
+	}
+
+	for (Edge * edge : edges)
+	{
+		json_t * pEdge = json_object();
+		json_array_append(pGraphEdges, pEdge);
+
+		// Source
+		json_t * pEdgeSource = json_string(edge->getSource()->getId().c_str());
+		json_object_set(pEdge, "source", pEdgeSource);
+
+		// Target
+		json_t * pEdgeTarget = json_string(edge->getTarget()->getId().c_str());
+		json_object_set(pEdge, "target", pEdgeTarget);
+
+		// Directed
+		json_t * pEdgeDirected = edge->isDirected() ? json_true() : json_false();
+		json_object_set(pEdge, "directed", pEdgeDirected);
+
+		// Metadata
+		json_t * pEdgeMetada = json_object();
+		json_object_set(pEdge, "metadata", pEdgeMetada);
+
+		for (auto pair : *edge)
+		{
+			json_t * pMeta = json_string(pair.second.c_str());
+			json_object_set(pEdgeMetada, pair.first.c_str(), pMeta);
+		}
+	}
+
+	int success = json_dump_file(pRoot, filename.c_str(), 0);
+
+	return(0 == success);
+}
+
+/**
  * @brief Graph::findNode
  * @param id
  * @return
@@ -287,6 +384,24 @@ void Graph::setType(const char * szType)
 void Graph::setLabel(const char * szLabel)
 {
 	label = szLabel;
+}
+
+/**
+ * @brief Graph::addNode
+ * @param pNode
+ */
+void Graph::addNode(Node * pNode)
+{
+	nodes.push_back(pNode);
+}
+
+/**
+ * @brief Graph::addEdge
+ * @param pEdge
+ */
+void Graph::addEdge(Edge * pEdge)
+{
+	edges.push_back(pEdge);
 }
 
 /**

@@ -72,3 +72,21 @@ const std::string & MetaDataContainer::getMetaData(const char * szKey)
 {
 	return(metada[szKey]);
 }
+
+/**
+ * @brief MetaDataContainer::begin
+ * @return
+ */
+MetaDataContainer::map::iterator MetaDataContainer::begin(void)
+{
+	return(metada.begin());
+}
+
+/**
+ * @brief MetaDataContainer::end
+ * @return
+ */
+MetaDataContainer::map::iterator MetaDataContainer::end(void)
+{
+	return(metada.end());
+}

@@ -17,20 +17,25 @@ public:
 	~Graph(void);
 
 	bool loadFromFile(const std::string & filename);
+	bool saveToFile(const std::string & filename);
 
 	Node * findNode(const std::string & id);
 
 	//
 	// Setters
-	void					setDirected		(bool bDirected);
-	void					setType			(const char * szType);
-	void					setLabel		(const char * szLabel);
+	void						setDirected		(bool bDirected);
+	void						setType			(const char * szType);
+	void						setLabel		(const char * szLabel);
+
+	void						addNode			(Node * pNode);
+	void						addEdge			(Edge * pEdge);
 
 	//
 	// Getters
 	bool						isDirected		(void) const;
 	const std::string &			getType			(void) const;
 	const std::string &			getLabel		(void) const;
+
 	const std::vector<Node*> &	getNodes		(void) const;
 	const std::vector<Edge*> &	getEdges		(void) const;
 
