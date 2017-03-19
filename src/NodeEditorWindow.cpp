@@ -25,8 +25,6 @@
 
 #include <qobjectnode.hpp>
 
-#include <jansson.h>
-
 #include <assert.h>
 
 #include <algorithm>
@@ -248,7 +246,7 @@ bool NodeEditorWindow::loadGraph(void)
 	{
 		// ID
 		const std::string & strUID = pNode->getId();
-		uintptr_t uid =  atoll(strUID.c_str());
+		uintptr_t uid = atoll(strUID.c_str());
 		assert(0 != uid);
 
 		// Type
@@ -341,30 +339,12 @@ bool NodeEditorWindow::loadGraph(void)
  */
 bool NodeEditorWindow::saveGraph(void)
 {
-	json_t * pRoot = json_object();
+	Graph G;
 
-	// Add the graph
-	json_t * pGraph = json_object();
-	json_object_set(pRoot, "graph", pGraph);
+	G.setType("RenderGraph");
+	G.setLabel("Unnamed Render Graph");
 
-	// Type
-	json_t * pGraphType = json_string("RenderGraph");
-	json_object_set(pGraph, "type", pGraphType);
-
-	// Label
-	json_t * pGraphLabel = json_string("Unnamed Render Graph");
-	json_object_set(pGraph, "label", pGraphLabel);
-
-	// Metadata
-	json_t * pGraphMetadata = json_object();
-	json_object_set(pGraph, "metadata", pGraphMetadata);
-
-	// Add the nodes/edges
-	json_t * pGraphNodes = json_array();
-	json_object_set(pGraph, "nodes", pGraphNodes);
-
-	json_t * pGraphEdges = json_array();
-	json_object_set(pGraph, "edges", pGraphEdges);
+	std::map<uintptr_t, Node *> mapUID;
 
 	QList<QGraphicsItem*> items = m_pScene->items();
 
@@ -377,49 +357,44 @@ bool NodeEditorWindow::saveGraph(void)
 				GraphicsNode * pNodeItem = static_cast<GraphicsNode*>(item);
 				assert(nullptr != pNodeItem);
 
+				char szId [16];
+				sprintf(szId, "%lld", uintptr_t(pNodeItem));
+
+				Node * pNode = new Node(szId);
+				assert(nullptr != pNode);
+				G.addNode(pNode);
+
+				pNode->setType(m_mapNodeType[pNodeItem].c_str());
+				pNode->setLabel(pNodeItem->getTitle().toLocal8Bit());
+
 				std::string & strNodeType = m_mapNodeType[pNodeItem];
-
-				json_t * pNode = json_object();
-				json_array_append(pGraphNodes, pNode);
-
-				// ID
-				json_t * pNodeID = json_integer(uintptr_t(pNodeItem));
-				json_object_set(pNode, "id", pNodeID);
-
-				// Type
-				json_t * pNodeType = json_string(m_mapNodeType[pNodeItem].c_str());
-				json_object_set(pNode, "type", pNodeType);
-
-				// Label
-				json_t * pNodeLabel = json_string(pNodeItem->getTitle().toLocal8Bit());
-				json_object_set(pNode, "label", pNodeLabel);
-
-				// Metadata
-				json_t * pNodeMetada = json_object();
-				json_object_set(pNode, "metadata", pNodeMetada);
 
 				if (strNodeType == "operation")
 				{
-					json_t * pNodeSubType = json_string(m_mapNode[pNodeItem]->identifier.c_str());
-					json_object_set(pNodeMetada, "subtype", pNodeSubType);
+					pNode->addMetaData("subtype", m_mapNode[pNodeItem]->identifier.c_str());
 				}
 				else if (strNodeType == "texture")
 				{
-					json_t * pNodeSubType = json_integer(0);
-					json_object_set(pNodeMetada, "format", pNodeSubType);
+					pNode->addMetaData("format", "0");
 				}
 
-				json_t * pNodePosX = json_real(pNodeItem->pos().x());
-				json_object_set(pNodeMetada, "xloc", pNodePosX);
+				char szPosX [16];
+				sprintf(szPosX, "%f", pNodeItem->pos().x());
+				pNode->addMetaData("xloc", szPosX);
 
-				json_t * pNodePosY = json_real(pNodeItem->pos().y());
-				json_object_set(pNodeMetada, "yloc", pNodePosY);
+				char szPosY [16];
+				sprintf(szPosY, "%f", pNodeItem->pos().y());
+				pNode->addMetaData("yloc", szPosY);
 
-				json_t * pNodeSizeX = json_real(pNodeItem->width());
-				json_object_set(pNodeMetada, "width", pNodeSizeX);
+				char szWidth [16];
+				sprintf(szWidth, "%f", pNodeItem->width());
+				pNode->addMetaData("width", szWidth);
 
-				json_t * pNodeSizeY = json_real(pNodeItem->height());
-				json_object_set(pNodeMetada, "height", pNodeSizeY);
+				char szHeight [16];
+				sprintf(szHeight, "%f", pNodeItem->height());
+				pNode->addMetaData("height", szHeight);
+
+				mapUID[uintptr_t(pNodeItem)] = pNode;
 			}
 			break;
 
@@ -428,30 +403,27 @@ bool NodeEditorWindow::saveGraph(void)
 				GraphicsBezierEdge * pEdgeItem = static_cast<GraphicsBezierEdge*>(item);
 				assert(nullptr != pEdgeItem);
 
-				json_t * pEdge = json_object();
-				json_array_append(pGraphEdges, pEdge);
-
 				// Source
-				json_t * pEdgeSource = json_integer(uintptr_t(pEdgeItem->getSource()->parentItem()));
-				json_object_set(pEdge, "source", pEdgeSource);
+				Node * pNodeSource = mapUID[uintptr_t(pEdgeItem->getSource()->parentItem())];
+				assert(nullptr != pNodeSource);
 
 				// Target
-				json_t * pEdgeTarget = json_integer(uintptr_t(pEdgeItem->getSink()->parentItem()));
-				json_object_set(pEdge, "target", pEdgeTarget);
+				Node * pNodeTarget = mapUID[uintptr_t(pEdgeItem->getSink()->parentItem())];
+				assert(nullptr != pNodeTarget);
 
-				// Directed
-				json_t * pEdgeDirected = json_true();
-				json_object_set(pEdge, "directed", pEdgeDirected);
+				Edge * pEdge = new Edge(pNodeSource, pNodeTarget); // FIXME
+				assert(nullptr != pEdge);
+				G.addEdge(pEdge);
 
-				// Metadata
-				json_t * pEdgeMetada = json_object();
-				json_object_set(pEdge, "metadata", pEdgeMetada);
+				pEdge->setDirected(true);
 
-				json_t * pEdgeSourceId = json_integer(pEdgeItem->getSource()->getIndex());
-				json_object_set(pEdgeMetada, "source_id", pEdgeSourceId);
+				char szSourceId [16];
+				sprintf(szSourceId, "%d", pEdgeItem->getSource()->getIndex());
+				pEdge->addMetaData("source_id", szSourceId);
 
-				json_t * pEdgeTargetId = json_integer(pEdgeItem->getSink()->getIndex());
-				json_object_set(pEdgeMetada, "target_id", pEdgeTargetId);
+				char szTargetId [16];
+				sprintf(szTargetId, "%d", pEdgeItem->getSink()->getIndex());
+				pEdge->addMetaData("target_id", szTargetId);
 			}
 			break;
 
@@ -462,9 +434,7 @@ bool NodeEditorWindow::saveGraph(void)
 		}
 	}
 
-	int success = json_dump_file(pRoot, GRAPH_FILE_PATH, 0);
-
-	return(0 == success);
+	return(G.saveToFile(GRAPH_FILE_PATH));
 }
 
 /**
