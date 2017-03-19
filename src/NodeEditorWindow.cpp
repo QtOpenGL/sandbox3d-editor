@@ -31,6 +31,10 @@
 
 #include <algorithm>
 
+#include "Graph/Graph.h"
+#include "Graph/Node.h"
+#include "Graph/Edge.h"
+
 #define GRAPH_FILE_PATH "data/render-graph.json"
 
 #define SCENE_SIZE_X 20000.0
@@ -230,153 +234,102 @@ void NodeEditorWindow::loadNodeDescriptors(void)
  */
 bool NodeEditorWindow::loadGraph(void)
 {
-	json_error_t err;
-	json_t * pRoot = json_load_file(GRAPH_FILE_PATH, 0, &err);
-
-	if (!pRoot)
+	Graph G;
+	if (!G.loadFromFile(GRAPH_FILE_PATH))
 	{
 		return(false);
 	}
 
-	// Get the graph
-	json_t * pGraph = json_object_get(pRoot, "graph");
-
-	// Type
-	json_t * pGraphType = json_object_get(pGraph, "type");
-	assert(nullptr != pGraphType);
-	assert(!strcmp("RenderGraph", json_string_value(pGraphType)));
-
-	// Label
-	json_t * pGraphLabel = json_object_get(pGraph, "label");
-	assert(nullptr != pGraphLabel);
-
-	// Metadata
-	json_t * pGraphMetadata = json_object_get(pGraph, "metadata");
-	assert(nullptr != pGraphLabel);
-
-	// Nodes
-	json_t * pGraphNodes = json_object_get(pGraph, "nodes");
-	assert(nullptr != pGraphNodes);
+	assert(G.getType() == "RenderGraph");
 
 	std::map<uintptr_t, GraphicsNode *> mapUID;
 
+	for (Node * pNode : G.getNodes())
 	{
-		size_t index;
-		json_t * pNode;
+		// ID
+		const std::string & strUID = pNode->getId();
+		uintptr_t uid =  atoll(strUID.c_str());
+		assert(0 != uid);
 
-		json_array_foreach(pGraphNodes, index, pNode)
+		// Type
+		const std::string & strType = pNode->getType();
+		const char * szType = strType.c_str();
+
+		// Label
+		const std::string & strLabel = pNode->getLabel();
+		const char * szLabel = strLabel.c_str();
+
+		// Metadata
+		const std::string & strNodePosX = pNode->getMetaData("xloc");
+		const std::string & strNodePosY = pNode->getMetaData("yloc");
+		const std::string & strNodeSizeX = pNode->getMetaData("width");
+		const std::string & strNodeSizeY = pNode->getMetaData("height");
+
+		// Create Node
+		GraphicsNode * n = nullptr;
+
+		if ("operation" == strType)
 		{
-			// ID
-			json_t * pNodeID = json_object_get(pNode, "id");
-			uintptr_t uid = json_integer_value(pNodeID);
-			assert(0 != uid);
+			const std::string & strSubType = pNode->getMetaData("subtype");
+			const char * szSubType = strSubType.c_str();
 
-			// Type
-			json_t * pNodeType = json_object_get(pNode, "type");
-			const char * strType = json_string_value(pNodeType);
+			std::vector<NodeDescriptor>::iterator it = std::find(m_aNodeDescriptors.begin(), m_aNodeDescriptors.end(), szSubType);
+			assert(it != m_aNodeDescriptors.end());
 
-			// Label
-			json_t * pNodeLabel = json_object_get(pNode, "label");
-			assert(nullptr != pNodeLabel);
-
-			// Metadata
-			json_t * pNodeMetada = json_object_get(pNode, "metadata");
-			assert(nullptr != pNodeMetada);
-
-			json_t * pNodePosX = json_object_get(pNodeMetada, "xloc");
-			assert(nullptr != pNodePosX);
-
-			json_t * pNodePosY = json_object_get(pNodeMetada, "yloc");
-			assert(nullptr != pNodePosY);
-
-			json_t * pNodeSizeX = json_object_get(pNodeMetada, "width");
-			assert(nullptr != pNodeSizeX);
-
-			json_t * pNodeSizeY = json_object_get(pNodeMetada, "height");
-			assert(nullptr != pNodeSizeY);
-
-			// Create Node
-			GraphicsNode * n = nullptr;
-
-			if (!strcmp("operation", strType))
-			{
-				json_t * pNodeSubType = json_object_get(pNodeMetada, "subtype");
-				assert(nullptr != pNodeSubType);
-				const char * strSubType = json_string_value(pNodeSubType);
-
-				std::vector<NodeDescriptor>::iterator it = std::find(m_aNodeDescriptors.begin(), m_aNodeDescriptors.end(), strSubType);
-				assert(it != m_aNodeDescriptors.end());
-
-				n = createOperationNode(*it);
-			}
-			else if (!strcmp("texture", strType))
-			{
-				json_t * pNodeFormat = json_object_get(pNodeMetada, "format");
-				assert(nullptr != pNodeFormat);
-
-				n = createTextureNode(json_integer_value(pNodeFormat), 1024, 1024);
-			}
-			else if (!strcmp("present", strType))
-			{
-				n = createPresentNode();
-			}
-			else
-			{
-				assert(false);
-			}
-
-			n->setPos(json_real_value(pNodePosX), json_real_value(pNodePosY));
-			n->setSize(json_real_value(pNodeSizeX), json_real_value(pNodeSizeY));
-			n->setTitle(json_string_value(pNodeLabel)); // currently useless
-
-			mapUID[uid] = n;
+			n = createOperationNode(*it);
 		}
+		else if ("texture" == strType)
+		{
+			const std::string & strFormat = pNode->getMetaData("format");
+			int iFormat = atoi(strFormat.c_str());
+
+			n = createTextureNode(iFormat, 1024, 1024);
+		}
+		else if ("present" == strType)
+		{
+			n = createPresentNode();
+		}
+		else
+		{
+			assert(false);
+		}
+
+		n->setPos(atof(strNodePosX.c_str()), atof(strNodePosY.c_str()));
+		n->setSize(atof(strNodeSizeX.c_str()), atof(strNodeSizeY.c_str()));
+		n->setTitle(szLabel); // currently useless
+
+		mapUID[uid] = n;
 	}
 
-	// Edges
-	json_t * pGraphEdges = json_object_get(pGraph, "edges");
-	assert(nullptr != pGraphEdges);
-
+	for (Edge * pEdge : G.getEdges())
 	{
-		size_t index;
-		json_t * pNode;
+		// Source
+		Node * pSourceNode = pEdge->getSource();
+		uintptr_t source_uid = atoll(pSourceNode->getId().c_str());
 
-		json_array_foreach(pGraphEdges, index, pNode)
-		{
-			// Source
-			json_t * pNodeEdgeSource = json_object_get(pNode, "source");
-			uintptr_t source_uid = json_integer_value(pNodeEdgeSource);
+		// Target
+		Node * pTargetNode = pEdge->getTarget();
+		uintptr_t target_uid = atoll(pTargetNode->getId().c_str());
 
-			// Target
-			json_t * pNodeEdgeTarget = json_object_get(pNode, "target");
-			uintptr_t target_uid = json_integer_value(pNodeEdgeTarget);
+		// Source Id
+		const std::string & strSourceId = pEdge->getMetaData("source_id");
+		unsigned int iSourceId = atoi(strSourceId.c_str());
 
-			// Directed
-			json_t * pNodeEdgeDirected = json_object_get(pNode, "directed");
-			assert(json_is_true(pNodeEdgeDirected));
+		// Target Id
+		const std::string & strTargetId = pEdge->getMetaData("target_id");
+		unsigned int iTargetId = atoi(strTargetId.c_str());
 
-			// Metadata
-			json_t * pNodeEdgeMetada = json_object_get(pNode, "metadata");
-			assert(nullptr != pNodeEdgeMetada);
+		// Create Edge
+		GraphicsNode * pGraphicsSourceNode = mapUID[source_uid];
+		assert(nullptr != pGraphicsSourceNode);
 
-			json_t * pNodeEdgeSourceId = json_object_get(pNodeEdgeMetada, "source_id");
-			assert(nullptr != pNodeEdgeSourceId);
+		GraphicsNode * pGraphicsTargetNode = mapUID[target_uid];
+		assert(nullptr != pGraphicsTargetNode);
 
-			json_t * pNodeEdgeTargetId = json_object_get(pNodeEdgeMetada, "target_id");
-			assert(nullptr != pNodeEdgeTargetId);
+		GraphicsDirectedEdge * e = new GraphicsBezierEdge();
+		e->connect(pGraphicsSourceNode, iSourceId, pGraphicsTargetNode, iTargetId);
 
-			// Create Edge
-			GraphicsNode * pSourceNode = mapUID[source_uid];
-			assert(nullptr != pSourceNode);
-
-			GraphicsNode * pTargetNode = mapUID[target_uid];
-			assert(nullptr != pTargetNode);
-
-			GraphicsDirectedEdge * pEdge = new GraphicsBezierEdge();
-			pEdge->connect(pSourceNode, json_integer_value(pNodeEdgeSourceId), pTargetNode, json_integer_value(pNodeEdgeTargetId));
-
-			m_pScene->addItem(pEdge);
-		}
+		m_pScene->addItem(e);
 	}
 
 	return(true);
