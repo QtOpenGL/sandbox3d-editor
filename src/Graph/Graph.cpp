@@ -3,6 +3,8 @@
 #include "Node.h"
 #include "Edge.h"
 
+#include <algorithm>
+
 #include <jansson.h>
 
 #include <assert.h>
@@ -360,6 +362,44 @@ Node * Graph::findNode(const std::string & id)
 }
 
 /**
+ * @brief Graph::getEdgeTo
+ * @param node
+ * @param outEdges
+ * @return
+ */
+bool Graph::getEdgeTo(Node * node, std::vector<Edge*> & outEdges) const
+{
+	for (Edge * edge : edges)
+	{
+		if (edge->getTarget() == node)
+		{
+			outEdges.push_back(edge);
+		}
+	}
+
+	return(true);
+}
+
+/**
+ * @brief Graph::getEdgeFrom
+ * @param node
+ * @param outEdges
+ * @return
+ */
+bool Graph::getEdgeFrom(Node * node, std::vector<Edge*> & outEdges) const
+{
+	for (Edge * edge : edges)
+	{
+		if (edge->getSource() == node)
+		{
+			outEdges.push_back(edge);
+		}
+	}
+
+	return(true);
+}
+
+/**
  * @brief Graph::setDirected
  * @param bDirected
  */
@@ -402,6 +442,34 @@ void Graph::addNode(Node * pNode)
 void Graph::addEdge(Edge * pEdge)
 {
 	edges.push_back(pEdge);
+}
+
+/**
+ * @brief Graph::removeNode
+ * @param pNode
+ */
+void Graph::removeNode(Node * pNode)
+{
+	std::vector<Node*>::iterator it = std::find(nodes.begin(), nodes.end(), pNode);
+
+	if (it != nodes.end())
+	{
+		nodes.erase(it);
+	}
+}
+
+/**
+ * @brief Graph::removeEdge
+ * @param pEdge
+ */
+void Graph::removeEdge(Edge * pEdge)
+{
+	std::vector<Edge*>::iterator it = std::find(edges.begin(), edges.end(), pEdge);
+
+	if (it != edges.end())
+	{
+		edges.erase(it);
+	}
 }
 
 /**

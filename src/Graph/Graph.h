@@ -20,6 +20,8 @@ public:
 	bool saveToFile(const std::string & filename);
 
 	Node * findNode(const std::string & id);
+	bool getEdgeTo(Node * node, std::vector<Edge*> & outEdges) const;
+	bool getEdgeFrom(Node * node, std::vector<Edge*> & outEdges) const;
 
 	//
 	// Setters
@@ -29,6 +31,9 @@ public:
 
 	void						addNode			(Node * pNode);
 	void						addEdge			(Edge * pEdge);
+
+	void						removeNode		(Node * pNode);
+	void						removeEdge		(Edge * pEdge);
 
 	//
 	// Getters
