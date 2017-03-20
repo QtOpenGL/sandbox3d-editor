@@ -38,6 +38,66 @@
 #define SCENE_SIZE_X 20000.0
 #define SCENE_SIZE_Y 20000.0
 
+const char * GLenumToString(unsigned int e)
+{
+	switch(e)
+	{
+		case GL_R8: return("GL_R8"); break;
+		case GL_RG8: return("GL_RG8"); break;
+		case GL_RGBA8: return("GL_RGBA8"); break;
+
+		case GL_R16: return("GL_R16"); break;
+		case GL_RG16: return("GL_RG16"); break;
+		case GL_RGBA16: return("GL_RGBA16"); break;
+
+		case GL_R16F: return("GL_R16F"); break;
+		case GL_RG16F: return("GL_RG16F"); break;
+		case GL_RGBA16F: return("GL_RGBA16F"); break;
+
+		case GL_R32F: return("GL_R32F"); break;
+		case GL_RG32F: return("GL_RG32F"); break;
+		case GL_RGBA32F: return("GL_RGBA32F"); break;
+
+		case GL_R8I: return("GL_R8I"); break;
+		case GL_RG8I: return("GL_RG8I"); break;
+		case GL_RGBA8I: return("GL_RGBA8I"); break;
+
+		case GL_R16I: return("GL_R16I"); break;
+		case GL_RG16I: return("GL_RG16I"); break;
+		case GL_RGBA16I: return("GL_RGBA16I"); break;
+
+		case GL_R32I: return("GL_R32I"); break;
+		case GL_RG32I: return("GL_RG32I"); break;
+		case GL_RGBA32I: return("GL_RGBA32I"); break;
+
+		case GL_R8UI: return("GL_R8UI"); break;
+		case GL_RG8UI: return("GL_RG8UI"); break;
+		case GL_RGBA8UI: return("GL_RGBA8UI"); break;
+
+		case GL_R16UI: return("GL_R16UI"); break;
+		case GL_RG16UI: return("GL_RG16UI"); break;
+		case GL_RGBA16UI: return("GL_RGBA16UI"); break;
+
+		case GL_R32UI: return("GL_R32UI"); break;
+		case GL_RG32UI: return("GL_RG32UI"); break;
+		case GL_RGBA32UI: return("GL_RGBA32UI"); break;
+
+		case GL_RGB10_A2: return("GL_RGB10_A2"); break;
+		case GL_RGB10_A2UI: return("GL_RGB10_A2UI"); break;
+		case GL_R11F_G11F_B10F: return("GL_R11F_G11F_B10F"); break;
+		case GL_SRGB8_ALPHA8: return("GL_SRGB8_ALPHA8"); break;
+
+		case GL_DEPTH_COMPONENT16: return("GL_DEPTH_COMPONENT16"); break;
+		case GL_DEPTH_COMPONENT24: return("GL_DEPTH_COMPONENT24"); break;
+		case GL_DEPTH_COMPONENT32F: return("GL_DEPTH_COMPONENT32F"); break;
+		case GL_DEPTH24_STENCIL8: return("GL_DEPTH24_STENCIL8"); break;
+		case GL_DEPTH32F_STENCIL8: return("GL_DEPTH32F_STENCIL8"); break;
+		case GL_STENCIL_INDEX8: return("GL_STENCIL_INDEX8"); break;
+	}
+
+	return("");
+}
+
 class GraphicsNodeTexture : public GraphicsNode
 {
 public:
@@ -334,13 +394,12 @@ bool NodeEditorWindow::loadGraph(void)
 }
 
 /**
- * @brief NodeEditorWindow::saveGraph
+ * @brief NodeEditorWindow::createGraph
+ * @param G
  * @return
  */
-bool NodeEditorWindow::saveGraph(void)
+bool NodeEditorWindow::createGraph(Graph & G)
 {
-	Graph G;
-
 	G.setType("RenderGraph");
 	G.setLabel("Unnamed Render Graph");
 
@@ -371,11 +430,11 @@ bool NodeEditorWindow::saveGraph(void)
 
 				if (strNodeType == "operation")
 				{
-					pNode->addMetaData("subtype", m_mapNode[pNodeItem]->identifier.c_str());
+					pNode->addMetaData("subtype", m_mapOperationNodes[pNodeItem]->identifier.c_str());
 				}
 				else if (strNodeType == "texture")
 				{
-					pNode->addMetaData("format", "0");
+					pNode->addMetaData("format", GLenumToString(m_mapTextureNodes[pNodeItem]));
 				}
 
 				char szPosX [16];
@@ -411,7 +470,7 @@ bool NodeEditorWindow::saveGraph(void)
 				Node * pNodeTarget = mapUID[uintptr_t(pEdgeItem->getSink()->parentItem())];
 				assert(nullptr != pNodeTarget);
 
-				Edge * pEdge = new Edge(pNodeSource, pNodeTarget); // FIXME
+				Edge * pEdge = new Edge(pNodeSource, pNodeTarget);
 				assert(nullptr != pEdge);
 				G.addEdge(pEdge);
 
@@ -434,7 +493,7 @@ bool NodeEditorWindow::saveGraph(void)
 		}
 	}
 
-	return(G.saveToFile(GRAPH_FILE_PATH));
+	return(true);
 }
 
 /**
@@ -483,7 +542,7 @@ GraphicsNode * NodeEditorWindow::createOperationNode(const NodeDescriptor & desc
 
 	m_pScene->addItem(n);
 
-	m_mapNode.insert(std::pair<const GraphicsNode*, const NodeDescriptor*>(n, &desc));
+	m_mapOperationNodes.insert(std::pair<const GraphicsNode*, const NodeDescriptor*>(n, &desc));
 	m_mapNodeType.insert(std::pair<const GraphicsNode*, std::string>(n, "operation"));
 
 	return(n);
@@ -511,7 +570,7 @@ GraphicsNode * NodeEditorWindow::createTextureNode(unsigned int format, unsigned
 
 	m_pScene->addItem(n);
 
-	//m_mapNode.insert(std::pair<const GraphicsNode*, const NodeDescriptor*>(n, &desc));
+	m_mapTextureNodes.insert(std::pair<const GraphicsNode*, unsigned int>(n, format));
 	m_mapNodeType.insert(std::pair<const GraphicsNode*, std::string>(n, "texture"));
 
 	return(n);
@@ -530,7 +589,14 @@ void NodeEditorWindow::onSceneFrameSwapped(void)
  */
 void NodeEditorWindow::on_actionSave_triggered(void)
 {
-	saveGraph();
+	Graph G;
+
+	createGraph(G);
+
+	if (G.saveToFile(GRAPH_FILE_PATH))
+	{
+		emit graphSaved(G);
+	}
 }
 
 /**
