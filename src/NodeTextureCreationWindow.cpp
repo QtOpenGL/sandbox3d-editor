@@ -85,5 +85,5 @@ NodeTextureCreationWindow::~NodeTextureCreationWindow()
  */
 unsigned int NodeTextureCreationWindow::getCurrentFormat(void) const
 {
-	return(0);
+	return(ui->comboBox->currentData().toUInt());
 }
