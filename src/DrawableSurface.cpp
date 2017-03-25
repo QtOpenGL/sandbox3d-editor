@@ -21,9 +21,10 @@
 
 #define ASSIMP_MAT4X4(m) mat4x4(m.a1, m.a2, m.a3, m.a4, m.b1, m.b2, m.b3, m.b4, m.c1, m.c2, m.c3, m.c4, m.d1, m.d2, m.d3, m.d4);
 
-
 #define _min(x, y) ((x < y) ? x : y)
 #define _max(x, y) ((x > y) ? x : y)
+
+Rendering * g_pRendering = nullptr; // ugly but needed for now
 
 /**
  * @brief Constructor
@@ -43,6 +44,8 @@ DrawableSurface::DrawableSurface(QWidget *parent)
 	connect(this, &QOpenGLWidget::resized, this, &DrawableSurface::onResized);
 	connect(this, &QOpenGLWidget::frameSwapped, this, &DrawableSurface::onFrameSwapped);
 #endif // (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+
+	g_pRendering = &m_renderer;
 }
 
 /**
@@ -84,7 +87,9 @@ void DrawableSurface::initializeGL(void)
 
 	m_pSpecial = new GPU::Buffer<GL_PIXEL_UNPACK_BUFFER>();
 
-	m_renderer.onInitializeComplete();
+	m_renderer.onReady();
+
+	m_renderer.initQueue("/tmp/render.xml");
 }
 
 /**

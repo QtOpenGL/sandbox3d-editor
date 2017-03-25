@@ -11,6 +11,8 @@ class QFileSystemWatcher;
 
 class DrawableSurface;
 
+class Graph;
+
 namespace Ui {
 	class MainWindow;
 }
@@ -58,5 +60,8 @@ private slots:
 	void on_actionNode_Editor_triggered();
 
 	void on_actionResetCamera_triggered();
+
+	void onGraphLoaded(const Graph & graph);
+	void onGraphSaved(const Graph & graph);
 
 };

@@ -97,6 +97,7 @@ public slots:
 
 signals:
 
+	void graphLoaded(const Graph & graph);
 	void graphSaved(const Graph & graph);
 
 };

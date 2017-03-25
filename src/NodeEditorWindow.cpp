@@ -38,6 +38,8 @@
 #define SCENE_SIZE_X 20000.0
 #define SCENE_SIZE_Y 20000.0
 
+#include "Rendering/StrToGL.h"
+
 const char * GLenumToString(unsigned int e)
 {
 	switch(e)
@@ -102,7 +104,7 @@ class GraphicsNodeTexture : public GraphicsNode
 {
 public:
 
-	GraphicsNodeTexture(QGraphicsItem *parent = nullptr) : GraphicsNode(parent)
+	GraphicsNodeTexture(QGraphicsItem *parent = nullptr) : GraphicsNode(parent), texture(0)
 	{
 		_title_item->hide();
 	}
@@ -115,7 +117,7 @@ public:
 		// MUST use old OpenGL because it seems that QGraphicsView does NOT support OpenGL > 3
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-		glBindTexture(GL_TEXTURE_2D, 3);
+		glBindTexture(GL_TEXTURE_2D, texture);
 		glBegin(GL_QUADS);
 		glTexCoord2d(0.0,1.0); glVertex2d(0, 0);
 		glTexCoord2d(1.0,1.0); glVertex2d(_width, 0);
@@ -130,6 +132,7 @@ public:
 		painter->drawRect(QRectF(0.0f, 0.0f, _width, _height));
 	}
 
+	GLuint texture;
 };
 
 /**
@@ -200,11 +203,18 @@ NodeEditorWindow::NodeEditorWindow(MainWindow * pMainWindow)
 	connect(m_pNodeTextureCreationWindow, SIGNAL(accepted()), this, SLOT(createTextureNodeFromDialog()));
 
 	// Load current Render Graph
-	if (!loadGraph())
 	{
-		createPresentNode();
+		if (loadGraph())
+		{
+			Graph G;
+			createGraph(G);
+			emit graphLoaded(G);
+		}
+		else
+		{
+			createPresentNode();
+		}
 	}
-
 	connect(pMainWindow->m_pDrawable, &QOpenGLWidget::frameSwapped, this, &NodeEditorWindow::onSceneFrameSwapped);
 }
 
@@ -339,7 +349,7 @@ bool NodeEditorWindow::loadGraph(void)
 		else if ("texture" == strType)
 		{
 			const std::string & strFormat = pNode->getMetaData("format");
-			int iFormat = atoi(strFormat.c_str());
+			unsigned int iFormat = strToFormat(strFormat.c_str());
 
 			n = createTextureNode(iFormat, 1024, 1024);
 		}
@@ -596,6 +606,44 @@ void NodeEditorWindow::on_actionSave_triggered(void)
 	if (G.saveToFile(GRAPH_FILE_PATH))
 	{
 		emit graphSaved(G);
+
+		extern  Rendering * g_pRendering;
+
+		QList<QGraphicsItem*> items = m_pScene->items();
+
+		for (QGraphicsItem * item : items)
+		{
+			switch (item->type())
+			{
+				case GraphicsNodeItemTypes::TypeNode:
+				{
+					GraphicsNode * pNodeItem = static_cast<GraphicsNode*>(item);
+					assert(nullptr != pNodeItem);
+
+					std::string & strNodeType = m_mapNodeType[pNodeItem];
+
+					if (strNodeType == "texture")
+					{
+						GraphicsNodeTexture * pNodeTextureItem = (GraphicsNodeTexture*)pNodeItem;
+
+						char szId [16];
+						sprintf(szId, "%lld", uintptr_t(pNodeItem));
+
+						const GPU::Texture<GL_TEXTURE_2D> * pTexture = g_pRendering->GetRenderTexture(szId);
+
+						if (pTexture)
+						{
+							pNodeTextureItem->texture = pTexture->GetObject();
+						}
+						else
+						{
+							pNodeTextureItem->texture = 0;
+						}
+					}
+				}
+				break;
+			}
+		}
 	}
 }
 

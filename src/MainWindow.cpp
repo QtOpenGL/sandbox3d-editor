@@ -2,6 +2,7 @@
 #include "ui_MainWindow.h"
 
 #include "DrawableSurface.h"
+#include "SerializeGraph.h"
 
 #include <QSettings>
 #include <QDockWidget>
@@ -62,6 +63,8 @@ MainWindow::MainWindow(QWidget * pParent)
 
 	{
 		m_pNodeEditorWindow = new NodeEditorWindow(this);
+		connect(m_pNodeEditorWindow, SIGNAL(graphSaved(const Graph &)), this, SLOT(onGraphSaved(const Graph &)));
+		connect(m_pNodeEditorWindow, SIGNAL(graphLoaded(const Graph &)), this, SLOT(onGraphLoaded(const Graph &)));
 	}
 
 	QSettings settings;
@@ -180,4 +183,24 @@ void MainWindow::on_actionNode_Editor_triggered()
 void MainWindow::on_actionResetCamera_triggered()
 {
 	static_cast<DrawableSurface*>(m_pDrawable)->ResetCamera();
+}
+
+/**
+ * @brief MainWindow::onGraphLoaded
+ */
+void MainWindow::onGraphLoaded(const Graph & graph)
+{
+	SerializeGraph(graph, m_pNodeEditorWindow->m_aNodeDescriptors);
+	m_pDrawable->m_renderer.initQueue("/tmp/render.xml");
+	m_pDrawable->update();
+}
+
+/**
+ * @brief MainWindow::onGraphSaved
+ */
+void MainWindow::onGraphSaved(const Graph & graph)
+{
+	SerializeGraph(graph, m_pNodeEditorWindow->m_aNodeDescriptors);
+	m_pDrawable->m_renderer.initQueue("/tmp/render.xml");
+	m_pDrawable->update();
 }
