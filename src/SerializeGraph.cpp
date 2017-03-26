@@ -8,6 +8,8 @@
 
 #include <assert.h>
 
+#define SERIALIZE_FOR_QT 1
+
 static void createGraphAlias(const Graph & graph, Graph & outGraph)
 {
 //	outGraph.setDirected(graph.isDirected());
@@ -72,7 +74,7 @@ static bool ApplyTopologicalOrdering(const Graph & graph, std::vector<Node*> & L
 	return(true);
 }
 
-bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & descriptors)
+bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & descriptors, std::string & strFinalTextureId)
 {
 	FILE * f = fopen("/tmp/render.xml", "w");
 
@@ -127,6 +129,8 @@ bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & des
 
 	Node * pDefaultFramebuffer = edges[0]->getSource();
 
+	strFinalTextureId = pDefaultFramebuffer->getId();
+
 	// ----------------------------------------------------------------------------------------
 
 	std::map<Node*, int> mapNodeFB;
@@ -143,7 +147,9 @@ bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & des
 
 	for (Node * node : aNodesTexture)
 	{
+#if !SERIALIZE_FOR_QT
 		if (node != pDefaultFramebuffer)
+#endif // !SERIALIZE_FOR_QT
 		{
 			fprintf(f, "\t\t<texture name=\"%s\" format=\"%s\" />\n", node->getId().c_str(), node->getMetaData("format").c_str());
 		}
@@ -162,10 +168,11 @@ bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & des
 	{
 		if (node->getType() == "operation")
 		{
-			bool bDefaultFB = true;
-
 			std::vector<Edge*> outEdges;
 			graph.getEdgeFrom(node, outEdges);
+
+#if !SERIALIZE_FOR_QT
+			bool bDefaultFB = true;
 
 			for (Edge * edge : outEdges)
 			{
@@ -182,6 +189,7 @@ bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & des
 				mapNodeFB[node] = 0;
 			}
 			else
+#endif // !SERIALIZE_FOR_QT
 			{
 				fprintf(f, "\t\t<framebuffer name=\"%d\">\n", id);
 
@@ -216,11 +224,13 @@ bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & des
 
 			int fbId = mapNodeFB[node];
 
+#if !SERIALIZE_FOR_QT
 			if (0 == fbId)
 			{
 				fprintf(f, "\t\t<element type=\"%s\" framebuffer=\"default\">\n", strSubType.c_str());
 			}
 			else
+#endif // !SERIALIZE_FOR_QT
 			{
 				fprintf(f, "\t\t<element type=\"%s\" framebuffer=\"%d\">\n", strSubType.c_str(), fbId);
 			}

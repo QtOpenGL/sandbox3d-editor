@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget * pParent)
 	}
 
 	{
-		m_pEnvSettingsWidget = new EnvSettingsWidget(this, m_pDrawable->m_renderer.environment);
+	//	m_pEnvSettingsWidget = new EnvSettingsWidget(this, m_pDrawable->m_renderer.environment);
 	}
 
 	{
@@ -190,8 +190,10 @@ void MainWindow::on_actionResetCamera_triggered()
  */
 void MainWindow::onGraphLoaded(const Graph & graph)
 {
-	SerializeGraph(graph, m_pNodeEditorWindow->m_aNodeDescriptors);
+	std::string strFinalTextureId;
+	SerializeGraph(graph, m_pNodeEditorWindow->m_aNodeDescriptors, strFinalTextureId);
 	m_pDrawable->m_renderer.initQueue("/tmp/render.xml");
+	m_pDrawable->setCurrentTexture(strFinalTextureId);
 	m_pDrawable->update();
 }
 
@@ -200,7 +202,9 @@ void MainWindow::onGraphLoaded(const Graph & graph)
  */
 void MainWindow::onGraphSaved(const Graph & graph)
 {
-	SerializeGraph(graph, m_pNodeEditorWindow->m_aNodeDescriptors);
+	std::string strFinalTextureId;
+	SerializeGraph(graph, m_pNodeEditorWindow->m_aNodeDescriptors, strFinalTextureId);
 	m_pDrawable->m_renderer.initQueue("/tmp/render.xml");
+	m_pDrawable->setCurrentTexture(strFinalTextureId);
 	m_pDrawable->update();
 }

@@ -36,6 +36,8 @@ public:
 
 	void	ResetCamera			(void);
 
+	void	setCurrentTexture	(const std::string & strFinalTextureId);
+
 protected:
 
 	void	initializeGL		(void);
@@ -91,6 +93,8 @@ private:
 	std::vector<Mesh*> m_apMeshes;
 
 	Mesh::Instance * m_pSelectedObject;
+
+	const GPU::Texture<GL_TEXTURE_2D> * m_pCurrentTexture;
 
 public:
 

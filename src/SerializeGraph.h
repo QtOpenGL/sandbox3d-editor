@@ -4,4 +4,4 @@
 
 class Graph;
 
-bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & descriptors);
+bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & descriptors, std::string & strFinalTextureId);

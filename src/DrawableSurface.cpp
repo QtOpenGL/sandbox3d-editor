@@ -9,6 +9,8 @@
 
 #include <QGLWidget> // for convertToGLFormat
 
+#include "QOpenGLResourceManager.h"
+
 #include <QDebug>
 
 #include <assimp/Importer.hpp>
@@ -37,6 +39,7 @@ DrawableSurface::DrawableSurface(QWidget *parent)
 , m_vClearColor(0.0f, 0.0f, 0.0f, 0.0f)
 , m_vAmbientColor(0.0f, 0.0f, 0.0f, 0.0f)
 , m_pSelectedObject(nullptr)
+, m_pCurrentTexture(nullptr)
 {
 	setAutoFillBackground(false);
 	setFocusPolicy(Qt::StrongFocus);
@@ -66,10 +69,21 @@ void DrawableSurface::ResetCamera(void)
 }
 
 /**
+ * @brief DrawableSurface::setCurrentTexture
+ * @param strFinalTextureId
+ */
+void DrawableSurface::setCurrentTexture(const std::string & strFinalTextureId)
+{
+	m_pCurrentTexture = m_renderer.GetRenderTexture(strFinalTextureId.c_str());
+}
+
+/**
  * @brief initializeGL
  */
 void DrawableSurface::initializeGL(void)
 {
+	QOpenGLResourceManager::instance().init();
+
 	GLint v;
 	glGetIntegerv(GL_CONTEXT_FLAGS, &v);
 	//assert (v & GL_CONTEXT_FLAG_DEBUG_BIT);
@@ -131,6 +145,24 @@ void DrawableSurface::paintGL(void)
 	glGetQueryObjectuiv(m_query, GL_QUERY_RESULT, &elapsed_time);
 
 	static_cast<MainWindow*>(parent())->SetRenderTime(t.getElapsedTimeInMs(), elapsed_time / 1000000.0);
+
+	if (m_pCurrentTexture)
+	{
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+		glDisable(GL_BLEND);
+
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, defaultFramebufferObject());
+
+		QOpenGLResourceManager & manager = QOpenGLResourceManager::instance();
+
+		manager.bindQuadResources();
+
+		glBindTexture(GL_TEXTURE_2D, m_pCurrentTexture->GetObject());
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		manager.unbindQuadResources();
+	}
 }
 
 /**
