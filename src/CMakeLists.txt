@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.12)
 
 INCLUDE(CheckIncludeFiles)
 
-file(GLOB_RECURSE UI_FILES ../ui/*.ui)
+file(GLOB_RECURSE UI_FILES ../resources/ui/*.ui)
 file(GLOB_RECURSE SRC_FILES *.cpp *.h *.inl ../include/*.h ../include/*.inl)
 
 # Qt
