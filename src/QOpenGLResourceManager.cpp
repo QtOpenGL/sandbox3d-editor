@@ -97,6 +97,8 @@ void QOpenGLResourceManager::release(void)
  */
 void QOpenGLResourceManager::initShaders(void)
 {
+	Q_INIT_RESOURCE(shaders);
+
 	//
 	// Create Bounding Box Shader
 	{
