@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8.12)
 
 INCLUDE(CheckIncludeFiles)
 
-file(GLOB_RECURSE RC_FILES ../*.qrc)
 file(GLOB_RECURSE UI_FILES ../ui/*.ui)
 file(GLOB_RECURSE SRC_FILES *.cpp *.h *.inl ../include/*.h ../include/*.inl)
 
@@ -35,6 +34,6 @@ find_package(assimp REQUIRED)
 find_library(JANSSON_LIBRARY jansson)
 
 # Compile application
-add_executable(${PROJECT_NAME} ${SRC_FILES} ${UI_FILES} ${RC_FILES})
+add_executable(${PROJECT_NAME} ${SRC_FILES} ${UI_FILES})
 
-target_link_libraries(${PROJECT_NAME} Sandbox3D ${assimp_LIBRARIES} ${JANSSON_LIBRARY} Qt5::Core Qt5::Widgets Qt5::Gui Qt5::OpenGL Qt5NodeEditor)
+target_link_libraries(${PROJECT_NAME} sandbox_resources Sandbox3D ${assimp_LIBRARIES} ${JANSSON_LIBRARY} Qt5::Core Qt5::Widgets Qt5::Gui Qt5::OpenGL Qt5NodeEditor)
