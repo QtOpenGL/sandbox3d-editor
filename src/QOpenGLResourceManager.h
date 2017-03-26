@@ -20,12 +20,22 @@ public:
 	void			bindQuadResources	(void);
 	void			unbindQuadResources	(void);
 
+protected:
+
+	void			initShaders			(void);
+
 private:
 
 	static QOpenGLResourceManager instance_;
 
-	// for quad rendering
-	QOpenGLBuffer				m_vertexBufferQuad;
+	// shared vertex buffer
+	QOpenGLBuffer				m_sharedVertexBuffer;
+
+	// Quad Rendering
 	QOpenGLVertexArrayObject	m_vertexArrayQuad;
 	QOpenGLShaderProgram *		m_pShaderQuad;
+
+	// Bounding Box Rendering
+	QOpenGLVertexArrayObject	m_vertexArrayBbox;
+	QOpenGLShaderProgram *		m_pShaderBbox;
 };

@@ -12,15 +12,15 @@ QOpenGLResourceManager & QOpenGLResourceManager::instance(void)
 }
 
 /**
- * @brief QOpenGLResourceManager::QOpenGLResourceManager
+ * @brief Constructor
  */
-QOpenGLResourceManager::QOpenGLResourceManager(void) : m_vertexBufferQuad(QOpenGLBuffer::VertexBuffer)
+QOpenGLResourceManager::QOpenGLResourceManager(void) : m_sharedVertexBuffer(QOpenGLBuffer::VertexBuffer)
 {
 	// ...
 }
 
 /**
- * @brief QOpenGLResourceManager::~QOpenGLResourceManager
+ * @brief Destructor
  */
 QOpenGLResourceManager::~QOpenGLResourceManager(void)
 {
@@ -28,11 +28,13 @@ QOpenGLResourceManager::~QOpenGLResourceManager(void)
 }
 
 /**
- * @brief QOpenGLResourceManager::init
+ * @brief Initialize resources
  * @return
  */
 bool QOpenGLResourceManager::init(void)
 {
+	initShaders();
+
 	static const float points [] =
 	{
 		-1.0f, -1.0f, /* | */ 0.0f, 0.0f,
@@ -41,49 +43,85 @@ bool QOpenGLResourceManager::init(void)
 		 1.0f,  1.0f, /* | */ 1.0f, 1.0f,
 	};
 
-	// Create Shader
-	m_pShaderQuad = new QOpenGLShaderProgram();
-	bool bCompiledVS = m_pShaderQuad->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/simple.vert");
-	Q_ASSERT(bCompiledVS);
-    bool bCompiledFS = m_pShaderQuad->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/simple.frag");
-	Q_ASSERT(bCompiledFS);
-    bool bLinked = m_pShaderQuad->link();
-	Q_ASSERT(bLinked);
-	m_pShaderQuad->bind();
+	//
+	// Create Shared Vertex Buffer
+	m_sharedVertexBuffer.create();
+    m_sharedVertexBuffer.bind();
+    m_sharedVertexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    m_sharedVertexBuffer.allocate(points, sizeof(points));
 
-	// Create Vertex Buffer
-	m_vertexBufferQuad.create();
-    m_vertexBufferQuad.bind();
-    m_vertexBufferQuad.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    m_vertexBufferQuad.allocate(points, sizeof(points));
+	//
+	// Create VAO
+	m_vertexArrayQuad.create();
+	m_vertexArrayBbox.create();
 
-	// Create Vertex Array Object
-    m_vertexArrayQuad.create();
-    m_vertexArrayQuad.bind();
+	//
+	// Setup Quad Inputs
+	{
+		m_pShaderQuad->bind();
+		m_vertexArrayQuad.bind();
 
-	// Setup Shader
-	m_pShaderQuad->enableAttributeArray(0);
-	m_pShaderQuad->enableAttributeArray(1);
-	m_pShaderQuad->setAttributeBuffer(0, GL_FLOAT, 0, 2, 4 * sizeof(float));
-	m_pShaderQuad->setAttributeBuffer(1, GL_FLOAT, 2 * sizeof(float), 2, 4 * sizeof(float));
+		m_pShaderQuad->enableAttributeArray(0);
+		m_pShaderQuad->enableAttributeArray(1);
+		m_pShaderQuad->setAttributeBuffer(0, GL_FLOAT, 0, 2, 4 * sizeof(float));
+		m_pShaderQuad->setAttributeBuffer(1, GL_FLOAT, 2 * sizeof(float), 2, 4 * sizeof(float));
 
-	// Unbind everything
-	m_vertexArrayQuad.release();
-	m_vertexBufferQuad.release();
-	m_pShaderQuad->release();
+		m_vertexArrayQuad.release();
+		m_pShaderQuad->release();
+	}
+
+	m_sharedVertexBuffer.release();
 
 	return(true);
 }
 
 /**
- * @brief QOpenGLResourceManager::release
+ * @brief Release resources
  */
 void QOpenGLResourceManager::release(void)
 {
+	m_vertexArrayBbox.destroy();
 	m_vertexArrayQuad.destroy();
-	m_vertexBufferQuad.destroy();
+
+	m_sharedVertexBuffer.destroy();
+
 	delete m_pShaderQuad;
 	m_pShaderQuad = nullptr;
+
+	delete m_pShaderBbox;
+	m_pShaderBbox = nullptr;
+}
+
+/**
+ * @brief QOpenGLResourceManager::initShaders
+ */
+void QOpenGLResourceManager::initShaders(void)
+{
+	//
+	// Create Bounding Box Shader
+	{
+		m_pShaderBbox = new QOpenGLShaderProgram();
+		bool bCompiledVS = m_pShaderBbox->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/bbox.vert");
+		Q_ASSERT(bCompiledVS);
+		bool bCompiledGS = m_pShaderBbox->addShaderFromSourceFile(QOpenGLShader::Geometry, ":/shaders/bbox.geom");
+		Q_ASSERT(bCompiledGS);
+		bool bCompiledFS = m_pShaderBbox->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/bbox.frag");
+		Q_ASSERT(bCompiledFS);
+		bool bLinked = m_pShaderBbox->link();
+		Q_ASSERT(bLinked);
+	}
+
+	//
+	// Create Quad Shader
+	{
+		m_pShaderQuad = new QOpenGLShaderProgram();
+		bool bCompiledVS = m_pShaderQuad->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/simple.vert");
+		Q_ASSERT(bCompiledVS);
+		bool bCompiledFS = m_pShaderQuad->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/simple.frag");
+		Q_ASSERT(bCompiledFS);
+		bool bLinked = m_pShaderQuad->link();
+		Q_ASSERT(bLinked);
+	}
 }
 
 /**
