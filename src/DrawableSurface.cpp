@@ -496,11 +496,14 @@ void DrawableSurface::addMeshRecursive(const aiNode * nd, const mat4x4 & parentT
 		m->m_BoundingBox.max.z = _max(m->m_BoundingBox.max.z, offset.m_vMax.z);
 	}
 
-	m->m_BoundingSphere.center.x = m->m_BoundingBox.max.x - m->m_BoundingBox.min.x;
-	m->m_BoundingSphere.center.y = m->m_BoundingBox.max.y - m->m_BoundingBox.min.y;
-	m->m_BoundingSphere.center.z = m->m_BoundingBox.max.z - m->m_BoundingBox.min.z;
+	if (nd->mNumMeshes > 0)
+	{
+		m->m_BoundingSphere.center.x = (m->m_BoundingBox.max.x - m->m_BoundingBox.min.x) * 0.5f;
+		m->m_BoundingSphere.center.y = (m->m_BoundingBox.max.y - m->m_BoundingBox.min.y) * 0.5f;
+		m->m_BoundingSphere.center.z = (m->m_BoundingBox.max.z - m->m_BoundingBox.min.z) * 0.5f;
 
-	m->m_BoundingSphere.radius = _max(distance(m->m_BoundingSphere.center, m->m_BoundingBox.min), distance(m->m_BoundingSphere.center, m->m_BoundingBox.max));
+		m->m_BoundingSphere.radius = _max(distance(m->m_BoundingSphere.center, m->m_BoundingBox.min), distance(m->m_BoundingSphere.center, m->m_BoundingBox.max));
+	}
 
 	Object instance(m);
 
