@@ -130,7 +130,7 @@ void DrawableSurface::paintGL(void)
 
 	t.Start();
 	{
-		m_renderer.onUpdate(matView, m_vClearColor, m_pSelectedObject);
+		m_renderer.onUpdate(matView, m_vClearColor);
 	}
 	t.Stop();
 
