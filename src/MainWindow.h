@@ -26,6 +26,8 @@ public:
 	explicit	MainWindow		(QWidget * parent = 0);
 	virtual		~MainWindow		(void);
 
+	void		init			(void);
+
 	void		closeEvent		(QCloseEvent * event);
 
 	void		SetRenderTime	(double cpu_time, double gpu_time);

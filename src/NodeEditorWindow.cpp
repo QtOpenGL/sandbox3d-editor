@@ -202,20 +202,22 @@ NodeEditorWindow::NodeEditorWindow(MainWindow * pMainWindow)
 	connect(m_pNodeOperationCreationWindow, SIGNAL(accepted()), this, SLOT(createOperationNodeFromDialog()));
 	connect(m_pNodeTextureCreationWindow, SIGNAL(accepted()), this, SLOT(createTextureNodeFromDialog()));
 
-	// Load current Render Graph
+	connect(pMainWindow->m_pDrawable, &QOpenGLWidget::frameSwapped, this, &NodeEditorWindow::onSceneFrameSwapped);
+
+	QSettings settings;
 	{
-		if (loadGraph())
+		QVariant posVariant = settings.value("nodeWindowPos");
+		if (!posVariant.isNull())
 		{
-			Graph G;
-			createGraph(G);
-			emit graphLoaded(G);
+			move(posVariant.toPoint());
 		}
-		else
+
+		QVariant sizeVariant = settings.value("nodeWindowSize");
+		if (!sizeVariant.isNull())
 		{
-			createPresentNode();
+			resize(sizeVariant.toSize());
 		}
 	}
-	connect(pMainWindow->m_pDrawable, &QOpenGLWidget::frameSwapped, this, &NodeEditorWindow::onSceneFrameSwapped);
 }
 
 /**
@@ -227,12 +229,40 @@ NodeEditorWindow::~NodeEditorWindow(void)
 }
 
 /**
+ * @brief NodeEditorWindow::init
+ */
+void NodeEditorWindow::init(void)
+{
+	// Load current Render Graph
+	{
+		if (loadGraph())
+		{
+			Graph G;
+			createGraph(G);
+			emit graphLoaded(G);
+
+			updateTextures();
+		}
+		else
+		{
+			createPresentNode();
+		}
+	}
+
+	QDialog::show();
+}
+
+/**
  * @brief NodeEditorWindow::closeEvent
  * @param event
  */
 void NodeEditorWindow::closeEvent(QCloseEvent * pEvent)
 {
-	// nothing here
+	(void)pEvent;
+
+	QSettings settings;
+	settings.setValue("nodeWindowPos", pos());
+	settings.setValue("nodeWindowSize", size());
 }
 
 /**
@@ -607,43 +637,7 @@ void NodeEditorWindow::on_actionSave_triggered(void)
 	{
 		emit graphSaved(G);
 
-		extern  Rendering * g_pRendering;
-
-		QList<QGraphicsItem*> items = m_pScene->items();
-
-		for (QGraphicsItem * item : items)
-		{
-			switch (item->type())
-			{
-				case GraphicsNodeItemTypes::TypeNode:
-				{
-					GraphicsNode * pNodeItem = static_cast<GraphicsNode*>(item);
-					assert(nullptr != pNodeItem);
-
-					std::string & strNodeType = m_mapNodeType[pNodeItem];
-
-					if (strNodeType == "texture")
-					{
-						GraphicsNodeTexture * pNodeTextureItem = (GraphicsNodeTexture*)pNodeItem;
-
-						char szId [16];
-						sprintf(szId, "%lld", uintptr_t(pNodeItem));
-
-						const GPU::Texture<GL_TEXTURE_2D> * pTexture = g_pRendering->GetRenderTexture(szId);
-
-						if (pTexture)
-						{
-							pNodeTextureItem->texture = pTexture->GetObject();
-						}
-						else
-						{
-							pNodeTextureItem->texture = 0;
-						}
-					}
-				}
-				break;
-			}
-		}
+		updateTextures();
 	}
 }
 
@@ -701,4 +695,48 @@ void NodeEditorWindow::createTextureNodeFromDialog(void)
 	unsigned int format = m_pNodeTextureCreationWindow->getCurrentFormat();
 
 	createTextureNode(format, 1024, 1024);
+}
+
+/**
+ * @brief NodeEditorWindow::updateTextures
+ */
+void NodeEditorWindow::updateTextures(void)
+{
+	extern  Rendering * g_pRendering;
+
+	QList<QGraphicsItem*> items = m_pScene->items();
+
+	for (QGraphicsItem * item : items)
+	{
+		switch (item->type())
+		{
+			case GraphicsNodeItemTypes::TypeNode:
+			{
+				GraphicsNode * pNodeItem = static_cast<GraphicsNode*>(item);
+				assert(nullptr != pNodeItem);
+
+				std::string & strNodeType = m_mapNodeType[pNodeItem];
+
+				if (strNodeType == "texture")
+				{
+					GraphicsNodeTexture * pNodeTextureItem = (GraphicsNodeTexture*)pNodeItem;
+
+					char szId [16];
+					sprintf(szId, "%lld", uintptr_t(pNodeItem));
+
+					const GPU::Texture<GL_TEXTURE_2D> * pTexture = g_pRendering->GetRenderTexture(szId);
+
+					if (pTexture)
+					{
+						pNodeTextureItem->texture = pTexture->GetObject();
+					}
+					else
+					{
+						pNodeTextureItem->texture = 0;
+					}
+				}
+			}
+			break;
+		}
+	}
 }

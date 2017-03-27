@@ -85,6 +85,16 @@ MainWindow::~MainWindow()
 }
 
 /**
+ * @brief MainWindow::init
+ */
+void MainWindow::init(void)
+{
+	show();
+
+	m_pNodeEditorWindow->init();
+}
+
+/**
  * @brief MainWindow::closeEvent
  * @param event
  */

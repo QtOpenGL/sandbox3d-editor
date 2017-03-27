@@ -35,7 +35,7 @@ int main(int argc, char ** argv)
     rmt_CreateGlobalInstance(&rmt);
 
 	MainWindow w;
-	w.show();
+	w.init();
 
 	int r = app.exec();
 

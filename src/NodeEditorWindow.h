@@ -32,11 +32,13 @@ class NodeEditorWindow : public QDialog
 
 public:
 
-	explicit	NodeEditorWindow		(MainWindow * pMainWindow);
-	virtual		~NodeEditorWindow		(void);
+	explicit			NodeEditorWindow		(MainWindow * pMainWindow);
+	virtual				~NodeEditorWindow		(void);
 
-	void		closeEvent				(QCloseEvent * event) Q_DECL_OVERRIDE;
-	void		contextMenuEvent		(QContextMenuEvent * event) Q_DECL_OVERRIDE;
+	void				init					(void);
+
+	virtual void		closeEvent				(QCloseEvent * event) Q_DECL_OVERRIDE;
+	virtual void		contextMenuEvent		(QContextMenuEvent * event) Q_DECL_OVERRIDE;
 
 protected:
 
@@ -49,6 +51,8 @@ protected:
 	GraphicsNode *		createPresentNode		(void);
 	GraphicsNode *		createOperationNode		(const NodeDescriptor & desc);
 	GraphicsNode *		createTextureNode		(unsigned int fomat, unsigned int width, unsigned int height);
+
+	void				updateTextures			(void);
 
 private:
 
