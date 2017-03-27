@@ -289,7 +289,7 @@ void DrawableSurface::keyReleaseEvent(QKeyEvent *event)
 	{
 		if (nullptr != m_pSelectedObject)
 		{
-			m_renderer.onDelete(*m_pSelectedObject);
+			m_renderer.m_scene.remove(*m_pSelectedObject);
 			m_pSelectedObject = nullptr;
 			update();
 		}
@@ -496,11 +496,17 @@ void DrawableSurface::addMeshRecursive(const aiNode * nd, const mat4x4 & parentT
 		m->m_BoundingBox.max.z = _max(m->m_BoundingBox.max.z, offset.m_vMax.z);
 	}
 
-	Mesh::Instance instance = m->Instantiate();
+	m->m_BoundingSphere.center.x = m->m_BoundingBox.max.x - m->m_BoundingBox.min.x;
+	m->m_BoundingSphere.center.y = m->m_BoundingBox.max.y - m->m_BoundingBox.min.y;
+	m->m_BoundingSphere.center.z = m->m_BoundingBox.max.z - m->m_BoundingBox.min.z;
+
+	m->m_BoundingSphere.radius = _max(distance(m->m_BoundingSphere.center, m->m_BoundingBox.min), distance(m->m_BoundingSphere.center, m->m_BoundingBox.max));
+
+	Object instance(m);
 
 	instance.transformation = transformation;
 
-	m_renderer.onCreate(instance);
+	m_renderer.m_scene.insert(instance);
 
 	for (int i = 0; i < nd->mNumChildren; ++i)
 	{

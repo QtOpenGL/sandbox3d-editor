@@ -23,8 +23,6 @@ class QString;
 class aiScene;
 class aiNode;
 
-class Mesh::Instance;
-
 class DrawableSurface : public QOpenGLWidget
 {
 	Q_OBJECT
@@ -92,7 +90,7 @@ private:
 
 	std::vector<Mesh*> m_apMeshes;
 
-	Mesh::Instance * m_pSelectedObject;
+	Object * m_pSelectedObject;
 
 	const GPU::Texture<GL_TEXTURE_2D> * m_pCurrentTexture;
 
