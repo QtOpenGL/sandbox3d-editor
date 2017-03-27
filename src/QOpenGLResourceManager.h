@@ -20,6 +20,9 @@ public:
 	void			bindQuadResources	(void);
 	void			unbindQuadResources	(void);
 
+	void			bindBboxResources	(const QMatrix4x4 & ModelViewProjection, const QVector3D & BBoxMin, const QVector3D & BBoxMax);
+	void			unbindBboxResources	(void);
+
 protected:
 
 	void			initShaders			(void);

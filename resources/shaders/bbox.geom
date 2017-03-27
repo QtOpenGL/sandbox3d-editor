@@ -13,15 +13,15 @@ void main()
 	vec4 vertices [8];
 
 	// front
-	vertices[0] = vec4(BBoxMin.x, BBoxMin.y, BBoxMin.z, 1.0) * ModelViewProjection;
-	vertices[1] = vec4(BBoxMax.x, BBoxMin.y, BBoxMin.z, 1.0) * ModelViewProjection;
-	vertices[2] = vec4(BBoxMin.x, BBoxMax.y, BBoxMin.z, 1.0) * ModelViewProjection;
-	vertices[3] = vec4(BBoxMax.x, BBoxMax.y, BBoxMin.z, 1.0) * ModelViewProjection;
+	vertices[0] = ModelViewProjection * vec4(BBoxMin.x, BBoxMin.y, BBoxMin.z, 1.0);
+	vertices[1] = ModelViewProjection * vec4(BBoxMax.x, BBoxMin.y, BBoxMin.z, 1.0);
+	vertices[2] = ModelViewProjection * vec4(BBoxMin.x, BBoxMax.y, BBoxMin.z, 1.0);
+	vertices[3] = ModelViewProjection * vec4(BBoxMax.x, BBoxMax.y, BBoxMin.z, 1.0);
 	// back
-	vertices[4] = vec4(BBoxMin.x, BBoxMin.y, BBoxMax.z, 1.0) * ModelViewProjection;
-	vertices[5] = vec4(BBoxMax.x, BBoxMin.y, BBoxMax.z, 1.0) * ModelViewProjection;
-	vertices[6] = vec4(BBoxMin.x, BBoxMax.y, BBoxMax.z, 1.0) * ModelViewProjection;
-	vertices[7] = vec4(BBoxMax.x, BBoxMax.y, BBoxMax.z, 1.0) * ModelViewProjection;
+	vertices[4] = ModelViewProjection * vec4(BBoxMin.x, BBoxMin.y, BBoxMax.z, 1.0);
+	vertices[5] = ModelViewProjection * vec4(BBoxMax.x, BBoxMin.y, BBoxMax.z, 1.0);
+	vertices[6] = ModelViewProjection * vec4(BBoxMin.x, BBoxMax.y, BBoxMax.z, 1.0);
+	vertices[7] = ModelViewProjection * vec4(BBoxMax.x, BBoxMax.y, BBoxMax.z, 1.0);
 
 	// ---------
 

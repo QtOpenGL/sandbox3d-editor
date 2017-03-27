@@ -37,10 +37,13 @@ bool QOpenGLResourceManager::init(void)
 
 	static const float points [] =
 	{
+		// quad
 		-1.0f, -1.0f, /* | */ 0.0f, 0.0f,
 		 1.0f, -1.0f, /* | */ 1.0f, 0.0f,
 		-1.0f,  1.0f, /* | */ 0.0f, 1.0f,
 		 1.0f,  1.0f, /* | */ 1.0f, 1.0f,
+		// point (bbox)
+		0.0f, 0.0f,
 	};
 
 	//
@@ -68,6 +71,19 @@ bool QOpenGLResourceManager::init(void)
 
 		m_vertexArrayQuad.release();
 		m_pShaderQuad->release();
+	}
+
+	//
+	// Setup Bounding Box Inputs
+	{
+		m_pShaderBbox->bind();
+		m_vertexArrayBbox.bind();
+
+		m_pShaderBbox->enableAttributeArray(0);
+		m_pShaderBbox->setAttributeBuffer(0, GL_FLOAT, 16 * sizeof(float), 2, 0);
+
+		m_vertexArrayBbox.release();
+		m_pShaderBbox->release();
 	}
 
 	m_sharedVertexBuffer.release();
@@ -131,12 +147,7 @@ void QOpenGLResourceManager::initShaders(void)
  */
 void QOpenGLResourceManager::bindQuadResources(void)
 {
-	char *version = (char*)glGetString(GL_VERSION);
-
 	m_pShaderQuad->bind();
-
-	//m_pShaderQuad->setUniformValue("size", size);
-	//m_pShaderQuad->setUniformValue("transform", transform);
 
 	m_vertexArrayQuad.bind();
 }
@@ -149,4 +160,28 @@ void QOpenGLResourceManager::unbindQuadResources(void)
 	m_vertexArrayQuad.release();
 
 	m_pShaderQuad->release();
+}
+
+/**
+ * @brief QOpenGLResourceManager::bindBboxResources
+ */
+void QOpenGLResourceManager::bindBboxResources(const QMatrix4x4 & ModelViewProjection, const QVector3D & BBoxMin, const QVector3D & BBoxMax)
+{
+	m_pShaderBbox->bind();
+
+	m_pShaderBbox->setUniformValue("ModelViewProjection", ModelViewProjection);
+	m_pShaderBbox->setUniformValue("BBoxMin", BBoxMin);
+	m_pShaderBbox->setUniformValue("BBoxMax", BBoxMax);
+
+	m_vertexArrayBbox.bind();
+}
+
+/**
+ * @brief QOpenGLResourceManager::unbindBboxResources
+ */
+void QOpenGLResourceManager::unbindBboxResources(void)
+{
+	m_vertexArrayBbox.release();
+
+	m_pShaderBbox->release();
 }

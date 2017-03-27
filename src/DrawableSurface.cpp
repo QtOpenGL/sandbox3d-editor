@@ -121,6 +121,8 @@ void DrawableSurface::resizeGL(int w, int h)
  */
 void DrawableSurface::paintGL(void)
 {
+	const mat4x4 & matView = m_camera.getViewMatrix();
+
 	GLuint elapsed_time = 0;
 	Timer t;
 
@@ -128,7 +130,6 @@ void DrawableSurface::paintGL(void)
 
 	t.Start();
 	{
-		const mat4x4 & matView = m_camera.getViewMatrix();
 		m_renderer.onUpdate(matView, m_vClearColor, m_pSelectedObject);
 	}
 	t.Stop();
@@ -146,22 +147,38 @@ void DrawableSurface::paintGL(void)
 
 	static_cast<MainWindow*>(parent())->SetRenderTime(t.getElapsedTimeInMs(), elapsed_time / 1000000.0);
 
-	if (m_pCurrentTexture)
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, defaultFramebufferObject());
+
+	QOpenGLResourceManager & manager = QOpenGLResourceManager::instance();
+
+	if (nullptr != m_pCurrentTexture)
 	{
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
-		glDisable(GL_BLEND);
-
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, defaultFramebufferObject());
-
-		QOpenGLResourceManager & manager = QOpenGLResourceManager::instance();
-
 		manager.bindQuadResources();
 
 		glBindTexture(GL_TEXTURE_2D, m_pCurrentTexture->GetObject());
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		manager.unbindQuadResources();
+	}
+
+	if (nullptr != m_pSelectedObject)
+	{
+		Mesh::BoundingBox bbox = m_pSelectedObject->mesh->m_BoundingBox;
+
+		mat4x4 mMVP = (m_renderer.m_matProjection * (matView * m_pSelectedObject->transformation));
+
+		QVector3D BBoxMin(bbox.min.x, bbox.min.y, bbox.min.z);
+		QVector3D BBoxMax(bbox.max.x, bbox.max.y, bbox.max.z);
+
+		manager.bindBboxResources(QMatrix4x4((float*)&mMVP), BBoxMin, BBoxMax);
+
+		glDrawArrays(GL_POINTS, 0, 1);
+
+		manager.unbindBboxResources();
 	}
 }
 
