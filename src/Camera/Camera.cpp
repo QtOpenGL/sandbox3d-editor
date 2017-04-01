@@ -10,7 +10,7 @@ Camera::Camera()
 , m_rotation(1.0f)
 , m_vPos(0.0f, 0.0f, 10.0f)
 , m_vCenter(0.0f, 0.0f, 0.0f)
-, m_vUp(0.0f, -1.0f, 0.0f)
+, m_vUp(0.0f, 1.0f, 0.0f)
 {
 	LookAt(m_vPos, m_vCenter, m_vUp);
 }
