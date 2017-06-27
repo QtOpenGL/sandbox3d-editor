@@ -14,7 +14,7 @@ QOpenGLResourceManager & QOpenGLResourceManager::instance(void)
 /**
  * @brief Constructor
  */
-QOpenGLResourceManager::QOpenGLResourceManager(void) : m_sharedVertexBuffer(QOpenGLBuffer::VertexBuffer)
+QOpenGLResourceManager::QOpenGLResourceManager(void) : m_sharedVertexBuffer(QOpenGLBuffer::VertexBuffer), m_pickBufferColorTexture(0), m_pickBufferDepthRenderbuffer(0)
 {
 	// ...
 }
@@ -88,6 +88,9 @@ bool QOpenGLResourceManager::init(void)
 
 	m_sharedVertexBuffer.release();
 
+	glGenFramebuffers(1, &m_pickBufferFramebuffer);
+	onResize(QSize(1280, 720));
+
 	return(true);
 }
 
@@ -106,6 +109,49 @@ void QOpenGLResourceManager::release(void)
 
 	delete m_pShaderBbox;
 	m_pShaderBbox = nullptr;
+}
+
+/**
+ * @brief Release resources
+ */
+void QOpenGLResourceManager::onResize(const QSize & size)
+{
+	//
+	// Release previous texture if needed
+	if (0 != m_pickBufferColorTexture)
+	{
+		glDeleteTextures(1, &m_pickBufferColorTexture);
+	}
+
+	//
+	// Create Color texture
+	{
+		glGenTextures(1, &m_pickBufferColorTexture);
+		glBindTexture(GL_TEXTURE_2D, m_pickBufferColorTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, size.width(), size.height(), 0, GL_RED_INTEGER, GL_UNSIGNED_INT, nullptr);
+	}
+
+	//
+	// Release previous texture if needed
+	if (0 != m_pickBufferDepthRenderbuffer)
+	{
+		glDeleteRenderbuffers(1, &m_pickBufferDepthRenderbuffer);
+	}
+
+	//
+	// Create Depth buffer
+	{
+		glGenRenderbuffers(1, &m_pickBufferDepthRenderbuffer);
+		glBindRenderbuffer(GL_RENDERBUFFER, m_pickBufferDepthRenderbuffer);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, size.width(), size.height());
+	}
+
+	//
+	// Bind
+	glBindFramebuffer(GL_FRAMEBUFFER, m_pickBufferFramebuffer);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_pickBufferColorTexture, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_pickBufferDepthRenderbuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 /**
@@ -138,6 +184,18 @@ void QOpenGLResourceManager::initShaders(void)
 		bool bCompiledFS = m_pShaderQuad->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/simple.frag");
 		Q_ASSERT(bCompiledFS);
 		bool bLinked = m_pShaderQuad->link();
+		Q_ASSERT(bLinked);
+	}
+
+	//
+	// Create Pick-Buffer Shader
+	{
+		m_pShaderPickBuffer = new QOpenGLShaderProgram();
+		bool bCompiledVS = m_pShaderPickBuffer->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/pickbuffer.vert");
+		Q_ASSERT(bCompiledVS);
+		bool bCompiledFS = m_pShaderPickBuffer->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/pickbuffer.frag");
+		Q_ASSERT(bCompiledFS);
+		bool bLinked = m_pShaderPickBuffer->link();
 		Q_ASSERT(bLinked);
 	}
 }
@@ -184,4 +242,13 @@ void QOpenGLResourceManager::unbindBboxResources(void)
 	m_vertexArrayBbox.release();
 
 	m_pShaderBbox->release();
+}
+
+/**
+ * @brief QOpenGLResourceManager::pickBufferFramebufferObject
+ * @return
+ */
+GLuint QOpenGLResourceManager::pickBufferFramebufferObject(void) const
+{
+	return(m_pickBufferFramebuffer);
 }

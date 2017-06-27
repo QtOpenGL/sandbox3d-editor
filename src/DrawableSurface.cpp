@@ -114,6 +114,11 @@ void DrawableSurface::initializeGL(void)
 void DrawableSurface::resizeGL(int w, int h)
 {
 	m_renderer.onResize(w, h);
+
+	QOpenGLResourceManager & manager = QOpenGLResourceManager::instance();
+	manager.onResize(QSize(w, h));
+
+	m_renderer.SetPickBufferFramebuffer(manager.pickBufferFramebufferObject());
 }
 
 /**
@@ -151,9 +156,33 @@ void DrawableSurface::paintGL(void)
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, defaultFramebufferObject());
-
 	QOpenGLResourceManager & manager = QOpenGLResourceManager::instance();
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, manager.pickBufferFramebufferObject());
+
+	{
+		unsigned int i = 0;
+
+		for (const Object & object : m_renderer.m_scene.getObjects())
+		{
+			object.mesh->bind();
+
+//			SetUniform(m_pickBufferPipeline.m_uShaderObject, "Model", object.transformation);
+
+			glVertexAttribI1ui(5, i);
+
+			for (SubMesh * m : object.getDrawCommands())
+			{
+				m->drawGL();
+			}
+
+			object.mesh->unbind();
+
+			++i;
+		}
+	}
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, defaultFramebufferObject());
 
 	if (nullptr != m_pCurrentTexture)
 	{

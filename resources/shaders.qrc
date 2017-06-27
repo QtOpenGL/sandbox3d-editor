@@ -5,5 +5,7 @@
         <file>shaders/bbox.geom</file>
         <file>shaders/bbox.frag</file>
         <file>shaders/bbox.vert</file>
+        <file>shaders/pickbuffer.vert</file>
+        <file>shaders/pickbuffer.frag</file>
     </qresource>
 </RCC>
