@@ -3,9 +3,9 @@
 mkdir -p data/shaders/
 
 
-FRAG=src/Rendering/Shader/shaders/*.frag
-VERT=src/Rendering/Shader/shaders/*.vert
-GEOM=src/Rendering/Shader/shaders/*.geom
+FRAG=external/sandbox3d/src/Rendering/Shader/shaders/*.frag
+VERT=external/sandbox3d/src/Rendering/Shader/shaders/*.vert
+GEOM=external/sandbox3d/src/Rendering/Shader/shaders/*.geom
 
 DEST=data/shaders/
 
