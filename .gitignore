@@ -30,5 +30,6 @@
 *~
 
 build/*
+build-*/*
 data/meshes/*
 data/sprites/*
