@@ -67,7 +67,7 @@ bool Graph::loadFromFile(const std::string & filename)
 	json_t * pGraphLabel = json_object_get(pGraph, "label");
 	if (nullptr != pGraphLabel)
 	{
-		const char * szLabel = json_string_value(pGraphType);
+		const char * szLabel = json_string_value(pGraphLabel);
 		setLabel(szLabel);
 	}
 
