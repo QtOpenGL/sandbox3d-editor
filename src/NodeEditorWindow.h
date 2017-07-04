@@ -14,13 +14,16 @@ class QMenu;
 class NodeOperationCreationWindow;
 class NodeTextureCreationWindow;
 
-class GraphicsNodeView;
-class GraphicsNodeScene;
-class GraphicsNode;
+class QGraphicsScene;
 
 class MainWindow;
 
 class Graph;
+
+namespace GraphWidget {
+	class View;
+	class Node;
+}
 
 namespace Ui {
 	class NodeEditorWindow;
@@ -48,9 +51,9 @@ protected:
 	bool				saveGraph				(void);
 	bool				createGraph				(Graph & graph);
 
-	GraphicsNode *		createPresentNode		(void);
-	GraphicsNode *		createOperationNode		(const NodeDescriptor & desc);
-	GraphicsNode *		createTextureNode		(unsigned int fomat, unsigned int width, unsigned int height);
+	GraphWidget::Node *	createPresentNode		(void);
+	GraphWidget::Node *	createOperationNode		(const NodeDescriptor & desc);
+	GraphWidget::Node *	createTextureNode		(unsigned int fomat, unsigned int width, unsigned int height);
 
 	void				updateTextures			(void);
 
@@ -63,8 +66,8 @@ protected:
 	QMenuBar *				m_pMenuBar;
 	QStatusBar *			m_pStatusBar;
 
-	GraphicsNodeView *		m_pView;
-	GraphicsNodeScene *		m_pScene;
+	GraphWidget::View *		m_pView;
+	QGraphicsScene *		m_pScene;
 
 	QOpenGLWidget *			m_pWidgetGL;
 
@@ -74,9 +77,9 @@ protected:
 	NodeOperationCreationWindow *	m_pNodeOperationCreationWindow;
 	NodeTextureCreationWindow *		m_pNodeTextureCreationWindow;
 
-	std::map<const GraphicsNode*, const NodeDescriptor*> m_mapOperationNodes;
-	std::map<const GraphicsNode*, unsigned int> m_mapTextureNodes;
-	std::map<const GraphicsNode*, std::string> m_mapNodeType;
+	std::map<const GraphWidget::Node*, const NodeDescriptor*> m_mapOperationNodes;
+	std::map<const GraphWidget::Node*, unsigned int> m_mapTextureNodes;
+	std::map<const GraphWidget::Node*, std::string> m_mapNodeType;
 
 public:
 

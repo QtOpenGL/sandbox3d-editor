@@ -16,15 +16,6 @@
 #include "MainWindow.h"
 #include "DrawableSurface.h"
 
-#include <graphicsnodescene.hpp>
-#include <graphicsnodeview.hpp>
-
-#include <graphicsnode.hpp>
-#include <graphicsbezieredge.hpp>
-#include <graphicsnodesocket.hpp>
-
-#include <qobjectnode.hpp>
-
 #include <assert.h>
 
 #include <algorithm>
@@ -32,6 +23,13 @@
 #include "Graph/Graph.h"
 #include "Graph/Node.h"
 #include "Graph/Edge.h"
+
+#include "GraphWidget/View.h"
+#include "GraphWidget/Edge.h"
+#include "GraphWidget/Node.h"
+#include "GraphWidget/NodeTexture.h"
+#include "GraphWidget/NodePass.h"
+#include "GraphWidget/NodeFinal.h"
 
 #define GRAPH_FILE_PATH "data/render-graph.json"
 
@@ -100,41 +98,6 @@ const char * GLenumToString(unsigned int e)
 	return("");
 }
 
-class GraphicsNodeTexture : public GraphicsNode
-{
-public:
-
-	GraphicsNodeTexture(QGraphicsItem *parent = nullptr) : GraphicsNode(parent), texture(0)
-	{
-		_title_item->hide();
-	}
-
-	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override
-	{
-		painter->beginNativePainting();
-
-		// Draw Render Target using OpenGL
-		// MUST use old OpenGL because it seems that QGraphicsView does NOT support OpenGL > 3
-		glEnable(GL_TEXTURE_2D);
-		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glBegin(GL_QUADS);
-		glTexCoord2d(0.0,1.0); glVertex2d(0, 0);
-		glTexCoord2d(1.0,1.0); glVertex2d(_width, 0);
-		glTexCoord2d(1.0,0.0); glVertex2d(_width, _height);
-		glTexCoord2d(0.0,0.0); glVertex2d(0, _height);
-		glEnd();
-
-		painter->endNativePainting();
-
-		painter->setPen(isSelected() ? _pen_selected : _pen_default);
-		painter->setBrush(Qt::NoBrush);
-		painter->drawRect(QRectF(0.0f, 0.0f, _width, _height));
-	}
-
-	GLuint texture;
-};
-
 /**
  * @brief Constructor
  * @param Main Window
@@ -153,8 +116,8 @@ NodeEditorWindow::NodeEditorWindow(MainWindow * pMainWindow)
 
 	m_pWidgetGL				= new QOpenGLWidget(this);
 
-	m_pScene				= new GraphicsNodeScene(this);
-	m_pView					= new GraphicsNodeView(m_pScene, this);
+	m_pScene				= new QGraphicsScene(this);
+	m_pView					= new GraphWidget::View(m_pScene, this);
 
 	ui->layout->addWidget(m_pMenuBar);
 	ui->layout->addWidget(m_pView);
@@ -168,6 +131,7 @@ NodeEditorWindow::NodeEditorWindow(MainWindow * pMainWindow)
 	setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint);
 
 	// Node Widget
+	m_pScene->setItemIndexMethod(QGraphicsScene::NoIndex);
 	m_pScene->setSceneRect(-(SCENE_SIZE_X*0.5), -(SCENE_SIZE_Y*0.5), SCENE_SIZE_X, SCENE_SIZE_Y);
 
 	// Enable OpenGL rendering for the Node View
@@ -279,7 +243,7 @@ void NodeEditorWindow::contextMenuEvent(QContextMenuEvent * pEvent)
 	{
 		switch (item->type())
 		{
-			case GraphicsNodeItemTypes::TypeNode:
+			case GraphWidget::Node::Type:
 			{
 				item->setSelected(true);
 
@@ -338,9 +302,11 @@ bool NodeEditorWindow::loadGraph(void)
 		return(false);
 	}
 
+	m_pView->setTitle(QString::fromStdString(G.getLabel()));
+
 	assert(G.getType() == "RenderGraph");
 
-	std::map<uintptr_t, GraphicsNode *> mapUID;
+	std::map<uintptr_t, GraphWidget::Node*> mapUID;
 
 	for (Node * pNode : G.getNodes())
 	{
@@ -364,7 +330,7 @@ bool NodeEditorWindow::loadGraph(void)
 		const std::string & strNodeSizeY = pNode->getMetaData("height");
 
 		// Create Node
-		GraphicsNode * n = nullptr;
+		GraphWidget::Node * n = nullptr;
 
 		if ("operation" == strType)
 		{
@@ -392,9 +358,10 @@ bool NodeEditorWindow::loadGraph(void)
 			assert(false);
 		}
 
-		n->setPos(atof(strNodePosX.c_str()), atof(strNodePosY.c_str()));
+		n->setPos(QPointF(atof(strNodePosX.c_str()), atof(strNodePosY.c_str())));
+#if 0
 		n->setSize(atof(strNodeSizeX.c_str()), atof(strNodeSizeY.c_str()));
-		n->setTitle(szLabel); // currently useless
+#endif // 0
 
 		mapUID[uid] = n;
 	}
@@ -418,15 +385,19 @@ bool NodeEditorWindow::loadGraph(void)
 		unsigned int iTargetId = atoi(strTargetId.c_str());
 
 		// Create Edge
-		GraphicsNode * pGraphicsSourceNode = mapUID[source_uid];
+		GraphWidget::Node * pGraphicsSourceNode = mapUID[source_uid];
 		assert(nullptr != pGraphicsSourceNode);
 
-		GraphicsNode * pGraphicsTargetNode = mapUID[target_uid];
+		GraphWidget::Node * pGraphicsTargetNode = mapUID[target_uid];
 		assert(nullptr != pGraphicsTargetNode);
 
-		GraphicsDirectedEdge * e = new GraphicsBezierEdge();
-		e->connect(pGraphicsSourceNode, iSourceId, pGraphicsTargetNode, iTargetId);
+		GraphWidget::ConnectorOutput * pConnectorSource = pGraphicsSourceNode->getOutputConnector(iSourceId);
+		assert(nullptr != pConnectorSource);
 
+		GraphWidget::ConnectorInput * pConnectorDestination = pGraphicsTargetNode->getInputConnector(iTargetId);
+		assert(nullptr != pConnectorDestination);
+
+		GraphWidget::Edge * e = new GraphWidget::Edge(pConnectorSource, pConnectorDestination);
 		m_pScene->addItem(e);
 	}
 
@@ -451,9 +422,9 @@ bool NodeEditorWindow::createGraph(Graph & G)
 	{
 		switch (item->type())
 		{
-			case GraphicsNodeItemTypes::TypeNode:
+			case GraphWidget::Node::Type:
 			{
-				GraphicsNode * pNodeItem = static_cast<GraphicsNode*>(item);
+				GraphWidget::Node * pNodeItem = static_cast<GraphWidget::Node*>(item);
 				assert(nullptr != pNodeItem);
 
 				char szId [16];
@@ -463,13 +434,13 @@ bool NodeEditorWindow::createGraph(Graph & G)
 				assert(nullptr != pNode);
 				G.addNode(pNode);
 
-				pNode->setType(m_mapNodeType[pNodeItem].c_str());
-				pNode->setLabel(pNodeItem->getTitle().toLocal8Bit());
-
 				std::string & strNodeType = m_mapNodeType[pNodeItem];
+
+				pNode->setType(strNodeType.c_str());
 
 				if (strNodeType == "operation")
 				{
+					pNode->setLabel(((GraphWidget::NodePass*)pNodeItem)->getTitle().toLocal8Bit());
 					pNode->addMetaData("subtype", m_mapOperationNodes[pNodeItem]->identifier.c_str());
 				}
 				else if (strNodeType == "texture")
@@ -486,28 +457,34 @@ bool NodeEditorWindow::createGraph(Graph & G)
 				pNode->addMetaData("yloc", szPosY);
 
 				char szWidth [16];
-				sprintf(szWidth, "%f", pNodeItem->width());
+				sprintf(szWidth, "%f", pNodeItem->getWidth());
 				pNode->addMetaData("width", szWidth);
 
 				char szHeight [16];
-				sprintf(szHeight, "%f", pNodeItem->height());
+				sprintf(szHeight, "%f", pNodeItem->getHeight());
 				pNode->addMetaData("height", szHeight);
 
 				mapUID[uintptr_t(pNodeItem)] = pNode;
 			}
 			break;
+		}
+	}
 
-			case GraphicsNodeItemTypes::TypeBezierEdge:
+	for (QGraphicsItem * item : items)
+	{
+		switch (item->type())
+		{
+			case GraphWidget::Edge::Type:
 			{
-				GraphicsBezierEdge * pEdgeItem = static_cast<GraphicsBezierEdge*>(item);
+				GraphWidget::Edge * pEdgeItem = static_cast<GraphWidget::Edge*>(item);
 				assert(nullptr != pEdgeItem);
 
 				// Source
-				Node * pNodeSource = mapUID[uintptr_t(pEdgeItem->getSource()->parentItem())];
+				Node * pNodeSource = mapUID[uintptr_t(pEdgeItem->getSourceNode())];
 				assert(nullptr != pNodeSource);
 
 				// Target
-				Node * pNodeTarget = mapUID[uintptr_t(pEdgeItem->getSink()->parentItem())];
+				Node * pNodeTarget = mapUID[uintptr_t(pEdgeItem->getDestinationNode())];
 				assert(nullptr != pNodeTarget);
 
 				Edge * pEdge = new Edge(pNodeSource, pNodeTarget);
@@ -517,19 +494,14 @@ bool NodeEditorWindow::createGraph(Graph & G)
 				pEdge->setDirected(true);
 
 				char szSourceId [16];
-				sprintf(szSourceId, "%d", pEdgeItem->getSource()->getIndex());
+				sprintf(szSourceId, "%d", pEdgeItem->getSourceIndex());
 				pEdge->addMetaData("source_id", szSourceId);
 
 				char szTargetId [16];
-				sprintf(szTargetId, "%d", pEdgeItem->getSink()->getIndex());
+				sprintf(szTargetId, "%d", pEdgeItem->getDestinationIndex());
 				pEdge->addMetaData("target_id", szTargetId);
 			}
 			break;
-
-			default:
-			{
-				// don't save anything else
-			}
 		}
 	}
 
@@ -539,17 +511,13 @@ bool NodeEditorWindow::createGraph(Graph & G)
 /**
  * @brief NodeEditorWindow::createDefaultNodes
  */
-GraphicsNode * NodeEditorWindow::createPresentNode(void)
+GraphWidget::Node * NodeEditorWindow::createPresentNode(void)
 {
-	GraphicsNode * n = new GraphicsNode();
-
-	n->setTitle(QString("Present"));
-
-	n->add_sink(QString("Backbuffer"), nullptr, 0);
+	GraphWidget::NodeFinal * n = new GraphWidget::NodeFinal();
 
 	m_pScene->addItem(n);
 
-	m_mapNodeType.insert(std::pair<const GraphicsNode*, std::string>(n, "present"));
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "present"));
 
 	return(n);
 }
@@ -558,17 +526,19 @@ GraphicsNode * NodeEditorWindow::createPresentNode(void)
  * @brief NodeEditorWindow::createNode
  * @param desc
  */
-GraphicsNode * NodeEditorWindow::createOperationNode(const NodeDescriptor & desc)
+GraphWidget::Node * NodeEditorWindow::createOperationNode(const NodeDescriptor & desc)
 {
-	GraphicsNode * n = new GraphicsNode();
+	GraphWidget::NodePass * n = new GraphWidget::NodePass();
 
 	n->setTitle(QString(desc.name.c_str()));
+
+	m_pScene->addItem(n);
 
 	int input_index = 0;
 
 	for (const NodeDescriptor::Input & input : desc.inputs)
 	{
-		n->add_sink(QString(input.name.c_str()), nullptr, input_index);
+		n->addInput(QString(input.name.c_str())); //, nullptr, input_index
 		++input_index;
 	}
 
@@ -576,42 +546,28 @@ GraphicsNode * NodeEditorWindow::createOperationNode(const NodeDescriptor & desc
 
 	for (const NodeDescriptor::Output & output : desc.outputs)
 	{
-		n->add_source(QString(output.name.c_str()), nullptr, output_index);
+ 		n->addOutput(QString(output.name.c_str())); //, nullptr, output_index
 		++output_index;
 	}
 
-	m_pScene->addItem(n);
-
-	m_mapOperationNodes.insert(std::pair<const GraphicsNode*, const NodeDescriptor*>(n, &desc));
-	m_mapNodeType.insert(std::pair<const GraphicsNode*, std::string>(n, "operation"));
+	m_mapOperationNodes.insert(std::pair<const GraphWidget::Node*, const NodeDescriptor*>(n, &desc));
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "operation"));
 
 	return(n);
 }
+
 /**
  * @brief NodeEditorWindow::createNode
  * @param desc
  */
-GraphicsNode * NodeEditorWindow::createTextureNode(unsigned int format, unsigned int width, unsigned int height)
+GraphWidget::Node * NodeEditorWindow::createTextureNode(unsigned int format, unsigned int width, unsigned int height)
 {
-	GraphicsNode * n = new GraphicsNodeTexture();
-
-	n->setTitle(QString("Texture"));
-
-	n->add_sink(QString(), nullptr, 0);
-	n->add_source(QString(), nullptr, 0);
-
-	QPixmap * pPixmap = new QPixmap(128, 128);
-	pPixmap->fill(Qt::red);
-
-	QLabel * pLabel = new QLabel();
-	pLabel->setPixmap(*pPixmap);
-
-	//n->setCentralWidget(pLabel);
+	GraphWidget::Node * n = new GraphWidget::NodeTexture();
 
 	m_pScene->addItem(n);
 
-	m_mapTextureNodes.insert(std::pair<const GraphicsNode*, unsigned int>(n, format));
-	m_mapNodeType.insert(std::pair<const GraphicsNode*, std::string>(n, "texture"));
+	m_mapTextureNodes.insert(std::pair<const GraphWidget::Node*, unsigned int>(n, format));
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "texture"));
 
 	return(n);
 }
@@ -666,7 +622,7 @@ void NodeEditorWindow::on_actionRemoveNode_triggered(void)
 
 	for (QGraphicsItem * item : list)
 	{
-		if (item->type() == GraphicsNodeItemTypes::TypeNode)
+		if (item->type() == GraphWidget::Node::Type)
 		{
 			item->setSelected(false);
 			m_pScene->removeItem(item);
@@ -710,16 +666,16 @@ void NodeEditorWindow::updateTextures(void)
 	{
 		switch (item->type())
 		{
-			case GraphicsNodeItemTypes::TypeNode:
+			case GraphWidget::Node::Type:
 			{
-				GraphicsNode * pNodeItem = static_cast<GraphicsNode*>(item);
+				GraphWidget::Node * pNodeItem = static_cast<GraphWidget::Node*>(item);
 				assert(nullptr != pNodeItem);
 
 				std::string & strNodeType = m_mapNodeType[pNodeItem];
 
 				if (strNodeType == "texture")
 				{
-					GraphicsNodeTexture * pNodeTextureItem = (GraphicsNodeTexture*)pNodeItem;
+					GraphWidget::NodeTexture * pNodeTextureItem = (GraphWidget::NodeTexture*)pNodeItem;
 
 					char szId [16];
 					sprintf(szId, "%lld", uintptr_t(pNodeItem));
@@ -728,11 +684,11 @@ void NodeEditorWindow::updateTextures(void)
 
 					if (pTexture)
 					{
-						pNodeTextureItem->texture = pTexture->GetObject();
+						pNodeTextureItem->setTexture(pTexture->GetObject());
 					}
 					else
 					{
-						pNodeTextureItem->texture = 0;
+						pNodeTextureItem->setTexture(0);
 					}
 				}
 			}
