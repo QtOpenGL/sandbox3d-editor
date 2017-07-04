@@ -1,6 +1,3 @@
-[submodule "external/qt5-node-editor"]
-	path = external/qt5-node-editor
-	url = https://github.com/magestik/qt5-node-editor.git
 [submodule "external/sandbox3d"]
 	path = external/sandbox3d
 	url = https://github.com/magestik/sandbox3d.git
