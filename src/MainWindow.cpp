@@ -10,6 +10,8 @@
 #include <QFileDialog>
 #include <QFileSystemWatcher>
 
+extern RendererWrapper g_RendererWrapper;
+
 /**
  * @brief MainWindow::MainWindow
  * @param parent
@@ -202,7 +204,7 @@ void MainWindow::onGraphLoaded(const Graph & graph)
 {
 	std::string strFinalTextureId;
 	SerializeGraph(graph, m_pNodeEditorWindow->m_aNodeDescriptors, strFinalTextureId);
-	m_pDrawable->m_renderer.initQueue("/tmp/render.xml");
+	g_RendererWrapper.initQueue("/tmp/render.xml");
 	m_pDrawable->setCurrentTexture(strFinalTextureId);
 	m_pDrawable->update();
 }
@@ -214,7 +216,7 @@ void MainWindow::onGraphSaved(const Graph & graph)
 {
 	std::string strFinalTextureId;
 	SerializeGraph(graph, m_pNodeEditorWindow->m_aNodeDescriptors, strFinalTextureId);
-	m_pDrawable->m_renderer.initQueue("/tmp/render.xml");
+	g_RendererWrapper.initQueue("/tmp/render.xml");
 	m_pDrawable->setCurrentTexture(strFinalTextureId);
 	m_pDrawable->update();
 }

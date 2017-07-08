@@ -1,9 +1,14 @@
 #include <QApplication>
+
+#include "RendererWrapper.h"
+
 #include <QGLFormat>
 #include <QSplashScreen>
 
 #include "MainWindow.h"
 #include "Remotery.h"
+
+RendererWrapper g_RendererWrapper;
 
 bool setDefaultFormatOpenGL(void)
 {
@@ -34,10 +39,14 @@ int main(int argc, char ** argv)
 	Remotery* rmt;
     rmt_CreateGlobalInstance(&rmt);
 
+	g_RendererWrapper.init();
+
 	MainWindow w;
 	w.init();
 
 	int r = app.exec();
+
+	g_RendererWrapper.release();
 
     rmt_DestroyGlobalInstance(rmt);
 

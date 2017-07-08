@@ -26,7 +26,7 @@
 #define _min(x, y) ((x < y) ? x : y)
 #define _max(x, y) ((x > y) ? x : y)
 
-Rendering * g_pRendering = nullptr; // ugly but needed for now
+extern RendererWrapper g_RendererWrapper;
 
 /**
  * @brief Constructor
@@ -39,7 +39,7 @@ DrawableSurface::DrawableSurface(QWidget *parent)
 , m_vClearColor(0.0f, 0.0f, 0.0f, 0.0f)
 , m_vAmbientColor(0.0f, 0.0f, 0.0f, 0.0f)
 , m_pSelectedObject(nullptr)
-, m_pCurrentTexture(nullptr)
+, m_uCurrentTexture(0)
 {
 	setAutoFillBackground(false);
 	setFocusPolicy(Qt::StrongFocus);
@@ -47,8 +47,6 @@ DrawableSurface::DrawableSurface(QWidget *parent)
 	connect(this, &QOpenGLWidget::resized, this, &DrawableSurface::onResized);
 	connect(this, &QOpenGLWidget::frameSwapped, this, &DrawableSurface::onFrameSwapped);
 #endif // (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
-
-	g_pRendering = &m_renderer;
 }
 
 /**
@@ -74,7 +72,7 @@ void DrawableSurface::ResetCamera(void)
  */
 void DrawableSurface::setCurrentTexture(const std::string & strFinalTextureId)
 {
-	m_pCurrentTexture = m_renderer.GetRenderTexture(strFinalTextureId.c_str());
+	m_uCurrentTexture = g_RendererWrapper.GetRenderTexture(strFinalTextureId.c_str());
 }
 
 /**
@@ -94,16 +92,9 @@ void DrawableSurface::initializeGL(void)
 
 	glGenQueries(1, &m_query);
 
-	for (int i = 0; i < NB_BUFFER; ++i)
-	{
-		m_apBuffer[i] = new GPU::Buffer<GL_PIXEL_UNPACK_BUFFER>();
-	}
+	g_RendererWrapper.onReady();
 
-	m_pSpecial = new GPU::Buffer<GL_PIXEL_UNPACK_BUFFER>();
-
-	m_renderer.onReady();
-
-	m_renderer.initQueue("/tmp/render.xml");
+	g_RendererWrapper.initQueue("/tmp/render.xml");
 }
 
 /**
@@ -113,12 +104,12 @@ void DrawableSurface::initializeGL(void)
  */
 void DrawableSurface::resizeGL(int w, int h)
 {
-	m_renderer.onResize(w, h);
+	g_RendererWrapper.onResize(w, h);
 
 	QOpenGLResourceManager & manager = QOpenGLResourceManager::instance();
 	manager.onResize(QSize(w, h));
 
-	m_renderer.SetPickBufferFramebuffer(manager.pickBufferFramebufferObject());
+	g_RendererWrapper.SetPickBufferFramebuffer(manager.pickBufferFramebufferObject());
 }
 
 /**
@@ -135,7 +126,7 @@ void DrawableSurface::paintGL(void)
 
 	t.Start();
 	{
-		m_renderer.onUpdate(matView, m_vClearColor);
+		g_RendererWrapper.onUpdate(matView, m_vClearColor);
 	}
 	t.Stop();
 
@@ -163,7 +154,7 @@ void DrawableSurface::paintGL(void)
 	{
 		unsigned int i = 0;
 
-		for (const Object & object : m_renderer.m_scene.getObjects())
+		for (const Object & object : g_RendererWrapper.getScene().getObjects())
 		{
 			object.mesh->bind();
 
@@ -184,11 +175,11 @@ void DrawableSurface::paintGL(void)
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, defaultFramebufferObject());
 
-	if (nullptr != m_pCurrentTexture)
+	if (0 != m_uCurrentTexture)
 	{
 		manager.bindQuadResources();
 
-		glBindTexture(GL_TEXTURE_2D, m_pCurrentTexture->GetObject());
+		glBindTexture(GL_TEXTURE_2D, m_uCurrentTexture);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		manager.unbindQuadResources();
@@ -198,7 +189,7 @@ void DrawableSurface::paintGL(void)
 	{
 		Mesh::BoundingBox bbox = m_pSelectedObject->mesh->m_BoundingBox;
 
-		mat4x4 mMVP = (m_renderer.m_matProjection * (matView * m_pSelectedObject->transformation));
+		mat4x4 mMVP = (g_RendererWrapper.getProjection() * (matView * m_pSelectedObject->transformation));
 
 		QVector3D BBoxMin(bbox.min.x, bbox.min.y, bbox.min.z);
 		QVector3D BBoxMax(bbox.max.x, bbox.max.y, bbox.max.z);
@@ -225,7 +216,7 @@ void DrawableSurface::onFrameSwapped(void)
 void DrawableSurface::onResized(void)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
-	m_renderer.SetDefaultFramebuffer(defaultFramebufferObject());
+	g_RendererWrapper.SetDefaultFramebuffer(defaultFramebufferObject());
 #endif // (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
 }
 
@@ -282,10 +273,40 @@ void DrawableSurface::mouseReleaseEvent(QMouseEvent * event)
 
 	if (!m_bMoved)
 	{
-		m_pSelectedObject = m_renderer.getObjectAtPos(pos);
+
+		m_pSelectedObject = getObjectAtPos(pos);
 	}
 
 	update();
+}
+
+/**
+ * @brief DrawableSurface::getObjectAtPos
+ * @param pos
+ * @return
+ */
+Object * DrawableSurface::getObjectAtPos(const ivec2 & pos)
+{
+	Object * object = nullptr;
+
+	QOpenGLResourceManager & manager = QOpenGLResourceManager::instance();
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, manager.pickBufferFramebufferObject());
+	glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+	unsigned int id = UINT32_MAX;
+
+	glReadPixels(pos.x, height() - pos.y, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &id);
+
+	if (id < g_RendererWrapper.getScene().getObjectCount())
+	{
+		object = (Object*)&(g_RendererWrapper.getScene().getObjects()[id]); // ugly
+	}
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glReadBuffer(GL_BACK);
+
+	return(object);
 }
 
 /**
@@ -318,148 +339,11 @@ void DrawableSurface::keyReleaseEvent(QKeyEvent *event)
 	{
 		if (nullptr != m_pSelectedObject)
 		{
-			m_renderer.m_scene.remove(*m_pSelectedObject);
+			g_RendererWrapper.getScene().remove(*m_pSelectedObject);
 			m_pSelectedObject = nullptr;
 			update();
 		}
 	}
-}
-
-#define USE_PBO 1
-
-/**
- * @brief DrawableSurface::loadSprites
- */
-void DrawableSurface::loadSprites()
-{
-	QDir dir("data/sprites");
-
-	const char ext [] =	"*.bmp *.gif *.jpg *.jpeg *.png *.pbm *.pgm *.ppm *.tiff *.xbm *.xpm";
-
-	QString filter(ext);
-	dir.setNameFilters(filter.split(' '));
-
-	QStringList list = dir.entryList(QDir::Files);
-
-	printf("Using technique %d \n", USE_PBO);
-
-	double totalTime = 0.0f;
-
-#if USE_PBO == 1
-
-	const int totalBufferSize = 2048*2048*4*sizeof(char);
-
-	for (int i = 0; i < NB_BUFFER; ++i)
-	{
-		GPU::realloc(*(m_apBuffer[i]), totalBufferSize, GL_STREAM_DRAW);
-	}
-
-	int buf = 0;
-	int offset = 0;
-#endif
-
-	for (QString & filename : list)
-	{
-#if USE_PBO == 0 || USE_PBO == 1
-		QImage img(dir.filePath(filename));
-		QImage tex = QGLWidget::convertToGLFormat(img);
-
-		Timer t;
-
-		t.Start();
-		{
-			GPU::Texture<GL_TEXTURE_2D> * pTexture = new GPU::Texture<GL_TEXTURE_2D>();
-
-			glBindTexture(GL_TEXTURE_2D, pTexture->GetObject());
-
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex.width(), tex.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
-#if USE_PBO == 0
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.width(), tex.height(), GL_RGBA, GL_UNSIGNED_BYTE, tex.bits());
-#elif USE_PBO == 1
-			size_t size = (tex.width() * tex.height() * 4 * sizeof(char));
-
-			if (size > totalBufferSize)
-			{
-				GPU::realloc(*m_pSpecial, size, GL_STREAM_DRAW);
-
-				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pSpecial->GetObject());
-
-				void * ptr = glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, size, GL_MAP_WRITE_BIT);
-				memcpy(ptr, tex.bits(), size);
-				glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
-
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.width(), tex.height(), GL_RGBA, GL_UNSIGNED_BYTE, BUFFER_OFFSET(0));
-
-				offset = size;
-
-				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-
-				continue;
-			}
-
-			int nextOffset = offset + size;
-			if (nextOffset > totalBufferSize)
-			{
-				buf = (buf + 1) % NB_BUFFER;
-
-				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_apBuffer[buf]->GetObject());
-
-				void * ptr = glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, size, GL_MAP_WRITE_BIT);
-				memcpy(ptr, tex.bits(), size);
-				glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
-
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.width(), tex.height(), GL_RGBA, GL_UNSIGNED_BYTE, BUFFER_OFFSET(0));
-
-				offset = size;
-
-				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-			}
-			else
-			{
-				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_apBuffer[buf]->GetObject());
-
-				void * ptr = glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, offset, size, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-				memcpy(ptr, tex.bits(), size);
-				glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
-
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.width(), tex.height(), GL_RGBA, GL_UNSIGNED_BYTE, BUFFER_OFFSET(offset));
-
-				offset = nextOffset % totalBufferSize;
-
-				glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-			}
-
-			glBindTexture(GL_TEXTURE_2D, 0);
-
-			if (0 == offset)
-			{
-				++buf;
-				GPU::realloc(*(m_apBuffer[buf]), totalBufferSize, GL_STREAM_DRAW);
-			}
-#endif
-		}
-		t.Stop();
-
-		double elapsed = t.getElapsedTimeInMs();
-		totalTime += elapsed;
-		printf("CPU time : %f \n", elapsed);
-#elif USE_PBO == 2
-		loadTexture(dir.filePath(filename));
-#endif
-	}
-
-	printf("Total Time elapsed : %f \n", totalTime);
-
-#if 0
-	Timer t;
-
-	t.Start();
-	glFinish();
-	t.Stop();
-
-	printf("Finish CPU time : %f \n", t.getElapsedTimeInMs());
-#endif
 }
 
 /**
@@ -497,21 +381,21 @@ void DrawableSurface::loadAllMaterials(const aiScene * scene)
 }
 
 /**
- * @brief DrawableSurface::addMeshRecursive
+ * @brief addMeshRecursive
  * @param nd
  * @param parentTransformation
  * @param preloaded
  */
-void DrawableSurface::addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformation, const std::vector<SubMesh *> & preloaded, GPU::Buffer<GL_ARRAY_BUFFER> * vertexBuffer, GPU::Buffer<GL_ELEMENT_ARRAY_BUFFER> * indexBuffer, const std::vector<SubMeshDefinition> & offsets, const std::vector<Mesh::VertexSpec> & specs)
+static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformation, const std::vector<SubMesh *> & preloaded, GPU::Buffer<GL_ARRAY_BUFFER> * vertexBuffer, GPU::Buffer<GL_ELEMENT_ARRAY_BUFFER> * indexBuffer, const std::vector<DrawableSurface::SubMeshDefinition> & offsets, const std::vector<Mesh::VertexSpec> & specs, std::vector<Mesh*> & apMeshes)
 {
 	mat4x4 transformation = parentTransformation * ASSIMP_MAT4X4(nd->mTransformation);
 
 	Mesh * m = new Mesh(vertexBuffer, specs, indexBuffer);
-	m_apMeshes.push_back(m);
+	apMeshes.push_back(m);
 
 	for (int i = 0; i < nd->mNumMeshes; ++i)
 	{
-		const SubMeshDefinition & offset = offsets[nd->mMeshes[i]];
+		const DrawableSurface::SubMeshDefinition & offset = offsets[nd->mMeshes[i]];
 		SubMesh * subMesh = m->AddSubMesh(offset.triangle_count, GL_TRIANGLES, offset.index_offset, GL_UNSIGNED_INT, offset.base_vertex);
 		subMesh->m_material = offset.material;
 		subMesh->m_pNormalMap = offset.m_pNormalMap;
@@ -538,11 +422,11 @@ void DrawableSurface::addMeshRecursive(const aiNode * nd, const mat4x4 & parentT
 
 	instance.transformation = transformation;
 
-	m_renderer.m_scene.insert(instance);
+	g_RendererWrapper.getScene().insert(instance);
 
 	for (int i = 0; i < nd->mNumChildren; ++i)
 	{
-		addMeshRecursive(nd->mChildren[i], transformation, preloaded, vertexBuffer, indexBuffer, offsets, specs);
+		addMeshRecursive(nd->mChildren[i], transformation, preloaded, vertexBuffer, indexBuffer, offsets, specs, apMeshes);
 	}
 }
 
@@ -851,7 +735,7 @@ void DrawableSurface::importScene(const QString & filename)
 
 	const mat4x4 identity (1.0f);
 
-	addMeshRecursive(scene->mRootNode, identity, meshes, vertexBuffer, indexBuffer, offsets, specs);
+	addMeshRecursive(scene->mRootNode, identity, meshes, vertexBuffer, indexBuffer, offsets, specs, m_apMeshes);
 }
 
 /**

@@ -658,7 +658,7 @@ void NodeEditorWindow::createTextureNodeFromDialog(void)
  */
 void NodeEditorWindow::updateTextures(void)
 {
-	extern  Rendering * g_pRendering;
+	extern RendererWrapper g_RendererWrapper;
 
 	QList<QGraphicsItem*> items = m_pScene->items();
 
@@ -680,16 +680,9 @@ void NodeEditorWindow::updateTextures(void)
 					char szId [16];
 					sprintf(szId, "%lld", uintptr_t(pNodeItem));
 
-					const GPU::Texture<GL_TEXTURE_2D> * pTexture = g_pRendering->GetRenderTexture(szId);
+					GLuint textureId = g_RendererWrapper.GetRenderTexture(szId);
 
-					if (pTexture)
-					{
-						pNodeTextureItem->setTexture(pTexture->GetObject());
-					}
-					else
-					{
-						pNodeTextureItem->setTexture(0);
-					}
+					pNodeTextureItem->setTexture(textureId);
 				}
 			}
 			break;

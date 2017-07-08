@@ -1,10 +1,6 @@
 #pragma once
 
-#define HAVE_OPENGL 1
-#define HAVE_VULKAN 0
-#define HAVE_GL_GLCOREARB_H 1
-
-#include "Rendering/Rendering.h"
+#include "RendererWrapper.h"
 
 #include <QtOpenGL>
 
@@ -14,8 +10,6 @@ typedef QGLWidget QOpenGLWidget;
 #endif // (QT_VERSION < QT_VERSION_CHECK(5, 4, 0))
 
 #include "Camera/Camera.h"
-
-#define NB_BUFFER 10
 
 class QDir;
 class QString;
@@ -51,13 +45,7 @@ protected:
 	void    keyPressEvent       (QKeyEvent * event);
 	void    keyReleaseEvent     (QKeyEvent * event);
 
-private:
-
-	void	loadSprites			(void);
-
-	GPU::Texture<GL_TEXTURE_2D> * loadTexture(const QString & filepath);
-
-	void loadAllMaterials(const aiScene * scene);
+public:
 
 	struct SubMeshDefinition
 	{
@@ -70,7 +58,13 @@ private:
 		vec3 m_vMax;
 	};
 
-	void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformation, const std::vector<SubMesh*> & preloaded, GPU::Buffer<GL_ARRAY_BUFFER> * vertexBuffer, GPU::Buffer<GL_ELEMENT_ARRAY_BUFFER> * indexBuffer, const std::vector<SubMeshDefinition> & offsets, const std::vector<Mesh::VertexSpec> & specs);
+private:
+
+	Object * getObjectAtPos(const ivec2 & pos);
+
+	GPU::Texture<GL_TEXTURE_2D> * loadTexture(const QString & filepath);
+
+	void loadAllMaterials(const aiScene * scene);
 
 	// Rendering
 	Camera		m_camera;
@@ -82,9 +76,6 @@ private:
 	//
 	unsigned int m_query;
 
-	GPU::Buffer<GL_PIXEL_UNPACK_BUFFER> * m_apBuffer [NB_BUFFER];
-	GPU::Buffer<GL_PIXEL_UNPACK_BUFFER> * m_pSpecial;
-
 	vec4 m_vClearColor;
 	vec4 m_vAmbientColor;
 
@@ -92,11 +83,7 @@ private:
 
 	Object * m_pSelectedObject;
 
-	const GPU::Texture<GL_TEXTURE_2D> * m_pCurrentTexture;
-
-public:
-
-	Rendering	m_renderer;
+	GLuint m_uCurrentTexture;
 
 signals:
 
