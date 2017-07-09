@@ -36,7 +36,7 @@
 #define _min(x, y) ((x < y) ? x : y)
 #define _max(x, y) ((x > y) ? x : y)
 
-static GPU::Texture<GL_TEXTURE_2D> * loadTexture(const QString & filename);
+static GLuint loadTexture(const QString & filename);
 
 extern RendererWrapper g_RendererWrapper;
 
@@ -46,7 +46,7 @@ struct SubMeshDefinition
 	unsigned int index_offset; // GL_UNSIGNED_INT
 	unsigned int base_vertex;
 	SubMesh::Material material;
-	const GPU::Texture<GL_TEXTURE_2D> * m_pNormalMap;
+	GLuint m_NormalMapId;
 	vec3 m_vMin;
 	vec3 m_vMax;
 };
@@ -393,11 +393,11 @@ void DrawableSurface::loadAllMaterials(const aiScene * scene)
 			{
 				QString texture_filename(str.C_Str());
 
-				GPU::Texture<GL_TEXTURE_2D> * pTexture = loadTexture(texture_filename);
+				GLuint textureId = loadTexture(texture_filename);
 
-				if (nullptr != pTexture)
+				if (0 != textureId)
 				{
-					g_Textures.insert(std::pair<std::string, GPU::Texture<GL_TEXTURE_2D> *>(texture_filename.toStdString(), pTexture));
+					g_Textures.insert(std::pair<std::string, GLuint>(texture_filename.toStdString(), textureId));
 				}
 			}
 		}
@@ -422,7 +422,7 @@ static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformat
 		const SubMeshDefinition & offset = offsets[nd->mMeshes[i]];
 		SubMesh * subMesh = m->AddSubMesh(offset.triangle_count, GL_TRIANGLES, offset.index_offset, GL_UNSIGNED_INT, offset.base_vertex);
 		subMesh->m_material = offset.material;
-		subMesh->m_pNormalMap = offset.m_pNormalMap;
+		subMesh->m_NormalMapId = offset.m_NormalMapId;
 
 		m->m_BoundingBox.min.x = _min(m->m_BoundingBox.min.x, offset.m_vMin.x);
 		m->m_BoundingBox.min.y = _min(m->m_BoundingBox.min.y, offset.m_vMin.y);
@@ -460,7 +460,7 @@ static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformat
  * @param filename
  * @return
  */
-static GPU::Texture<GL_TEXTURE_2D> * loadTexture(const QString & filename)
+static GLuint loadTexture(const QString & filename)
 {
 	QImage img;
 
@@ -479,20 +479,22 @@ static GPU::Texture<GL_TEXTURE_2D> * loadTexture(const QString & filename)
 
 	if (size > 0)
 	{
-		GPU::Texture<GL_TEXTURE_2D> * pTexture = new GPU::Texture<GL_TEXTURE_2D>();
+		GLuint textureId = 0;
 
-		pTexture->init<GL_RGBA8>(tex.width(), tex.height());
+		glGenTextures(1, &textureId); // FIXME !!!!
 
-		glBindTexture(GL_TEXTURE_2D, pTexture->GetObject());
-
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.width(), tex.height(), GL_RGBA, GL_UNSIGNED_BYTE, tex.bits());
-
+		glBindTexture(GL_TEXTURE_2D, textureId);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.width(), tex.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, tex.bits());
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		return(pTexture);
+		return(textureId);
 	}
 
-	return(nullptr);
+	return(0);
 }
 
 /**
@@ -660,7 +662,7 @@ void DrawableSurface::importScene(const QString & filename)
 		definition.m_vMin = min;
 		definition.m_vMax = max;
 
-		definition.m_pNormalMap = nullptr;
+		definition.m_NormalMapId = 0;
 
 		if (mesh->HasTangentsAndBitangents())
 		{
@@ -670,7 +672,7 @@ void DrawableSurface::importScene(const QString & filename)
 
 			if (g_Textures.find(texture_name) != g_Textures.end())
 			{
-				definition.m_pNormalMap = g_Textures[texture_name];
+				definition.m_NormalMapId = g_Textures[texture_name];
 			}
 		}
 
@@ -688,11 +690,11 @@ void DrawableSurface::importScene(const QString & filename)
 				aiColor3D color (0.f, 0.f, 0.f);
 				scene->mMaterials[mesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE,color);
 
-				definition.material.m_diffuse = new GPU::Texture<GL_TEXTURE_2D>();
+				GPU::Texture<GL_TEXTURE_2D> * pTexture = new GPU::Texture<GL_TEXTURE_2D>(); // FIXME
 
-				definition.material.m_diffuse->init<GL_RGBA8>(1, 1);
+				pTexture->init<GL_RGBA8>(1, 1);
 
-				glBindTexture(GL_TEXTURE_2D, definition.material.m_diffuse->GetObject());
+				glBindTexture(GL_TEXTURE_2D, pTexture->GetObject());
 
 				unsigned char texels [] =
 				{
@@ -705,6 +707,8 @@ void DrawableSurface::importScene(const QString & filename)
 				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, texels);
 
 				glBindTexture(GL_TEXTURE_2D, 0);
+
+				definition.material.m_diffuse = pTexture->GetObject();
 			}
 		}
 
@@ -722,11 +726,11 @@ void DrawableSurface::importScene(const QString & filename)
 				aiColor3D color (0.f, 0.f, 0.f);
 				scene->mMaterials[mesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE,color);
 
-				definition.material.m_specular = new GPU::Texture<GL_TEXTURE_2D>();
+				GPU::Texture<GL_TEXTURE_2D> * pTexture = new GPU::Texture<GL_TEXTURE_2D>(); // FIXME
 
-				definition.material.m_specular->init<GL_RGBA8>(1, 1);
+				pTexture->init<GL_RGBA8>(1, 1);
 
-				glBindTexture(GL_TEXTURE_2D, definition.material.m_specular->GetObject());
+				glBindTexture(GL_TEXTURE_2D, pTexture->GetObject());
 
 				unsigned char texels [] =
 				{
@@ -739,6 +743,8 @@ void DrawableSurface::importScene(const QString & filename)
 				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, texels);
 
 				glBindTexture(GL_TEXTURE_2D, 0);
+
+				definition.material.m_specular = pTexture->GetObject();
 			}
 		}
 
