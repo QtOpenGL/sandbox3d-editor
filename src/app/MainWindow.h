@@ -1,9 +1,9 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QColorDialog>
 
 #include "NodeEditorWindow.h"
-#include "EnvSettingsWidget.h"
 
 class QDockWidget;
 class QFileDialog;
@@ -40,7 +40,6 @@ private:
 protected:
 
 	NodeEditorWindow * m_pNodeEditorWindow;
-	EnvSettingsWidget * m_pEnvSettingsWidget;
 
 public:
 
