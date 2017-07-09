@@ -1,11 +1,3 @@
-// -------------------------------------------------------------
-// TODO : remove this
-#define HAVE_OPENGL 1
-#define HAVE_VULKAN 0
-#define HAVE_GL_GLCOREARB_H 1
-#include "Rendering/Rendering.h"
-// -------------------------------------------------------------
-
 #include "NodeEditorWindow.h"
 #include "ui_NodeEditorWindow.h"
 
