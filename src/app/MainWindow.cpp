@@ -2,6 +2,7 @@
 #include "ui_MainWindow.h"
 
 #include "DrawableSurface.h"
+#include "RendererWrapper.h"
 #include "SerializeGraph.h"
 
 #include <QSettings>

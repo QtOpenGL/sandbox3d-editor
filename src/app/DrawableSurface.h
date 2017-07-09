@@ -1,8 +1,7 @@
 #pragma once
 
-#include "RendererWrapper.h"
-
 #include <QtOpenGL>
+#include <QOpenGLFunctions_3_2_Core>
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 4, 0))
 #include <QGLWidget>
@@ -17,7 +16,10 @@ class QString;
 class aiScene;
 class aiNode;
 
-class DrawableSurface : public QOpenGLWidget
+class Object;
+class Mesh;
+
+class DrawableSurface : public QOpenGLWidget, public QOpenGLFunctions_3_2_Core
 {
 	Q_OBJECT
 
@@ -45,24 +47,9 @@ protected:
 	void    keyPressEvent       (QKeyEvent * event);
 	void    keyReleaseEvent     (QKeyEvent * event);
 
-public:
-
-	struct SubMeshDefinition
-	{
-		unsigned int triangle_count; // GL_TRIANGLES
-		unsigned int index_offset; // GL_UNSIGNED_INT
-		unsigned int base_vertex;
-		SubMesh::Material material;
-		const GPU::Texture<GL_TEXTURE_2D> * m_pNormalMap;
-		vec3 m_vMin;
-		vec3 m_vMax;
-	};
-
 private:
 
 	Object * getObjectAtPos(const ivec2 & pos);
-
-	GPU::Texture<GL_TEXTURE_2D> * loadTexture(const QString & filepath);
 
 	void loadAllMaterials(const aiScene * scene);
 
@@ -74,7 +61,7 @@ private:
 	bool		m_bMoved;
 
 	//
-	unsigned int m_query;
+	GLuint m_query;
 
 	vec4 m_vClearColor;
 	vec4 m_vAmbientColor;

@@ -1,4 +1,14 @@
-﻿#include "DrawableSurface.h"
+﻿// -------------------------------------------------------------
+// TODO : remove this
+#define HAVE_OPENGL 1
+#define HAVE_VULKAN 0
+#define HAVE_GL_GLCOREARB_H 1
+#include "Rendering/Rendering.h"
+// -------------------------------------------------------------
+
+#include "DrawableSurface.h"
+
+#include "RendererWrapper.h"
 
 #include "MainWindow.h"
 
@@ -26,7 +36,20 @@
 #define _min(x, y) ((x < y) ? x : y)
 #define _max(x, y) ((x > y) ? x : y)
 
+static GPU::Texture<GL_TEXTURE_2D> * loadTexture(const QString & filename);
+
 extern RendererWrapper g_RendererWrapper;
+
+struct SubMeshDefinition
+{
+	unsigned int triangle_count; // GL_TRIANGLES
+	unsigned int index_offset; // GL_UNSIGNED_INT
+	unsigned int base_vertex;
+	SubMesh::Material material;
+	const GPU::Texture<GL_TEXTURE_2D> * m_pNormalMap;
+	vec3 m_vMin;
+	vec3 m_vMax;
+};
 
 /**
  * @brief Constructor
@@ -80,6 +103,7 @@ void DrawableSurface::setCurrentTexture(const std::string & strFinalTextureId)
  */
 void DrawableSurface::initializeGL(void)
 {
+	QOpenGLFunctions_3_2_Core::initializeOpenGLFunctions();
 	QOpenGLResourceManager::instance().init();
 
 	GLint v;
@@ -386,7 +410,7 @@ void DrawableSurface::loadAllMaterials(const aiScene * scene)
  * @param parentTransformation
  * @param preloaded
  */
-static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformation, const std::vector<SubMesh *> & preloaded, GPU::Buffer<GL_ARRAY_BUFFER> * vertexBuffer, GPU::Buffer<GL_ELEMENT_ARRAY_BUFFER> * indexBuffer, const std::vector<DrawableSurface::SubMeshDefinition> & offsets, const std::vector<Mesh::VertexSpec> & specs, std::vector<Mesh*> & apMeshes)
+static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformation, const std::vector<SubMesh *> & preloaded, GPU::Buffer<GL_ARRAY_BUFFER> * vertexBuffer, GPU::Buffer<GL_ELEMENT_ARRAY_BUFFER> * indexBuffer, const std::vector<SubMeshDefinition> & offsets, const std::vector<Mesh::VertexSpec> & specs, std::vector<Mesh*> & apMeshes)
 {
 	mat4x4 transformation = parentTransformation * ASSIMP_MAT4X4(nd->mTransformation);
 
@@ -395,7 +419,7 @@ static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformat
 
 	for (int i = 0; i < nd->mNumMeshes; ++i)
 	{
-		const DrawableSurface::SubMeshDefinition & offset = offsets[nd->mMeshes[i]];
+		const SubMeshDefinition & offset = offsets[nd->mMeshes[i]];
 		SubMesh * subMesh = m->AddSubMesh(offset.triangle_count, GL_TRIANGLES, offset.index_offset, GL_UNSIGNED_INT, offset.base_vertex);
 		subMesh->m_material = offset.material;
 		subMesh->m_pNormalMap = offset.m_pNormalMap;
@@ -431,12 +455,12 @@ static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformat
 }
 
 /**
- * @brief DrawableSurface::loadTexture
+ * @brief loadTexture
  * @param dir
  * @param filename
  * @return
  */
-GPU::Texture<GL_TEXTURE_2D> * DrawableSurface::loadTexture(const QString & filename)
+static GPU::Texture<GL_TEXTURE_2D> * loadTexture(const QString & filename)
 {
 	QImage img;
 
