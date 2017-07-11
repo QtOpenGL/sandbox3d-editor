@@ -1,6 +1,11 @@
 #include "ConnectorOutput.h"
 
+#include "Node.h"
+#include "Edge.h"
+
 #include <QPainter>
+
+#include <QGraphicsScene>
 
 #define USE_FULL_CIRCLE 0
 
@@ -103,5 +108,28 @@ void ConnectorOutput::paint(QPainter * painter, const QStyleOptionGraphicsItem *
 #endif // USE_FULL_CIRCLE
 }
 
+/**
+ * @brief ConnectorOutput::itemChange
+ * @param change
+ * @param value
+ * @return
+ */
+QVariant ConnectorOutput::itemChange(GraphicsItemChange change, const QVariant & value)
+{
+	if (change == ItemSceneHasChanged)
+	{
+		if (!scene())
+		{
+			for (Edge * edge : m_aEdges)
+			{
+				delete edge;
+			}
+
+			m_aEdges.clear();
+		}
+	}
+
+	return QGraphicsItem::itemChange(change, value);
+}
 
 }

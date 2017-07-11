@@ -31,6 +31,8 @@ protected:
 	QPainterPath	shape				(void) const override;
     void			paint				(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) override;
 
+	QVariant		itemChange			(GraphicsItemChange change, const QVariant & value) override;
+
 private:
 
 	Edge * m_pEdge;

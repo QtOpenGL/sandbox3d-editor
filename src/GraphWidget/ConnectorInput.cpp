@@ -1,6 +1,7 @@
 #include "ConnectorInput.h"
 
 #include "Node.h"
+#include "Edge.h"
 
 #include <QPainter>
 
@@ -35,8 +36,12 @@ void ConnectorInput::setEdge(Edge * pEdge)
 {
 	if (nullptr != m_pEdge)
 	{
-		scene()->removeItem((QGraphicsItem*)m_pEdge);
-		delete m_pEdge;
+		QGraphicsScene * pScene = scene();
+		if (pScene)
+		{
+			pScene->removeItem((QGraphicsItem*)m_pEdge);
+		}
+		//delete m_pEdge;
 	}
 
 	m_pEdge = pEdge;
@@ -102,6 +107,26 @@ void ConnectorInput::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 	path.arcTo(QRectF(-radius, -radius, radius*2.0, radius*2.0), 90.0, 180.0);
 	painter->drawPath(path);
 #endif // USE_FULL_CIRCLE
+}
+
+/**
+ * @brief ConnectorInput::itemChange
+ * @param change
+ * @param value
+ * @return
+ */
+QVariant ConnectorInput::itemChange(GraphicsItemChange change, const QVariant & value)
+{
+	if (change == ItemSceneHasChanged)
+	{
+		if (!scene())
+		{
+			delete m_pEdge;
+			m_pEdge = nullptr;
+		}
+	}
+
+	return QGraphicsItem::itemChange(change, value);
 }
 
 }
