@@ -51,22 +51,12 @@ private:
 
 	Object * getObjectAtPos(const ivec2 & pos);
 
-	void loadAllMaterials(const aiScene * scene);
-
 	// Rendering
 	Camera		m_camera;
 
 	// Navigation
 	ivec2		m_vLastPos;
 	bool		m_bMoved;
-
-	//
-	GLuint m_query;
-
-	vec4 m_vClearColor;
-	vec4 m_vAmbientColor;
-
-	std::vector<Mesh*> m_apMeshes;
 
 	Object * m_pSelectedObject;
 
@@ -77,9 +67,6 @@ signals:
 public slots:
 
 	void importScene(const QString & filename);
-
-	void setClearColor(const QColor & color);
-	void setAmbientColor(const QColor & color);
 
 	void	onFrameSwapped			(void);
 	void	onResized				(void);

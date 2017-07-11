@@ -109,7 +109,6 @@
     <property name="title">
      <string>Settings</string>
     </property>
-    <addaction name="actionClear_color"/>
     <addaction name="actionNode_Editor"/>
    </widget>
    <widget class="QMenu" name="menuCamera">
