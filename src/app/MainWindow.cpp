@@ -27,14 +27,6 @@ MainWindow::MainWindow(QWidget * pParent)
 	setCentralWidget(m_pDrawable);
 
 	{
-		m_pClearColorChooser = new QColorDialog(this);
-		m_pClearColorChooser->hide();
-		m_pClearColorChooser->setWindowTitle("Clear Color Chooser");
-		connect(m_pClearColorChooser, SIGNAL(currentColorChanged(const QColor &)), m_pDrawable, SLOT(setClearColor(const QColor &)));
-		m_pClearColorChooser->setCurrentColor(QColor::fromRgbF(0.5f, 0.5f, 0.5f));
-	}
-
-	{
 		m_pFileChooser = new QFileDialog(this );
 		m_pFileChooser->hide();
 		m_pFileChooser->setWindowTitle("Import scene ...");
@@ -51,17 +43,6 @@ MainWindow::MainWindow(QWidget * pParent)
 		m_pFileChooser->setNameFilters(filter.split(' '));
 
 		connect(m_pFileChooser, SIGNAL(fileSelected(const QString &)), m_pDrawable, SLOT(importScene(const QString &)));
-	}
-
-	{
-		// TODO : make this work !
-		m_pFileWatcher = new QFileSystemWatcher(this);
-		m_pFileWatcher->addPath("data/shaders");
-		connect(m_pFileWatcher, SIGNAL(directoryChanged(QString)), m_pDrawable, SLOT(reloadShader(QString)));
-	}
-
-	{
-	//	m_pEnvSettingsWidget = new EnvSettingsWidget(this, m_pDrawable->m_renderer.environment);
 	}
 
 	{
@@ -172,14 +153,6 @@ void MainWindow::on_actionFullscreen_toggled(bool checked)
 void MainWindow::on_actionImport_triggered()
 {
 	m_pFileChooser->show();
-}
-
-/**
- * @brief MainWindow::on_actionClear_color_clicked
- */
-void MainWindow::on_actionClear_color_triggered()
-{
-	m_pClearColorChooser->show();
 }
 
 /**

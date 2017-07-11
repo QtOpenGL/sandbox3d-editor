@@ -45,11 +45,7 @@ public:
 
 	DrawableSurface * m_pDrawable;
 
-	QColorDialog * m_pClearColorChooser;
-
 	QFileDialog * m_pFileChooser;
-
-	QFileSystemWatcher * m_pFileWatcher;
 
 private slots:
 
@@ -57,7 +53,6 @@ private slots:
 
 	void on_actionImport_triggered();
 
-	void on_actionClear_color_triggered();
 	void on_actionNode_Editor_triggered();
 
 	void on_actionResetCamera_triggered();
