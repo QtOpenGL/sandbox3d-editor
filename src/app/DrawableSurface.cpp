@@ -178,9 +178,7 @@ void DrawableSurface::onFrameSwapped(void)
  */
 void DrawableSurface::onResized(void)
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
-	g_RendererWrapper.SetDefaultFramebuffer(defaultFramebufferObject());
-#endif // (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+	//update();
 }
 
 /**

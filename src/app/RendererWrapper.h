@@ -39,8 +39,6 @@ public:
 	// ...
 	unsigned int /*GLuint*/ GetRenderTexture(const char * name) const;
 
-	void SetDefaultFramebuffer(unsigned int /*GLuint*/ framebuffer);
-
 	//
 	// ...
 	const mat4x4 & getProjection(void) const;

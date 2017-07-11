@@ -146,15 +146,6 @@ GLuint RendererWrapper::GetRenderTexture(const char * name) const
 }
 
 /**
- * @brief RendererWrapper::SetDefaultFramebuffer
- * @param framebuffer
- */
-void RendererWrapper::SetDefaultFramebuffer(GLuint framebuffer)
-{
-	g_pRendering->SetDefaultFramebuffer(framebuffer);
-}
-
-/**
  * @brief RendererWrapper::getScene
  * @return
  */
