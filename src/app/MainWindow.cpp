@@ -56,8 +56,6 @@ MainWindow::MainWindow(QWidget * pParent)
 	restoreState(settings.value("mainWindowState").toByteArray());
 
 	ui->statusbar->showMessage(tr("Ready"), 2000);
-	ui->statusbar->addPermanentWidget(ui->cpu_time_text);
-	ui->statusbar->addPermanentWidget(ui->gpu_time_text);
 }
 
 /**
@@ -89,37 +87,6 @@ void MainWindow::closeEvent(QCloseEvent * pEvent)
 	QSettings settings;
 	settings.setValue("mainWindowGeometry", saveGeometry());
 	settings.setValue("mainWindowState", saveState());
-}
-
-/**
- * @brief MainWindow::SetRenderTime
- * @param t
- */
-void MainWindow::SetRenderTime(double cpu_time, double gpu_time)
-{
-	QString str1 = "CPU : "+ QString::number(cpu_time, 'f', 6 ) +" ms";
-	ui->cpu_time_text->setText(str1);
-
-	if (cpu_time < 4.0)
-	{
-		ui->cpu_time_text->setStyleSheet("* {color : black; }");
-	}
-	else
-	{
-		ui->cpu_time_text->setStyleSheet("* {color : red; }");
-	}
-
-	QString str2 = "GPU : "+ QString::number(gpu_time, 'f', 6 ) +" ms";
-	ui->gpu_time_text->setText(str2);
-
-	if (gpu_time < 16.0)
-	{
-		ui->gpu_time_text->setStyleSheet("* {color : black; }");
-	}
-	else
-	{
-		ui->gpu_time_text->setStyleSheet("* {color : red; }");
-	}
 }
 
 /**
