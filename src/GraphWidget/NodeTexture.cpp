@@ -6,6 +6,8 @@
 #include <QPainter>
 #include <QtOpenGL>
 
+#include <QOpenGLFunctions_3_0>
+
 namespace GraphWidget
 {
 
@@ -105,6 +107,14 @@ QPainterPath NodeTexture::shape(void) const
  */
 void NodeTexture::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
+	QOpenGLContext * pContext = QOpenGLContext::currentContext();
+	QOpenGLFunctions_3_0 * glFuncs = pContext->versionFunctions<QOpenGLFunctions_3_0>();
+
+	if (!glFuncs)
+	{
+		return;
+	}
+
 	double border = 1.0;
 	QRectF rect = QRectF(0.0, 0.0, width, height);
 
@@ -112,15 +122,15 @@ void NodeTexture::paint(QPainter * painter, const QStyleOptionGraphicsItem * opt
 
 	// Draw Render Target using OpenGL
 	// MUST use old OpenGL because it seems that QGraphicsView does NOT support OpenGL > 3
-	glEnable(GL_TEXTURE_2D);
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glBegin(GL_QUADS);
-	glTexCoord2d(0.0,1.0); glVertex2d(0.0,			0.0);
-	glTexCoord2d(1.0,1.0); glVertex2d(0.0 + width,	0.0);
-	glTexCoord2d(1.0,0.0); glVertex2d(0.0 + width,	0.0 + height);
-	glTexCoord2d(0.0,0.0); glVertex2d(0.0,			0.0 + height);
-	glEnd();
+	glFuncs->glEnable(GL_TEXTURE_2D);
+	glFuncs->glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glFuncs->glBindTexture(GL_TEXTURE_2D, texture);
+	glFuncs->glBegin(GL_QUADS);
+	glFuncs->glTexCoord2d(0.0,1.0); glFuncs->glVertex2d(0.0,			0.0);
+	glFuncs->glTexCoord2d(1.0,1.0); glFuncs->glVertex2d(0.0 + width,	0.0);
+	glFuncs->glTexCoord2d(1.0,0.0); glFuncs->glVertex2d(0.0 + width,	0.0 + height);
+	glFuncs->glTexCoord2d(0.0,0.0); glFuncs->glVertex2d(0.0,			0.0 + height);
+	glFuncs->glEnd();
 
 	painter->endNativePainting();
 

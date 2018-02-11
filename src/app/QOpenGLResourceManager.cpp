@@ -1,5 +1,7 @@
 #include "QOpenGLResourceManager.h"
 
+#include <QOpenGLFunctions_3_1>
+
 QOpenGLResourceManager QOpenGLResourceManager::instance_;
 
 /**
@@ -33,6 +35,14 @@ QOpenGLResourceManager::~QOpenGLResourceManager(void)
  */
 bool QOpenGLResourceManager::init(void)
 {
+	QOpenGLContext * pContext = QOpenGLContext::currentContext();
+	QOpenGLFunctions_3_1 * glFuncs = pContext->versionFunctions<QOpenGLFunctions_3_1>();
+
+	if (!glFuncs)
+	{
+		return(false);
+	}
+
 	initShaders();
 
 	static const float points [] =
@@ -88,7 +98,7 @@ bool QOpenGLResourceManager::init(void)
 
 	m_sharedVertexBuffer.release();
 
-	glGenFramebuffers(1, &m_pickBufferFramebuffer);
+	glFuncs->glGenFramebuffers(1, &m_pickBufferFramebuffer);
 	onResize(QSize(1280, 720));
 
 	return(true);
@@ -116,42 +126,50 @@ void QOpenGLResourceManager::release(void)
  */
 void QOpenGLResourceManager::onResize(const QSize & size)
 {
+	QOpenGLContext * pContext = QOpenGLContext::currentContext();
+	QOpenGLFunctions_3_1 * glFuncs = pContext->versionFunctions<QOpenGLFunctions_3_1>();
+
+	if (!glFuncs)
+	{
+		return;
+	}
+
 	//
 	// Release previous texture if needed
 	if (0 != m_pickBufferColorTexture)
 	{
-		glDeleteTextures(1, &m_pickBufferColorTexture);
+		glFuncs->glDeleteTextures(1, &m_pickBufferColorTexture);
 	}
 
 	//
 	// Create Color texture
 	{
-		glGenTextures(1, &m_pickBufferColorTexture);
-		glBindTexture(GL_TEXTURE_2D, m_pickBufferColorTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, size.width(), size.height(), 0, GL_RED_INTEGER, GL_UNSIGNED_INT, nullptr);
+		glFuncs->glGenTextures(1, &m_pickBufferColorTexture);
+		glFuncs->glBindTexture(GL_TEXTURE_2D, m_pickBufferColorTexture);
+		glFuncs->glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, size.width(), size.height(), 0, GL_RED_INTEGER, GL_UNSIGNED_INT, nullptr);
 	}
 
 	//
 	// Release previous texture if needed
 	if (0 != m_pickBufferDepthRenderbuffer)
 	{
-		glDeleteRenderbuffers(1, &m_pickBufferDepthRenderbuffer);
+		glFuncs->glDeleteRenderbuffers(1, &m_pickBufferDepthRenderbuffer);
 	}
 
 	//
 	// Create Depth buffer
 	{
-		glGenRenderbuffers(1, &m_pickBufferDepthRenderbuffer);
-		glBindRenderbuffer(GL_RENDERBUFFER, m_pickBufferDepthRenderbuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, size.width(), size.height());
+		glFuncs->glGenRenderbuffers(1, &m_pickBufferDepthRenderbuffer);
+		glFuncs->glBindRenderbuffer(GL_RENDERBUFFER, m_pickBufferDepthRenderbuffer);
+		glFuncs->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, size.width(), size.height());
 	}
 
 	//
 	// Bind
-	glBindFramebuffer(GL_FRAMEBUFFER, m_pickBufferFramebuffer);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_pickBufferColorTexture, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_pickBufferDepthRenderbuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glFuncs->glBindFramebuffer(GL_FRAMEBUFFER, m_pickBufferFramebuffer);
+	glFuncs->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_pickBufferColorTexture, 0);
+	glFuncs->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_pickBufferDepthRenderbuffer);
+	glFuncs->glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 /**
