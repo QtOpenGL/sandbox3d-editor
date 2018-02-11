@@ -20,16 +20,14 @@ endif()
 
 qt5_wrap_ui(UI_HEADER_FILES ${UI_FILES})
 
-# Assimp
-find_package(assimp REQUIRED)
-
-# Jansson
-find_library(JANSSON_LIBRARY jansson)
-
 set(RENDERER_LIB "" CACHE FILEPATH "Path to the renderer library")
 add_definitions(-DRENDERER_LIB=\"${RENDERER_LIB}\")
 
 # Compile application
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${UI_FILES})
 
-target_link_libraries(${PROJECT_NAME} sandbox_resources scene Sandbox3D ${assimp_LIBRARIES} ${JANSSON_LIBRARY} Qt5::Core Qt5::Widgets Qt5::Gui Qt5::OpenGL GraphWidget Graph)
+target_link_libraries(${PROJECT_NAME} PRIVATE sandbox_resources scene Qt5::Core Qt5::Widgets Qt5::Gui Qt5::OpenGL GraphWidget Graph)
+
+# Jansson
+find_library(JANSSON_LIBRARY jansson)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${JANSSON_LIBRARY})
