@@ -6,7 +6,6 @@
 #include <QSplashScreen>
 
 #include "MainWindow.h"
-#include "Remotery.h"
 
 RendererWrapper g_RendererWrapper;
 
@@ -36,9 +35,6 @@ int main(int argc, char ** argv)
 		return(-1);
 	}
 
-	Remotery* rmt;
-    rmt_CreateGlobalInstance(&rmt);
-
 	g_RendererWrapper.init();
 
 	MainWindow w;
@@ -47,8 +43,6 @@ int main(int argc, char ** argv)
 	int r = app.exec();
 
 	g_RendererWrapper.release();
-
-    rmt_DestroyGlobalInstance(rmt);
 
 	return(r);
 }
