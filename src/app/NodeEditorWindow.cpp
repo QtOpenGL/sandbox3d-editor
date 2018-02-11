@@ -37,7 +37,62 @@
 #define SCENE_SIZE_X 20000.0
 #define SCENE_SIZE_Y 20000.0
 
-#include "Rendering/StrToGL.h"
+GLenum StringToGLenum(const char * szEnumName)
+{
+	if (!strcmp(szEnumName, "GL_R8")) return(GL_R8);
+	else if (!strcmp(szEnumName, "GL_RG8")) return(GL_RG8);
+	else if (!strcmp(szEnumName, "GL_RGBA8")) return(GL_RGBA8);
+
+	else if (!strcmp(szEnumName, "GL_R16")) return(GL_R16);
+	else if (!strcmp(szEnumName, "GL_RG16")) return(GL_RG16);
+	else if (!strcmp(szEnumName, "GL_RGBA16")) return(GL_RGBA16);
+
+	else if (!strcmp(szEnumName, "GL_R16F")) return(GL_R16F);
+	else if (!strcmp(szEnumName, "GL_RG16F")) return(GL_RG16F);
+	else if (!strcmp(szEnumName, "GL_RGBA16F")) return(GL_RGBA16F);
+
+	else if (!strcmp(szEnumName, "GL_R32F")) return(GL_R32F);
+	else if (!strcmp(szEnumName, "GL_RG32F")) return(GL_RG32F);
+	else if (!strcmp(szEnumName, "GL_RGBA32F")) return(GL_RGBA32F);
+
+	else if (!strcmp(szEnumName, "GL_R8I")) return(GL_R8I);
+	else if (!strcmp(szEnumName, "GL_RG8I")) return(GL_RG8I);
+	else if (!strcmp(szEnumName, "GL_RGBA8I")) return(GL_RGBA8I);
+
+	else if (!strcmp(szEnumName, "GL_R16I")) return(GL_R16I);
+	else if (!strcmp(szEnumName, "GL_RG16I")) return(GL_RG16I);
+	else if (!strcmp(szEnumName, "GL_RGBA16I")) return(GL_RGBA16I);
+
+	else if (!strcmp(szEnumName, "GL_R32I")) return(GL_R32I);
+	else if (!strcmp(szEnumName, "GL_RG32I")) return(GL_RG32I);
+	else if (!strcmp(szEnumName, "GL_RGBA32I")) return(GL_RGBA32I);
+
+	else if (!strcmp(szEnumName, "GL_R8UI")) return(GL_R8UI);
+	else if (!strcmp(szEnumName, "GL_RG8UI")) return(GL_RG8UI);
+	else if (!strcmp(szEnumName, "GL_RGBA8UI")) return(GL_RGBA8UI);
+
+	else if (!strcmp(szEnumName, "GL_R16UI")) return(GL_R16UI);
+	else if (!strcmp(szEnumName, "GL_RG16UI")) return(GL_RG16UI);
+	else if (!strcmp(szEnumName, "GL_RGBA16UI")) return(GL_RGBA16UI);
+
+	else if (!strcmp(szEnumName, "GL_R32UI")) return(GL_R32UI);
+	else if (!strcmp(szEnumName, "GL_RG32UI")) return(GL_RG32UI);
+	else if (!strcmp(szEnumName, "GL_RGBA32UI")) return(GL_RGBA32UI);
+
+	else if (!strcmp(szEnumName, "GL_RGB10_A2")) return(GL_RGB10_A2);
+	else if (!strcmp(szEnumName, "GL_RGB10_A2UI")) return(GL_RGB10_A2UI);
+	else if (!strcmp(szEnumName, "GL_R11F_G11F_B10F")) return(GL_R11F_G11F_B10F);
+	else if (!strcmp(szEnumName, "GL_SRGB8_ALPHA8")) return(GL_SRGB8_ALPHA8);
+
+	else if (!strcmp(szEnumName, "GL_DEPTH_COMPONENT16")) return(GL_DEPTH_COMPONENT16);
+	else if (!strcmp(szEnumName, "GL_DEPTH_COMPONENT24")) return(GL_DEPTH_COMPONENT24);
+	else if (!strcmp(szEnumName, "GL_DEPTH_COMPONENT32F")) return(GL_DEPTH_COMPONENT32F);
+	else if (!strcmp(szEnumName, "GL_DEPTH24_STENCIL8")) return(GL_DEPTH24_STENCIL8);
+	else if (!strcmp(szEnumName, "GL_DEPTH32F_STENCIL8")) return(GL_DEPTH32F_STENCIL8);
+	else if (!strcmp(szEnumName, "GL_STENCIL_INDEX8")) return(GL_STENCIL_INDEX8);
+
+	return(0);
+}
 
 const char * GLenumToString(unsigned int e)
 {
@@ -346,7 +401,7 @@ bool NodeEditorWindow::loadGraph(void)
 		else if ("texture" == strType)
 		{
 			const std::string & strFormat = pNode->getMetaData("format");
-			unsigned int iFormat = strToFormat(strFormat.c_str());
+			unsigned int iFormat = StringToGLenum(strFormat.c_str());
 
 			n = createTextureNode(iFormat, 1024, 1024);
 		}
