@@ -32,8 +32,9 @@ public:
 
 	//
 	// Scene management
-	Scene &		getScene			(void);
-	bool		importToScene		(const char * szFilename);
+	Scene &			getScene			(void);
+	const Scene &	getScene			(void) const;
+	bool			importToScene		(const char * szFilename);
 
 	//
 	// ...
@@ -42,5 +43,9 @@ public:
 	//
 	// ...
 	const mat4x4 & getProjection(void) const;
+
+private:
+
+	Scene * m_pScene;
 
 };

@@ -40,7 +40,7 @@ struct SubMeshDefinition
 
 static GLuint loadTexture(const char * szFilename);
 static void loadAllMaterials(const aiScene * scene);
-static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformation, const std::vector<SubMesh *> & preloaded, GPU::Buffer<GL_ARRAY_BUFFER> * vertexBuffer, GPU::Buffer<GL_ELEMENT_ARRAY_BUFFER> * indexBuffer, const std::vector<SubMeshDefinition> & offsets, const std::vector<Mesh::VertexSpec> & specs, std::vector<Mesh*> & apMeshes);
+static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformation, const std::vector<SubMesh *> & preloaded, GPU::Buffer<GL_ARRAY_BUFFER> * vertexBuffer, GPU::Buffer<GL_ELEMENT_ARRAY_BUFFER> * indexBuffer, const std::vector<SubMeshDefinition> & offsets, const std::vector<Mesh::VertexSpec> & specs, std::vector<Mesh*> & apMeshes, Scene & scene);
 
 std::vector<Mesh*> g_apMeshes;
 
@@ -51,7 +51,7 @@ static Rendering * g_pRendering = nullptr; // ugly but needed for now
  */
 RendererWrapper::RendererWrapper(void)
 {
-	// ...
+	m_pScene = new Scene();
 }
 
 /**
@@ -59,7 +59,7 @@ RendererWrapper::RendererWrapper(void)
  */
 RendererWrapper::~RendererWrapper(void)
 {
-	// ...
+	delete m_pScene;
 }
 
 /**
@@ -68,7 +68,7 @@ RendererWrapper::~RendererWrapper(void)
  */
 bool RendererWrapper::init(void)
 {
-	g_pRendering = new Rendering();
+	g_pRendering = new Rendering(*m_pScene);
 	return(true);
 }
 
@@ -151,7 +151,16 @@ GLuint RendererWrapper::GetRenderTexture(const char * name) const
  */
 Scene & RendererWrapper::getScene(void)
 {
-	return(g_pRendering->m_scene);
+	return(*m_pScene);
+}
+
+/**
+ * @brief RendererWrapper::getScene
+ * @return
+ */
+const Scene & RendererWrapper::getScene(void) const
+{
+	return(*m_pScene);
 }
 
 /**
@@ -421,7 +430,7 @@ bool RendererWrapper::importToScene(const char * szFilename)
 
 	const mat4x4 identity (1.0f);
 
-	addMeshRecursive(scene->mRootNode, identity, meshes, vertexBuffer, indexBuffer, offsets, specs, g_apMeshes);
+	addMeshRecursive(scene->mRootNode, identity, meshes, vertexBuffer, indexBuffer, offsets, specs, g_apMeshes, *m_pScene);
 
 	return(false);
 }
@@ -518,7 +527,7 @@ static void loadAllMaterials(const aiScene * scene)
  * @param parentTransformation
  * @param preloaded
  */
-static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformation, const std::vector<SubMesh *> & preloaded, GPU::Buffer<GL_ARRAY_BUFFER> * vertexBuffer, GPU::Buffer<GL_ELEMENT_ARRAY_BUFFER> * indexBuffer, const std::vector<SubMeshDefinition> & offsets, const std::vector<Mesh::VertexSpec> & specs, std::vector<Mesh*> & apMeshes)
+static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformation, const std::vector<SubMesh *> & preloaded, GPU::Buffer<GL_ARRAY_BUFFER> * vertexBuffer, GPU::Buffer<GL_ELEMENT_ARRAY_BUFFER> * indexBuffer, const std::vector<SubMeshDefinition> & offsets, const std::vector<Mesh::VertexSpec> & specs, std::vector<Mesh*> & apMeshes, Scene & scene)
 {
 	mat4x4 transformation = parentTransformation * ASSIMP_MAT4X4(nd->mTransformation);
 
@@ -554,10 +563,10 @@ static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformat
 
 	instance.transformation = transformation;
 
-	g_pRendering->m_scene.insert(instance);
+	scene.insert(instance);
 
 	for (int i = 0; i < nd->mNumChildren; ++i)
 	{
-		addMeshRecursive(nd->mChildren[i], transformation, preloaded, vertexBuffer, indexBuffer, offsets, specs, apMeshes);
+		addMeshRecursive(nd->mChildren[i], transformation, preloaded, vertexBuffer, indexBuffer, offsets, specs, apMeshes, scene);
 	}
 }
