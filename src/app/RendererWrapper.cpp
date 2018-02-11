@@ -44,14 +44,49 @@ static void addMeshRecursive(const aiNode * nd, const mat4x4 & parentTransformat
 
 std::vector<Mesh*> g_apMeshes;
 
-static Rendering * g_pRendering = nullptr; // ugly but needed for now
+#ifndef RENDERER_LIB
+#	error "RENDERER_LIB must be defined"
+#endif // RENDERER_LIB
 
 /**
  * @brief RendererWrapper::RendererWrapper
  */
-RendererWrapper::RendererWrapper(void)
+RendererWrapper::RendererWrapper(void) : m_rendererLibrary(RENDERER_LIB)
 {
 	m_pScene = new Scene();
+
+	//
+	// Load renderer library
+	if (!m_rendererLibrary.load())
+	{
+		return;
+	}
+
+	renderer_onLoad_function OnLoad = (renderer_onLoad_function)m_rendererLibrary.resolve("renderer_onLoad");
+
+	if (OnLoad == nullptr)
+	{
+		m_rendererLibrary.unload();
+		return;
+	}
+
+	if (!OnLoad())
+	{
+		m_rendererLibrary.unload();
+		return;
+	}
+
+	m_pOnInit = (renderer_onInit_function)m_rendererLibrary.resolve("renderer_onInit");
+	m_pOnRelease = (renderer_onRelease_function)m_rendererLibrary.resolve("renderer_onRelease");
+
+	m_pOnReady = (renderer_onReady_function)m_rendererLibrary.resolve("renderer_onReady");
+	m_pOnResize = (renderer_onResize_function)m_rendererLibrary.resolve("renderer_onResize");
+	m_pOnUpdate = (renderer_onUpdate_function)m_rendererLibrary.resolve("renderer_onUpdate");
+
+	m_pInitQueue = (renderer_initQueue_function)m_rendererLibrary.resolve("renderer_initQueue");
+	m_pReleaseQueue = (renderer_releaseQueue_function)m_rendererLibrary.resolve("renderer_releaseQueue");
+
+	m_pGetRenderTexture = (renderer_getRenderTexture_function)m_rendererLibrary.resolve("renderer_getRenderTexture");
 }
 
 /**
@@ -59,6 +94,7 @@ RendererWrapper::RendererWrapper(void)
  */
 RendererWrapper::~RendererWrapper(void)
 {
+	m_rendererLibrary.unload();
 	delete m_pScene;
 }
 
@@ -68,8 +104,12 @@ RendererWrapper::~RendererWrapper(void)
  */
 bool RendererWrapper::init(void)
 {
-	g_pRendering = new Rendering(*m_pScene);
-	return(true);
+	if (m_pOnInit)
+	{
+		return(m_pOnInit(*m_pScene));
+	}
+
+	return(false);
 }
 
 /**
@@ -78,9 +118,12 @@ bool RendererWrapper::init(void)
  */
 bool RendererWrapper::release(void)
 {
-	delete g_pRendering;
-	g_pRendering = nullptr;
-	return(true);
+	if (m_pOnRelease)
+	{
+		return(m_pOnRelease());
+	}
+
+	return(false);
 }
 
 /**
@@ -88,7 +131,10 @@ bool RendererWrapper::release(void)
  */
 void RendererWrapper::onReady(void)
 {
-	g_pRendering->onReady();
+	if (m_pOnReady)
+	{
+		m_pOnReady();
+	}
 }
 
 /**
@@ -96,9 +142,12 @@ void RendererWrapper::onReady(void)
  * @param width
  * @param height
  */
-void RendererWrapper::onResize(int width, int height)
+void RendererWrapper::onResize(unsigned int width, unsigned int height)
 {
-	g_pRendering->onResize(width, height);
+	if (m_pOnResize)
+	{
+		m_pOnResize(width, height);
+	}
 }
 
 /**
@@ -108,7 +157,10 @@ void RendererWrapper::onResize(int width, int height)
  */
 void RendererWrapper::onUpdate(const mat4x4 & mView)
 {
-	g_pRendering->onUpdate(mView, vec4(0.7f, 0.7f, 0.7f, 1.0f));
+	if (m_pOnUpdate)
+	{
+		m_pOnUpdate(mView);
+	}
 }
 
 /**
@@ -117,7 +169,10 @@ void RendererWrapper::onUpdate(const mat4x4 & mView)
  */
 void RendererWrapper::initQueue(const char * szFilename)
 {
-	g_pRendering->initQueue(szFilename);
+	if (m_pInitQueue)
+	{
+		m_pInitQueue(szFilename);
+	}
 }
 
 /**
@@ -125,7 +180,10 @@ void RendererWrapper::initQueue(const char * szFilename)
  */
 void RendererWrapper::releaseQueue(void)
 {
-	g_pRendering->releaseQueue();
+	if (m_pReleaseQueue)
+	{
+		m_pReleaseQueue();
+	}
 }
 
 /**
@@ -135,11 +193,9 @@ void RendererWrapper::releaseQueue(void)
  */
 GLuint RendererWrapper::GetRenderTexture(const char * name) const
 {
-	const GPU::Texture<GL_TEXTURE_2D> * pRenderTexture = g_pRendering->GetRenderTexture(name);
-
-	if (nullptr != pRenderTexture)
+	if (m_pGetRenderTexture)
 	{
-		return(pRenderTexture->GetObject());
+		return(m_pGetRenderTexture(name));
 	}
 
 	return(0);
@@ -433,15 +489,6 @@ bool RendererWrapper::importToScene(const char * szFilename)
 	addMeshRecursive(scene->mRootNode, identity, meshes, vertexBuffer, indexBuffer, offsets, specs, g_apMeshes, *m_pScene);
 
 	return(false);
-}
-
-/**
- * @brief RendererWrapper::getProjection
- * @return
- */
-const mat4x4 & RendererWrapper::getProjection(void) const
-{
-	return(g_pRendering->m_matProjection);
 }
 
 // -------------------------------------------------------------

@@ -26,6 +26,9 @@ find_package(assimp REQUIRED)
 # Jansson
 find_library(JANSSON_LIBRARY jansson)
 
+set(RENDERER_LIB "" CACHE FILEPATH "Path to the renderer library")
+add_definitions(-DRENDERER_LIB=\"${RENDERER_LIB}\")
+
 # Compile application
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${UI_FILES})
 
