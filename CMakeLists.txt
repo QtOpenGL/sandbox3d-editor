@@ -11,8 +11,6 @@ endif ()
 # Scene
 find_package(Scene REQUIRED)
 
-add_subdirectory(external)
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
