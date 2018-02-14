@@ -8,7 +8,7 @@
 typedef QGLWidget QOpenGLWidget;
 #endif // (QT_VERSION < QT_VERSION_CHECK(5, 4, 0))
 
-#include "Camera/Camera.h"
+#include "Objects/Camera/Camera.h"
 
 class QDir;
 class QString;
