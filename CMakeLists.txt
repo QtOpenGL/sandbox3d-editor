@@ -8,6 +8,8 @@ if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Debug) # Default
 endif ()
 
+add_subdirectory(external)
+
 # Scene
 find_package(Scene REQUIRED)
 

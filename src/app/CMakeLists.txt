@@ -26,6 +26,10 @@ add_definitions(-DRENDERER_LIB=\"${RENDERER_LIB}\")
 # Compile application
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${UI_FILES})
 
+IF(CMAKE_BUILD_TYPE MATCHES Debug)
+        target_link_libraries(${PROJECT_NAME} PUBLIC glBreak)
+ENDIF()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE sandbox_resources scene Qt5::Core Qt5::Widgets Qt5::Gui Qt5::OpenGL GraphWidget Graph)
 
 # Jansson
