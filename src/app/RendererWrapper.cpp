@@ -62,9 +62,9 @@ bool RendererWrapper::loadPlugins(const char * szPluginsFile)
 		QString name = element.attribute("name", "unnamed plugin");
 		QString lib = element.attribute("lib", "");
 		QString nodes = element.attribute("nodes", "");
-		QString shaders = element.attribute("shaders", "");
+		QString dir = element.attribute("dir", "");
 
-		if (!loadPlugin(name, lib, nodes, shaders))
+		if (!loadPlugin(name, lib, nodes, dir))
 		{
 			bAllPluginsLoaded = false;
 		}
@@ -127,9 +127,9 @@ bool RendererWrapper::release(void)
  * @param shaders
  * @return
  */
-bool RendererWrapper::loadPlugin(const QString & name, const QString & lib, const QString & nodes, const QString & shaders)
+bool RendererWrapper::loadPlugin(const QString & name, const QString & lib, const QString & nodesDirectory, const QString & baseDirectory)
 {
-	Plugin * plugin = new Plugin(lib); // QLibrary copy-constructor is private
+	Plugin * plugin = new Plugin(name, lib); // QLibrary copy-constructor is private
 
 	//
 	// Load renderer library
@@ -146,7 +146,9 @@ bool RendererWrapper::loadPlugin(const QString & name, const QString & lib, cons
 		return(false);
 	}
 
-	if (!OnLoad())
+	const std::string strBaseDir = baseDirectory.toStdString();
+
+	if (!OnLoad(strBaseDir.data()))
 	{
 		plugin->library.unload();
 		return(false);
@@ -165,6 +167,8 @@ bool RendererWrapper::loadPlugin(const QString & name, const QString & lib, cons
 	plugin->GetRenderTexture = (renderer_getRenderTexture_function)plugin->library.resolve("renderer_getRenderTexture");
 
 	m_aPlugins.append(plugin);
+
+	m_aNodeDirectories.append(nodesDirectory);
 
 	return(true);
 }

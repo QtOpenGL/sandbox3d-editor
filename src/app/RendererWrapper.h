@@ -50,13 +50,20 @@ public:
 	// ...
 	unsigned int /*GLuint*/ GetRenderTexture(const char * name) const;
 
+	//
+	// ...
+	QVector<QString> GetNodesDirectories(void) const
+	{
+		return(m_aNodeDirectories);
+	}
+
 protected:
 
 	// ...
 
 private:
 
-	bool loadPlugin(const QString & name, const QString & lib, const QString & nodes, const QString & shaders);
+	bool loadPlugin(const QString & name, const QString & lib, const QString & nodesDirectory, const QString & shaders);
 
 public:
 
@@ -68,7 +75,7 @@ protected:
 
 private:
 
-	typedef bool (*renderer_onLoad_function)(void);
+	typedef bool (*renderer_onLoad_function)(const char * baseDirectory);
 
 	typedef bool (*renderer_onInit_function)(Scene & scene);
 	typedef bool (*renderer_onRelease_function)(void);
@@ -84,7 +91,7 @@ private:
 
 	struct Plugin
 	{
-		Plugin(const QString & lib) : library(lib)
+		Plugin(const QString & strName, const QString & strLibPath) : name(strName), library(strLibPath)
 		{
 			OnInit = nullptr;
 			OnRelease = nullptr;
@@ -99,6 +106,7 @@ private:
 			GetRenderTexture = nullptr;
 		}
 
+		QString name;
 		QLibrary library;
 
 		renderer_onInit_function OnInit;
@@ -115,5 +123,7 @@ private:
 	};
 
 	QVector<Plugin*> m_aPlugins;
+
+	QVector<QString> m_aNodeDirectories;
 
 };
