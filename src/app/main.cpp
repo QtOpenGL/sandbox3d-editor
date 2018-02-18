@@ -35,6 +35,11 @@ int main(int argc, char ** argv)
 		return(-1);
 	}
 
+	if (argc > 1)
+	{
+		g_RendererWrapper.loadPlugins(argv[1]);
+	}
+
 	g_RendererWrapper.init();
 
 	MainWindow w;

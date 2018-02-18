@@ -8,49 +8,14 @@
 
 #include <QGLWidget> // for convertToGLFormat
 
-#ifndef RENDERER_LIB
-#	error "RENDERER_LIB must be defined"
-#endif // RENDERER_LIB
+#include <QtXml/QtXml>
 
 /**
  * @brief RendererWrapper::RendererWrapper
  */
-RendererWrapper::RendererWrapper(void) : m_rendererLibrary(RENDERER_LIB)
+RendererWrapper::RendererWrapper(void)
 {
 	m_pScene = new Scene();
-
-	//
-	// Load renderer library
-	if (!m_rendererLibrary.load())
-	{
-		return;
-	}
-
-	renderer_onLoad_function OnLoad = (renderer_onLoad_function)m_rendererLibrary.resolve("renderer_onLoad");
-
-	if (OnLoad == nullptr)
-	{
-		m_rendererLibrary.unload();
-		return;
-	}
-
-	if (!OnLoad())
-	{
-		m_rendererLibrary.unload();
-		return;
-	}
-
-	m_pOnInit = (renderer_onInit_function)m_rendererLibrary.resolve("renderer_onInit");
-	m_pOnRelease = (renderer_onRelease_function)m_rendererLibrary.resolve("renderer_onRelease");
-
-	m_pOnReady = (renderer_onReady_function)m_rendererLibrary.resolve("renderer_onReady");
-	m_pOnResize = (renderer_onResize_function)m_rendererLibrary.resolve("renderer_onResize");
-	m_pOnUpdate = (renderer_onUpdate_function)m_rendererLibrary.resolve("renderer_onUpdate");
-
-	m_pInitQueue = (renderer_initQueue_function)m_rendererLibrary.resolve("renderer_initQueue");
-	m_pReleaseQueue = (renderer_releaseQueue_function)m_rendererLibrary.resolve("renderer_releaseQueue");
-
-	m_pGetRenderTexture = (renderer_getRenderTexture_function)m_rendererLibrary.resolve("renderer_getRenderTexture");
 }
 
 /**
@@ -58,8 +23,56 @@ RendererWrapper::RendererWrapper(void) : m_rendererLibrary(RENDERER_LIB)
  */
 RendererWrapper::~RendererWrapper(void)
 {
-	m_rendererLibrary.unload();
 	delete m_pScene;
+}
+
+/**
+ * @brief Load Plugins
+ * @param szPluginsFile
+ * @return
+ */
+bool RendererWrapper::loadPlugins(const char * szPluginsFile)
+{
+	QFile plugins_file(szPluginsFile);
+
+	if (!plugins_file.open(QIODevice::ReadOnly))
+	{
+		return(false);
+	}
+
+	QDomDocument dom("plugins_file");
+	bool parse_success = dom.setContent(&plugins_file);
+	plugins_file.close();
+
+	if (!parse_success)
+	{
+		return(false);
+	}
+
+	QDomElement rootNode = dom.documentElement();
+
+	QDomNode pluginNode = rootNode.firstChild();
+
+	bool bAllPluginsLoaded = true;
+
+	while (!pluginNode.isNull())
+	{
+		QDomElement element = pluginNode.toElement();
+
+		QString name = element.attribute("name", "unnamed plugin");
+		QString lib = element.attribute("lib", "");
+		QString nodes = element.attribute("nodes", "");
+		QString shaders = element.attribute("shaders", "");
+
+		if (!loadPlugin(name, lib, nodes, shaders))
+		{
+			bAllPluginsLoaded = false;
+		}
+
+		pluginNode = pluginNode.nextSibling();
+	}
+
+	return(bAllPluginsLoaded);
 }
 
 /**
@@ -68,12 +81,20 @@ RendererWrapper::~RendererWrapper(void)
  */
 bool RendererWrapper::init(void)
 {
-	if (m_pOnInit)
+	bool bSuccess = true;
+
+	for (Plugin * plugin : m_aPlugins)
 	{
-		return(m_pOnInit(*m_pScene));
+		if (plugin->OnInit)
+		{
+			if (!plugin->OnInit(*m_pScene))
+			{
+				bSuccess = false;
+			}
+		}
 	}
 
-	return(false);
+	return(bSuccess);
 }
 
 /**
@@ -82,22 +103,84 @@ bool RendererWrapper::init(void)
  */
 bool RendererWrapper::release(void)
 {
-	if (m_pOnRelease)
+	bool bSuccess = true;
+
+	for (Plugin * plugin : m_aPlugins)
 	{
-		return(m_pOnRelease());
+		if (plugin->OnRelease)
+		{
+			if (!plugin->OnRelease())
+			{
+				bSuccess = false;
+			}
+		}
 	}
 
-	return(false);
+	return(bSuccess);
 }
+
+/**
+ * @brief RendererWrapper::loadPlugin
+ * @param name
+ * @param lib
+ * @param nodes
+ * @param shaders
+ * @return
+ */
+bool RendererWrapper::loadPlugin(const QString & name, const QString & lib, const QString & nodes, const QString & shaders)
+{
+	Plugin * plugin = new Plugin(lib); // QLibrary copy-constructor is private
+
+	//
+	// Load renderer library
+	if (!plugin->library.load())
+	{
+		return(false);
+	}
+
+	renderer_onLoad_function OnLoad = (renderer_onLoad_function)plugin->library.resolve("renderer_onLoad");
+
+	if (OnLoad == nullptr)
+	{
+		plugin->library.unload();
+		return(false);
+	}
+
+	if (!OnLoad())
+	{
+		plugin->library.unload();
+		return(false);
+	}
+
+	plugin->OnInit = (renderer_onInit_function)plugin->library.resolve("renderer_onInit");
+	plugin->OnRelease = (renderer_onRelease_function)plugin->library.resolve("renderer_onRelease");
+
+	plugin->OnReady = (renderer_onReady_function)plugin->library.resolve("renderer_onReady");
+	plugin->OnResize = (renderer_onResize_function)plugin->library.resolve("renderer_onResize");
+	plugin->OnUpdate = (renderer_onUpdate_function)plugin->library.resolve("renderer_onUpdate");
+
+	plugin->InitQueue = (renderer_initQueue_function)plugin->library.resolve("renderer_initQueue");
+	plugin->ReleaseQueue = (renderer_releaseQueue_function)plugin->library.resolve("renderer_releaseQueue");
+
+	plugin->GetRenderTexture = (renderer_getRenderTexture_function)plugin->library.resolve("renderer_getRenderTexture");
+
+	m_aPlugins.append(plugin);
+
+	return(true);
+}
+
 
 /**
  * @brief RendererWrapper::onReady
  */
 void RendererWrapper::onReady(void)
 {
-	if (m_pOnReady)
+	for (Plugin * plugin : m_aPlugins)
 	{
-		m_pOnReady();
+		if (plugin->OnReady)
+		{
+			plugin->OnReady();
+		}
 	}
 }
 
@@ -108,9 +191,12 @@ void RendererWrapper::onReady(void)
  */
 void RendererWrapper::onResize(unsigned int width, unsigned int height)
 {
-	if (m_pOnResize)
+	for (Plugin * plugin : m_aPlugins)
 	{
-		m_pOnResize(width, height);
+		if (plugin->OnResize)
+		{
+			plugin->OnResize(width, height);
+		}
 	}
 }
 
@@ -121,9 +207,12 @@ void RendererWrapper::onResize(unsigned int width, unsigned int height)
  */
 void RendererWrapper::onUpdate(const mat4x4 & mView)
 {
-	if (m_pOnUpdate)
+	for (Plugin * plugin : m_aPlugins)
 	{
-		m_pOnUpdate(mView);
+		if (plugin->OnUpdate)
+		{
+			plugin->OnUpdate(mView);
+		}
 	}
 }
 
@@ -133,9 +222,12 @@ void RendererWrapper::onUpdate(const mat4x4 & mView)
  */
 void RendererWrapper::initQueue(const char * szFilename)
 {
-	if (m_pInitQueue)
+	for (Plugin * plugin : m_aPlugins)
 	{
-		m_pInitQueue(szFilename);
+		if (plugin->InitQueue)
+		{
+			plugin->InitQueue(szFilename);
+		}
 	}
 }
 
@@ -144,9 +236,12 @@ void RendererWrapper::initQueue(const char * szFilename)
  */
 void RendererWrapper::releaseQueue(void)
 {
-	if (m_pReleaseQueue)
+	for (Plugin * plugin : m_aPlugins)
 	{
-		m_pReleaseQueue();
+		if (plugin->ReleaseQueue)
+		{
+			plugin->ReleaseQueue();
+		}
 	}
 }
 
@@ -157,9 +252,17 @@ void RendererWrapper::releaseQueue(void)
  */
 GLuint RendererWrapper::GetRenderTexture(const char * name) const
 {
-	if (m_pGetRenderTexture)
+	for (Plugin * plugin : m_aPlugins)
 	{
-		return(m_pGetRenderTexture(name));
+		if (plugin->GetRenderTexture)
+		{
+			GLuint textureId = plugin->GetRenderTexture(name);
+
+			if (textureId != 0)
+			{
+				return(textureId);
+			}
+		}
 	}
 
 	return(0);

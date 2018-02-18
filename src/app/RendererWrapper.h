@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QVector>
 #include <QLibrary>
 
 #include <Vector.h>
@@ -16,10 +17,17 @@ public:
 	RendererWrapper		(void);
 	~RendererWrapper	(void);
 
+	bool		loadPlugins			(const char * szPluginsFile);
+
 	//
 	// ...
 	bool		init				(void);
 	bool		release				(void);
+
+	//
+	// ...
+	bool		onInit				(void);
+	bool		onRelease			(void);
 
 	//
 	// ...
@@ -44,11 +52,21 @@ public:
 
 protected:
 
-	Scene * m_pScene;
+	// ...
 
 private:
 
-	QLibrary m_rendererLibrary;
+	bool loadPlugin(const QString & name, const QString & lib, const QString & nodes, const QString & shaders);
+
+public:
+
+	// ...
+
+protected:
+
+	Scene * m_pScene;
+
+private:
 
 	typedef bool (*renderer_onLoad_function)(void);
 
@@ -64,16 +82,38 @@ private:
 
 	typedef unsigned int (*renderer_getRenderTexture_function)(const char * szName);
 
-	renderer_onInit_function m_pOnInit;
-	renderer_onRelease_function m_pOnRelease;
+	struct Plugin
+	{
+		Plugin(const QString & lib) : library(lib)
+		{
+			OnInit = nullptr;
+			OnRelease = nullptr;
 
-	renderer_onReady_function m_pOnReady;
-	renderer_onResize_function m_pOnResize;
-	renderer_onUpdate_function m_pOnUpdate;
+			OnReady = nullptr;
+			OnResize = nullptr;
+			OnUpdate = nullptr;
 
-	renderer_initQueue_function m_pInitQueue;
-	renderer_releaseQueue_function m_pReleaseQueue;
+			InitQueue = nullptr;
+			ReleaseQueue = nullptr;
 
-	renderer_getRenderTexture_function m_pGetRenderTexture;
+			GetRenderTexture = nullptr;
+		}
+
+		QLibrary library;
+
+		renderer_onInit_function OnInit;
+		renderer_onRelease_function OnRelease;
+
+		renderer_onReady_function OnReady;
+		renderer_onResize_function OnResize;
+		renderer_onUpdate_function OnUpdate;
+
+		renderer_initQueue_function InitQueue;
+		renderer_releaseQueue_function ReleaseQueue;
+
+		renderer_getRenderTexture_function GetRenderTexture;
+	};
+
+	QVector<Plugin*> m_aPlugins;
 
 };
