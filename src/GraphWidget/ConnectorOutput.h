@@ -21,6 +21,7 @@ public:
 	// API
 	void					addEdge				(Edge * pEdge);
 	void					removeEdge			(Edge * pEdge);
+	void					removeAllEdges		(void);
 
 	virtual EType			getConnectorType	(void) const override;
 

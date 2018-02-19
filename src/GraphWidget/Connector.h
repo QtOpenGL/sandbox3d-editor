@@ -62,6 +62,8 @@ private:
 
 	unsigned int	m_mask;
 
+	bool m_bDisconnecting;
+
 public:
 
 	static const qreal radius;

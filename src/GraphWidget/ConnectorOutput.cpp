@@ -43,7 +43,32 @@ void ConnectorOutput::addEdge(Edge * pEdge)
  */
 void ConnectorOutput::removeEdge(Edge * pEdge)
 {
+	QGraphicsScene * pScene = scene();
+
+	if (pScene)
+	{
+		pScene->removeItem((QGraphicsItem*)pEdge);
+	}
+
 	m_aEdges.removeAll(pEdge);
+}
+
+/**
+ * @brief ConnectorOutput::removeAllEdges
+ */
+void ConnectorOutput::removeAllEdges(void)
+{
+	QGraphicsScene * pScene = scene();
+
+	if (pScene)
+	{
+		for (Edge * pEdge : m_aEdges)
+		{
+			pScene->removeItem((QGraphicsItem*)pEdge);
+		}
+	}
+
+	m_aEdges.clear();
 }
 
 /**

@@ -1,5 +1,8 @@
 #include "Connector.h"
 
+#include "ConnectorInput.h"
+#include "ConnectorOutput.h"
+
 #include "ConnectionHandler.h"
 
 #include <QPainter>
@@ -15,7 +18,7 @@ const qreal Connector::radius = 9.0;
 /**
  * @brief Constructor
  */
-Connector::Connector(Node * parent, unsigned int index) : QGraphicsItem((QGraphicsItem*)parent), m_index(index), m_mask(0)
+Connector::Connector(Node * parent, unsigned int index) : QGraphicsItem((QGraphicsItem*)parent), m_index(index), m_mask(0), m_bDisconnecting(false)
 {
 	setZValue(1);
 	setCacheMode(NoCache);
@@ -64,8 +67,15 @@ unsigned int Connector::getMask(void) const
  */
 void Connector::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
-	ConnectionHandler & handler = ConnectionHandler::instance();
-	handler.start(this);
+	if (event->modifiers() != Qt::ControlModifier)
+	{
+		ConnectionHandler & handler = ConnectionHandler::instance();
+		handler.start(this);
+	}
+	else
+	{
+		m_bDisconnecting = true;
+	}
 }
 
 /**
@@ -74,9 +84,12 @@ void Connector::mousePressEvent(QGraphicsSceneMouseEvent * event)
  */
 void Connector::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {
-	ConnectionHandler & handler = ConnectionHandler::instance();
-	QPointF absolute_pos = mapToScene(event->pos());
-	handler.move(absolute_pos.x(), absolute_pos.y());
+	if (!m_bDisconnecting)
+	{
+		ConnectionHandler & handler = ConnectionHandler::instance();
+		QPointF absolute_pos = mapToScene(event->pos());
+		handler.move(absolute_pos.x(), absolute_pos.y());
+	}
 }
 
 /**
@@ -85,9 +98,29 @@ void Connector::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
  */
 void Connector::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
-	ConnectionHandler & handler = ConnectionHandler::instance();
-	QPointF absolute_pos = mapToScene(event->pos());
-	handler.stop(absolute_pos.x(), absolute_pos.y());
+	if (!m_bDisconnecting)
+	{
+		ConnectionHandler & handler = ConnectionHandler::instance();
+		QPointF absolute_pos = mapToScene(event->pos());
+		handler.stop(absolute_pos.x(), absolute_pos.y());
+	}
+	else
+	{
+		switch (getConnectorType())
+		{
+			case Input:
+			{
+				static_cast<ConnectorInput*>(this)->setEdge(nullptr);
+			}
+			break;
+
+			case Output:
+			{
+				static_cast<ConnectorOutput*>(this)->removeAllEdges();
+			}
+			break;
+		}
+	}
 }
 
 /**
