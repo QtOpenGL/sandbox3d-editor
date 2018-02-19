@@ -16,6 +16,8 @@ NodeFinal::NodeFinal(void) : Node(), input(nullptr)
 {
 	setCacheMode(DeviceCoordinateCache);
 	input = new ConnectorInput(this, 0);
+	input->setPos(0.0, radius);
+	input->setMask(READ_BIT | TYPE_TEXTURE_BIT);
 }
 
 /**
