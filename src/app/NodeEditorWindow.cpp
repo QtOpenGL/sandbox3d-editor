@@ -319,23 +319,30 @@ void NodeEditorWindow::contextMenuEvent(QContextMenuEvent * pEvent)
  */
 void NodeEditorWindow::loadNodeDescriptors(void)
 {
-	QDir dir("data/nodes");
-	QStringList list = dir.entryList(QDir::Files);
-
 	bool successful = true;
 
-	for (QString & filename : list)
-	{
-		NodeDescriptor desc;
-		bool loading = desc.loadFromFile(dir.filePath(filename).toStdString());
+	extern RendererWrapper g_RendererWrapper;
 
-		if (loading)
+	const QVector<QString> & aNodesDir = g_RendererWrapper.GetNodesDirectories();
+
+	for (const QString & strNodesDir : aNodesDir)
+	{
+		QDir dir(strNodesDir);
+		QStringList list = dir.entryList(QDir::Files);
+
+		for (QString & filename : list)
 		{
-			m_aNodeDescriptors.push_back(desc);
-		}
-		else
-		{
-			successful = false;
+			NodeDescriptor desc;
+			bool loading = desc.loadFromFile(dir.filePath(filename).toStdString());
+
+			if (loading)
+			{
+				m_aNodeDescriptors.push_back(desc);
+			}
+			else
+			{
+				successful = false;
+			}
 		}
 	}
 
