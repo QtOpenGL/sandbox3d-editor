@@ -164,7 +164,7 @@ void MainWindow::onGraphLoaded(const Graph & graph)
 	std::string strFinalTextureId;
 	SerializeGraph(graph, m_pNodeEditorWindow->m_aNodeDescriptors, strFinalTextureId);
 	g_RendererWrapper.initQueue("/tmp/render.xml");
-	m_pDrawable->setCurrentTexture(strFinalTextureId);
+	m_pDrawable->setCurrentTexture(QString(strFinalTextureId.data()));
 	m_pDrawable->update();
 }
 
@@ -176,6 +176,6 @@ void MainWindow::onGraphSaved(const Graph & graph)
 	std::string strFinalTextureId;
 	SerializeGraph(graph, m_pNodeEditorWindow->m_aNodeDescriptors, strFinalTextureId);
 	g_RendererWrapper.initQueue("/tmp/render.xml");
-	m_pDrawable->setCurrentTexture(strFinalTextureId);
+	m_pDrawable->setCurrentTexture(QString(strFinalTextureId.data()));
 	m_pDrawable->update();
 }

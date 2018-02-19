@@ -94,9 +94,10 @@ void DrawableSurface::DrawSceneAABB(bool bEnable)
  * @brief DrawableSurface::setCurrentTexture
  * @param strFinalTextureId
  */
-void DrawableSurface::setCurrentTexture(const std::string & strFinalTextureId)
+void DrawableSurface::setCurrentTexture(const QString & strFinalTextureId)
 {
-	m_uCurrentTexture = g_RendererWrapper.GetRenderTexture(strFinalTextureId.c_str());
+	std::string strFinalTextureIdStd = strFinalTextureId.toStdString();
+	m_uCurrentTexture = g_RendererWrapper.GetRenderTexture(strFinalTextureIdStd.c_str());
 }
 
 /**

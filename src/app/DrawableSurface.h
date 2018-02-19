@@ -10,14 +10,9 @@ typedef QGLWidget QOpenGLWidget;
 
 #include "Objects/Camera/Camera.h"
 
-class QDir;
 class QString;
 
-class aiScene;
-class aiNode;
-
 class Object;
-class Mesh;
 
 class DrawableSurface : public QOpenGLWidget, public QOpenGLFunctions_3_2_Core
 {
@@ -33,7 +28,7 @@ public:
 	void	DrawObjectsAABB		(bool bEnable);
 	void	DrawSceneAABB		(bool bEnable);
 
-	void	setCurrentTexture	(const std::string & strFinalTextureId);
+	void	setCurrentTexture	(const QString & strFinalTextureId);
 
 protected:
 
