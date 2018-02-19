@@ -53,6 +53,8 @@
      <string>Window</string>
     </property>
     <addaction name="actionFullscreen"/>
+    <addaction name="actionDrawObjectsAABB"/>
+    <addaction name="actionDrawSceneAABB"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -326,6 +328,22 @@
   <action name="actionNode_Editor">
    <property name="text">
     <string>Node Editor</string>
+   </property>
+  </action>
+  <action name="actionDrawObjectsAABB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Draw Objects AABB</string>
+   </property>
+  </action>
+  <action name="actionDrawSceneAABB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Draw Scene AABB</string>
    </property>
   </action>
  </widget>

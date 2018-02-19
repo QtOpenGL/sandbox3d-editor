@@ -30,6 +30,9 @@ public:
 
 	void	ResetCamera			(void);
 
+	void	DrawObjectsAABB		(bool bEnable);
+	void	DrawSceneAABB		(bool bEnable);
+
 	void	setCurrentTexture	(const std::string & strFinalTextureId);
 
 protected:
@@ -58,8 +61,17 @@ private:
 	ivec2		m_vLastPos;
 	bool		m_bMoved;
 
+	//
+	// AABB debug
+	bool		m_bDrawObjectsAABB;
+	bool		m_bDrawSceneAABB;
+
+	//
+	//
 	Object * m_pSelectedObject;
 
+	//
+	// Draw
 	GLuint m_uCurrentTexture;
 
 signals:

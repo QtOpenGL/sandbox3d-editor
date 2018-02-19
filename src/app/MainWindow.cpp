@@ -115,6 +115,24 @@ void MainWindow::on_actionFullscreen_toggled(bool checked)
 }
 
 /**
+ * @brief MainWindow::on_actionDrawObjectsAABB_toggled
+ * @param checked
+ */
+void MainWindow::on_actionDrawObjectsAABB_toggled(bool checked)
+{
+	static_cast<DrawableSurface*>(m_pDrawable)->DrawObjectsAABB(checked);
+}
+
+/**
+ * @brief MainWindow::on_actionDrawSceneAABB_toggled
+ * @param checked
+ */
+void MainWindow::on_actionDrawSceneAABB_toggled(bool checked)
+{
+	static_cast<DrawableSurface*>(m_pDrawable)->DrawSceneAABB(checked);
+}
+
+/**
  * @brief MainWindow::on_actionImport_triggered
  */
 void MainWindow::on_actionImport_triggered()

@@ -49,6 +49,8 @@ public:
 private slots:
 
 	void on_actionFullscreen_toggled(bool checked);
+	void on_actionDrawObjectsAABB_toggled(bool checked);
+	void on_actionDrawSceneAABB_toggled(bool checked);
 
 	void on_actionImport_triggered();
 

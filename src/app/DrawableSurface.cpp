@@ -8,11 +8,31 @@
 
 #include "QOpenGLResourceManager.h"
 
+#include "Scene.h"
+
 #include <assert.h>
 
 #define ENABLE_PICKBUFFER 0
 
 extern RendererWrapper g_RendererWrapper;
+
+static inline float cotangent(float angleInRadians)
+{
+	return(tanf(M_PI_2 - angleInRadians));
+}
+
+static inline mat4x4 _perspective(float fovy, float aspect, float zNear, float zFar)
+{
+	float f = cotangent(radians(fovy * 0.5f));
+
+	mat4x4 mat;
+	mat[0] = vec4(f / aspect, 0.0f, 0.0f, 0.0f);
+	mat[1] = vec4(0.0f, f, 0.0f, 0.0f);
+	mat[2] = vec4(0.0f, 0.0f, (zFar + zNear) / (zNear - zFar), (2 * zFar * zNear) / (zNear - zFar));
+	mat[3] = vec4(0.0f, 0.0f, -1.0f, 0.0f);
+
+	return(mat);
+}
 
 /**
  * @brief Constructor
@@ -23,6 +43,8 @@ DrawableSurface::DrawableSurface(QWidget *parent)
 , m_camera()
 , m_vLastPos(0, 0)
 , m_pSelectedObject(nullptr)
+, m_bDrawObjectsAABB(false)
+, m_bDrawSceneAABB(false)
 , m_uCurrentTexture(0)
 {
 	setAutoFillBackground(false);
@@ -47,6 +69,24 @@ DrawableSurface::~DrawableSurface(void)
 void DrawableSurface::ResetCamera(void)
 {
 	m_camera = Camera();
+	update();
+}
+
+/**
+ * @brief DrawableSurface::DrawObjectsAABB
+ */
+void DrawableSurface::DrawObjectsAABB(bool bEnable)
+{
+	m_bDrawObjectsAABB = bEnable;
+	update();
+}
+
+/**
+ * @brief DrawableSurface::ResetSceneAABB
+ */
+void DrawableSurface::DrawSceneAABB(bool bEnable)
+{
+	m_bDrawSceneAABB = bEnable;
 	update();
 }
 
@@ -163,6 +203,59 @@ void DrawableSurface::paintGL(void)
 		manager.unbindBboxResources();
 	}
 #endif // ENABLE_PICKBUFFER
+
+	const Scene & scene = g_RendererWrapper.getScene();
+
+	const float fov = 75.0f;
+	float ratio = width()/(float)height();
+	mat4x4 matProjection = _perspective(fov, ratio, 0.01f, 100.0f);
+
+	if (m_bDrawObjectsAABB)
+	{
+		for (const Object & object : scene.getObjects())
+		{
+			mat4x4 mMVP = (matProjection * (matView * object.transformation));
+
+			for (const Object::Mesh & mesh : object.Meshes)
+			{
+				unsigned int MeshID = mesh.MeshID;
+
+				const ResourceManager & resourceManager = scene.getResourceManager();
+
+				const BoundingBox & bbox = resourceManager.getBoundingBox(MeshID);
+
+				QVector3D BBoxMin(bbox.min.x, bbox.min.y, bbox.min.z);
+				QVector3D BBoxMax(bbox.max.x, bbox.max.y, bbox.max.z);
+
+				manager.bindBboxResources(QMatrix4x4((float*)&mMVP), BBoxMin, BBoxMax);
+
+				//glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+				glDrawArrays(GL_POINTS, 0, 1);
+				//glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+				manager.unbindBboxResources();
+			}
+		}
+	}
+
+	if (m_bDrawSceneAABB)
+	{
+		const BoundingBox & bbox = scene.getBoundingBox();
+
+
+		mat4x4 mMVP = (matProjection * (matView));
+
+		QVector3D BBoxMin(bbox.min.x, bbox.min.y, bbox.min.z);
+		QVector3D BBoxMax(bbox.max.x, bbox.max.y, bbox.max.z);
+
+		manager.bindBboxResources(QMatrix4x4((float*)&mMVP), BBoxMin, BBoxMax);
+
+		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+		glDrawArrays(GL_POINTS, 0, 1);
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+		manager.unbindBboxResources();
+	}
 }
 
 /**
