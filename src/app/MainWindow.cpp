@@ -80,6 +80,11 @@ MainWindow::MainWindow(QWidget * pParent)
 	restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
 	restoreState(settings.value("mainWindowState").toByteArray());
 
+	if (isFullScreen())
+	{
+		showMaximized(); // don't want the window in fullscreen mode at launch
+	}
+
 	ui->statusbar->showMessage(tr("Ready"), 2000);
 }
 
@@ -228,18 +233,22 @@ void MainWindow::on_actionPreferences_triggered(void)
 }
 
 /**
- * @brief MainWindow::on_actionFullscreen_toggled
+ * @brief MainWindow::on_actionFullscreen_triggered
  * @param checked
  */
-void MainWindow::on_actionFullscreen_toggled(bool checked)
+void MainWindow::on_actionFullscreen_triggered(void)
 {
-	if (checked)
+	if (!isFullScreen())
 	{
+		ui->menubar->hide();
+		ui->statusbar->hide();
 		showFullScreen();
 	}
 	else
 	{
 		showNormal();
+		ui->menubar->show();
+		ui->statusbar->show();
 	}
 }
 

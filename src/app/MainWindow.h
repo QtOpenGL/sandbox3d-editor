@@ -77,23 +77,23 @@ private slots:
 
 	//
 	// View menu
-	void on_actionFullscreen_toggled(bool checked);
+	void on_actionFullscreen_triggered(void);
 	void on_actionDrawObjectsAABB_toggled(bool checked);
 	void on_actionDrawSceneAABB_toggled(bool checked);
 
 	//
 	// Camera menu
-	void on_actionResetCamera_triggered();
+	void on_actionResetCamera_triggered(void);
 
 	//
 	// Window menu
-	void on_actionShowRenderGraphEditor_triggered();
-	void on_actionShowCommandList_triggered();
+	void on_actionShowRenderGraphEditor_triggered(void);
+	void on_actionShowCommandList_triggered(void);
 
 	//
 	// Help menu
-	void on_actionHelp_triggered();
-	void on_actionAbout_triggered();
+	void on_actionHelp_triggered(void);
+	void on_actionAbout_triggered(void);
 
 	//
 	// Custom

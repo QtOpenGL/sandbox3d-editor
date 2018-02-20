@@ -148,6 +148,9 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset theme="help-contents"/>
+   </property>
    <property name="text">
     <string>Help</string>
    </property>
@@ -157,7 +160,7 @@
   </action>
   <action name="actionFullscreen">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset theme="view-fullscreen">
@@ -322,6 +325,9 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset theme="help-about"/>
+   </property>
    <property name="text">
     <string>About ...</string>
    </property>
@@ -356,11 +362,6 @@
   <action name="actionempty">
    <property name="text">
     <string>empty</string>
-   </property>
-  </action>
-  <action name="actioncvhbbc">
-   <property name="text">
-    <string>cvhbbc</string>
    </property>
   </action>
   <action name="actionShowCommandList">
