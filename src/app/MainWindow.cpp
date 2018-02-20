@@ -23,6 +23,31 @@ MainWindow::MainWindow(QWidget * pParent)
 {
 	ui->setupUi(this);
 
+	//
+	// Setup undo/redo
+	{
+		m_pUndoStack = new QUndoStack(this);
+
+		QIcon iconUndo(QIcon::fromTheme(QStringLiteral("edit-undo")));
+		QAction * undoAction = m_pUndoStack->createUndoAction(this, tr("&Undo"));
+		undoAction->setIcon(iconUndo);
+		undoAction->setShortcuts(QKeySequence::Undo);
+		ui->menuEdit->insertAction(ui->actionCut, undoAction);
+
+		QIcon iconRedo(QIcon::fromTheme(QStringLiteral("edit-redo")));
+		QAction * redoAction = m_pUndoStack->createRedoAction(this, tr("&Redo"));
+		redoAction->setIcon(iconRedo);
+		redoAction->setShortcuts(QKeySequence::Redo);
+		ui->menuEdit->insertAction(ui->actionCut, redoAction);
+
+		ui->menuEdit->insertSeparator(ui->actionCut);
+
+		m_pUndoView = new QUndoView(m_pUndoStack);
+		m_pUndoView->setWindowTitle(tr("Command List"));
+		m_pUndoView->setAttribute(Qt::WA_QuitOnClose, false);
+
+	}
+
 	m_pDrawable = new DrawableSurface(this);
 	setCentralWidget(m_pDrawable);
 
@@ -99,6 +124,110 @@ void MainWindow::SetStatus(const QString & str)
 }
 
 /**
+ * @brief MainWindow::on_actionNew_triggered
+ */
+void MainWindow::on_actionNew_triggered(void)
+{
+	// TODO
+}
+
+/**
+ * @brief MainWindow::on_actionOpen_triggered
+ */
+void MainWindow::on_actionOpen_triggered(void)
+{
+	// TODO : format ?
+}
+
+/**
+ * @brief MainWindow::on_actionSave_triggered
+ */
+void MainWindow::on_actionSave_triggered(void)
+{
+	// TODO : format ?
+}
+
+/**
+ * @brief MainWindow::on_actionSaveAs_triggered
+ */
+void MainWindow::on_actionSaveAs_triggered(void)
+{
+	// TODO : format ?
+}
+
+/**
+ * @brief MainWindow::on_actionImport_triggered
+ */
+void MainWindow::on_actionImport_triggered(void)
+{
+	m_pFileChooser->show();
+}
+
+/**
+ * @brief MainWindow::on_actionExport_triggered
+ */
+void MainWindow::on_actionExport_triggered(void)
+{
+	// FIXME : is this really needed ?
+}
+
+/**
+ * @brief MainWindow::on_actionCut_triggered
+ */
+void MainWindow::on_actionCut_triggered(void)
+{
+	// TODO : format ?
+}
+
+/**
+ * @brief MainWindow::on_actionCopy_triggered
+ */
+void MainWindow::on_actionCopy_triggered(void)
+{
+	// TODO : format ?
+}
+
+/**
+ * @brief MainWindow::on_actionPaste_triggered
+ */
+void MainWindow::on_actionPaste_triggered(void)
+{
+	// TODO : format ?
+}
+
+/**
+ * @brief MainWindow::on_actionSelectAll_triggered
+ */
+void MainWindow::on_actionSelectAll_triggered(void)
+{
+	// TODO : implement selection first
+}
+
+/**
+ * @brief MainWindow::on_actionDelete_triggered
+ */
+void MainWindow::on_actionDelete_triggered(void)
+{
+	// TODO : implement selection first
+}
+
+/**
+ * @brief MainWindow::on_actionFind_triggered
+ */
+void MainWindow::on_actionFind_triggered(void)
+{
+	// TODO : show find window
+}
+
+/**
+ * @brief MainWindow::on_actionPreferences_triggered
+ */
+void MainWindow::on_actionPreferences_triggered(void)
+{
+	// TODO : show preferences window
+}
+
+/**
  * @brief MainWindow::on_actionFullscreen_toggled
  * @param checked
  */
@@ -133,27 +262,43 @@ void MainWindow::on_actionDrawSceneAABB_toggled(bool checked)
 }
 
 /**
- * @brief MainWindow::on_actionImport_triggered
- */
-void MainWindow::on_actionImport_triggered()
-{
-	m_pFileChooser->show();
-}
-
-/**
- * @brief MainWindow::on_actionNode_Editor_triggered
- */
-void MainWindow::on_actionNode_Editor_triggered()
-{
-	m_pNodeEditorWindow->show();
-}
-
-/**
  * @brief MainWindow::on_actionClear_color_clicked
  */
 void MainWindow::on_actionResetCamera_triggered()
 {
 	static_cast<DrawableSurface*>(m_pDrawable)->ResetCamera();
+}
+
+/**
+ * @brief MainWindow::on_actionShowRenderGraphEditor_triggered
+ */
+void MainWindow::on_actionShowRenderGraphEditor_triggered()
+{
+	m_pNodeEditorWindow->show();
+}
+
+/**
+ * @brief MainWindow::on_actionShowCommandList_triggered
+ */
+void MainWindow::on_actionShowCommandList_triggered()
+{
+	m_pUndoView->show();
+}
+
+/**
+ * @brief MainWindow::on_actionHelp_triggered
+ */
+void MainWindow::on_actionHelp_triggered()
+{
+	// TODO : open link
+}
+
+/**
+ * @brief MainWindow::on_actionAbout_triggered
+ */
+void MainWindow::on_actionAbout_triggered()
+{
+	// TODO : show about window
 }
 
 /**

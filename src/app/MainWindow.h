@@ -5,9 +5,9 @@
 
 #include "NodeEditorWindow.h"
 
-class QDockWidget;
 class QFileDialog;
-class QFileSystemWatcher;
+class QUndoStack;
+class QUndoView;
 
 class DrawableSurface;
 
@@ -36,6 +36,9 @@ private:
 
 	Ui::MainWindow * ui;
 
+	QUndoStack * m_pUndoStack;
+	QUndoView * m_pUndoView;
+
 protected:
 
 	NodeEditorWindow * m_pNodeEditorWindow;
@@ -48,16 +51,52 @@ public:
 
 private slots:
 
+	//
+	// File menu
+	void on_actionNew_triggered(void);
+	void on_actionOpen_triggered(void);
+
+	void on_actionSave_triggered(void);
+	void on_actionSaveAs_triggered(void);
+
+	void on_actionImport_triggered(void);
+	void on_actionExport_triggered(void);
+
+	//void on_actionExit_triggered(void);
+
+	//
+	// Edit menu
+	void on_actionCut_triggered(void);
+	void on_actionCopy_triggered(void);
+	void on_actionPaste_triggered(void);
+
+	void on_actionSelectAll_triggered(void);
+	void on_actionDelete_triggered(void);
+	void on_actionFind_triggered(void);
+	void on_actionPreferences_triggered(void);
+
+	//
+	// View menu
 	void on_actionFullscreen_toggled(bool checked);
 	void on_actionDrawObjectsAABB_toggled(bool checked);
 	void on_actionDrawSceneAABB_toggled(bool checked);
 
-	void on_actionImport_triggered();
-
-	void on_actionNode_Editor_triggered();
-
+	//
+	// Camera menu
 	void on_actionResetCamera_triggered();
 
+	//
+	// Window menu
+	void on_actionShowRenderGraphEditor_triggered();
+	void on_actionShowCommandList_triggered();
+
+	//
+	// Help menu
+	void on_actionHelp_triggered();
+	void on_actionAbout_triggered();
+
+	//
+	// Custom
 	void onGraphLoaded(const Graph & graph);
 	void onGraphSaved(const Graph & graph);
 
