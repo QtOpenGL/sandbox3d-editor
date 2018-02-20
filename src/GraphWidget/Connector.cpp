@@ -120,6 +120,8 @@ void Connector::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 			}
 			break;
 		}
+
+		m_bDisconnecting = false;
 	}
 }
 
