@@ -5,20 +5,6 @@ INCLUDE(CheckIncludeFiles)
 file(GLOB_RECURSE UI_FILES ../../resources/ui/*.ui)
 file(GLOB_RECURSE SRC_FILES *.cpp *.h *.inl ../include/*.h ../include/*.inl)
 
-# Qt
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-find_package(Qt5Core)
-find_package(Qt5Widgets)
-find_package(Qt5Gui)
-find_package(Qt5OpenGL)
-find_package(Qt5Xml)
-
-if(Qt5_POSITION_INDEPENDENT_CODE)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-endif()
-
 qt5_wrap_ui(UI_HEADER_FILES ${UI_FILES})
 
 # Compile application
@@ -29,7 +15,3 @@ IF(CMAKE_BUILD_TYPE MATCHES Debug)
 ENDIF()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE sandbox_resources scene Qt5::Core Qt5::Widgets Qt5::Gui Qt5::OpenGL Qt5::Xml GraphWidget Graph)
-
-# Jansson
-find_library(JANSSON_LIBRARY jansson)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${JANSSON_LIBRARY})
