@@ -1,11 +1,9 @@
 sandbox3d-editor
 =========
 
-An editor for [sandbox3d](https://github.com/magestik/sandbox3d)
-
 ### Build
 
-Compile C++ code, and preprocess shaders :
+Compile application :
 ```
 $ mkdir build
 $ cd build
@@ -15,6 +13,7 @@ $ cmake --build .
 
 ### Dependencies
 
-The only dependency for this project is Qt5. 
+This project is based on Qt5 (>= 5.4).
 
-Note : [sandbox3d](https://github.com/magestik/sandbox3d) has some dependencies too.
+By design, this project can't render anything by itself. Instead it loads an external plugin that will provide render passes that will do the rendering. An example of such a plugin can be found here : [sandbox3d](https://github.com/magestik/sandbox3d).
+
