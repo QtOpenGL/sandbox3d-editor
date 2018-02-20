@@ -1,12 +1,12 @@
 #pragma once
 
-#include <string>
+#include <QString>
 #include <vector>
 
 struct NodeDescriptor
 {
 	NodeDescriptor(void);
-	bool loadFromFile(const std::string & filename);
+	bool loadFromFile(const QString & filename);
 
 	enum DataType
 	{
@@ -17,14 +17,14 @@ struct NodeDescriptor
 
 	struct Input
 	{
-		std::string identifier;
-		std::string name;
+		QString identifier;
+		QString name;
 		DataType type;
 	};
 
 	struct Output
 	{
-		std::string name;
+		QString name;
 		DataType type;
 	};
 
@@ -33,8 +33,8 @@ struct NodeDescriptor
 		return(identifier == strId);
 	}
 
-	std::string identifier;
-	std::string name;
+	QString identifier;
+	QString name;
 
 	std::vector<Input> inputs;
 	std::vector<Output> outputs;

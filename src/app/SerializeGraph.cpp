@@ -251,7 +251,7 @@ bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & des
 
 					Node * source = edge->getSource();
 					assert(source->getType() == "texture"); // remove this when constant parameters will be implemented
-					fprintf(f, "\t\t\t<param name=\"%s\" value=\"%s\" />\n", input.identifier.c_str(), source->getId().c_str());
+					fprintf(f, "\t\t\t<param name=\"%s\" value=\"%s\" />\n", (const char*)input.identifier.toLocal8Bit(), source->getId().c_str());
 				}
 			}
 

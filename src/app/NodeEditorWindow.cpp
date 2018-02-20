@@ -333,7 +333,7 @@ void NodeEditorWindow::loadNodeDescriptors(void)
 		for (QString & filename : list)
 		{
 			NodeDescriptor desc;
-			bool loading = desc.loadFromFile(dir.filePath(filename).toStdString());
+			bool loading = desc.loadFromFile(dir.filePath(filename));
 
 			if (loading)
 			{
@@ -504,7 +504,7 @@ bool NodeEditorWindow::createGraph(Graph & G)
 				if (strNodeType == "operation")
 				{
 					pNode->setLabel(((GraphWidget::NodePass*)pNodeItem)->getTitle().toLocal8Bit());
-					pNode->addMetaData("subtype", m_mapOperationNodes[pNodeItem]->identifier.c_str());
+					pNode->addMetaData("subtype", (const char*)m_mapOperationNodes[pNodeItem]->identifier.toLocal8Bit());
 				}
 				else if (strNodeType == "texture")
 				{
@@ -593,7 +593,7 @@ GraphWidget::Node * NodeEditorWindow::createOperationNode(const NodeDescriptor &
 {
 	GraphWidget::NodePass * n = new GraphWidget::NodePass();
 
-	n->setTitle(QString(desc.name.c_str()));
+	n->setTitle(desc.name);
 
 	m_pScene->addItem(n);
 
@@ -601,7 +601,7 @@ GraphWidget::Node * NodeEditorWindow::createOperationNode(const NodeDescriptor &
 
 	for (const NodeDescriptor::Input & input : desc.inputs)
 	{
-		n->addInput(QString(input.name.c_str())); //, nullptr, input_index
+		n->addInput(input.name); //, nullptr, input_index
 		++input_index;
 	}
 
@@ -609,7 +609,7 @@ GraphWidget::Node * NodeEditorWindow::createOperationNode(const NodeDescriptor &
 
 	for (const NodeDescriptor::Output & output : desc.outputs)
 	{
- 		n->addOutput(QString(output.name.c_str())); //, nullptr, output_index
+		n->addOutput(output.name); //, nullptr, output_index
 		++output_index;
 	}
 

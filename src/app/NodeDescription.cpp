@@ -1,17 +1,18 @@
 #include "NodeDescription.h"
 
-#include <assert.h>
-#include <string.h>
+#include <QFile>
 
-#include <jansson.h>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
-static NodeDescriptor::DataType DataTypeFromString(const char * str)
+static NodeDescriptor::DataType DataTypeFromString(const QString & str)
 {
-	if (!strcmp(str, "Texture"))
+	if (str == "Texture")
 	{
 		return(NodeDescriptor::Texture);
 	}
-	else if (!strcmp(str, "Constant"))
+	else if (str == "Constant")
 	{
 		return(NodeDescriptor::Constant);
 	}
@@ -19,36 +20,35 @@ static NodeDescriptor::DataType DataTypeFromString(const char * str)
 	return(NodeDescriptor::UnknownDataType);
 }
 
-static bool ImportInputs(json_t * array, std::vector<NodeDescriptor::Input> & inputs)
+static bool ImportInputs(const QJsonArray & array, std::vector<NodeDescriptor::Input> & inputs)
 {
-	if (!json_is_array(array))
+	for (QJsonValue object : array)
 	{
-		return(false);
-	}
+		if (!object.isObject())
+		{
+			return(false);
+		}
 
-	size_t index;
-	json_t * elmt;
+		QJsonObject node = object.toObject();
 
-	json_array_foreach(array, index, elmt)
-	{
 		NodeDescriptor::Input input;
 
-		const char * key;
-		json_t * value;
-
-		json_object_foreach(elmt, key, value)
+		for (QJsonObject::const_iterator it = node.begin(); it != node.end(); it++)
 		{
-			if (!strcmp(key, "id"))
+			QString key = it.key();
+			QJsonValue value = it.value();
+
+			if (key == "id")
 			{
-				input.identifier = json_string_value(value);
+				input.identifier = value.toString();
 			}
-			else if (!strcmp(key, "name"))
+			else if (key == "name")
 			{
-				input.name = json_string_value(value);
+				input.name = value.toString();
 			}
-			else if (!strcmp(key, "type"))
+			else if (key == "type")
 			{
-				input.type = DataTypeFromString(json_string_value(value));
+				input.type = DataTypeFromString(value.toString());
 			}
 			else
 			{
@@ -62,32 +62,31 @@ static bool ImportInputs(json_t * array, std::vector<NodeDescriptor::Input> & in
 	return(true);
 }
 
-static bool ImportOutputs(json_t * array, std::vector<NodeDescriptor::Output> & outputs)
+static bool ImportOutputs(const QJsonArray & array, std::vector<NodeDescriptor::Output> & outputs)
 {
-	if (!json_is_array(array))
+	for (QJsonValue object : array)
 	{
-		return(false);
-	}
+		if (!object.isObject())
+		{
+			return(false);
+		}
 
-	size_t index;
-	json_t * elmt;
+		QJsonObject node = object.toObject();
 
-	json_array_foreach(array, index, elmt)
-	{
 		NodeDescriptor::Output output;
 
-		const char * key;
-		json_t * value;
-
-		json_object_foreach(elmt, key, value)
+		for (QJsonObject::const_iterator it = node.begin(); it != node.end(); it++)
 		{
-			if (!strcmp(key, "name"))
+			QString key = it.key();
+			QJsonValue value = it.value();
+
+			if (key == "name")
 			{
-				output.name = json_string_value(value);
+				output.name = value.toString();
 			}
-			else if (!strcmp(key, "type"))
+			else if (key == "type")
 			{
-				output.type = DataTypeFromString(json_string_value(value));
+				output.type = DataTypeFromString(value.toString());
 			}
 			else
 			{
@@ -114,36 +113,62 @@ NodeDescriptor::NodeDescriptor(void) : name("empty")
  * @param filename
  * @return
  */
-bool NodeDescriptor::loadFromFile(const std::string & filename)
+bool NodeDescriptor::loadFromFile(const QString & filename)
 {
-	json_error_t error;
-	json_t * root = json_load_file(filename.c_str(), 0, &error);
+	QFile loadFile(filename);
 
-	if (!root)
+	if (!loadFile.open(QIODevice::ReadOnly))
 	{
-		return(false); // parse error
+		qWarning("Couldn't open node file.");
+		return(false);
 	}
 
-	const char * key;
-	json_t * value;
+	QByteArray fileContent = loadFile.readAll();
 
-	json_object_foreach(root, key, value)
+	QJsonDocument doc(QJsonDocument::fromJson(fileContent));
+
+	QJsonObject root = doc.object();
+
+	for (QJsonObject::const_iterator it = root.begin(); it != root.end(); it++)
 	{
-		if (!strcmp(key, "id"))
+		QString key = it.key();
+		QJsonValue value = it.value();
+
+		if (key == "id")
 		{
-			identifier = json_string_value(value);
+			if (!value.isString())
+			{
+				return(false);
+			}
+
+			identifier = value.toString();
 		}
-		else if (!strcmp(key, "name"))
+		else if (key == "name")
 		{
-			name = json_string_value(value);
+			if (!value.isString())
+			{
+				return(false);
+			}
+
+			name = value.toString();
 		}
-		else if (!strcmp(key, "inputs"))
+		else if (key == "inputs")
 		{
-			ImportInputs(value, inputs);
+			if (!value.isArray())
+			{
+				return(false);
+			}
+
+			ImportInputs(value.toArray(), inputs);
 		}
-		else if (!strcmp(key, "outputs"))
+		else if (key == "outputs")
 		{
-			ImportOutputs(value, outputs);
+			if (!value.isArray())
+			{
+				return(false);
+			}
+
+			ImportOutputs(value.toArray(), outputs);
 		}
 		else
 		{

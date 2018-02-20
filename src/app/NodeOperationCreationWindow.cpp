@@ -13,7 +13,7 @@ NodeOperationCreationWindow::NodeOperationCreationWindow(const std::vector<NodeD
 
 	for (const NodeDescriptor & desc : aDescriptors)
 	{
-		ui->comboBox->addItem(QString(desc.name.c_str()), QVariant::fromValue((void*)&desc));
+		ui->comboBox->addItem(desc.name, QVariant::fromValue((void*)&desc));
 	}
 }
 
