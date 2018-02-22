@@ -13,6 +13,5 @@ if (Qt5_POSITION_INDEPENDENT_CODE)
 endif ()
 
 # add subdirectories
-add_subdirectory(Graph)
 add_subdirectory(GraphWidget)
 add_subdirectory(app)

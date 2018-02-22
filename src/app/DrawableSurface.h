@@ -10,6 +10,8 @@ typedef QGLWidget QOpenGLWidget;
 
 #include "Objects/Camera/Camera.h"
 
+#include "RenderGraph.h"
+
 class QString;
 
 class Object;
@@ -68,6 +70,10 @@ private:
 	//
 	// Draw
 	GLuint m_uCurrentTexture;
+
+	//
+	// Render Graph
+	RenderGraph::Queue * m_pRenderQueue;
 
 signals:
 

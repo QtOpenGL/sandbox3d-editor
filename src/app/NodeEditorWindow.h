@@ -101,7 +101,6 @@ public slots:
 	void createOperationNodeFromDialog();
 	void createTextureNodeFromDialog();
 
-
 signals:
 
 	void graphLoaded(const Graph & graph);

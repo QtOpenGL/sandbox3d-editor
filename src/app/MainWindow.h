@@ -5,6 +5,8 @@
 
 #include "NodeEditorWindow.h"
 
+#include "RenderGraph.h"
+
 class QFileDialog;
 class QUndoStack;
 class QUndoView;
@@ -12,6 +14,11 @@ class QUndoView;
 class DrawableSurface;
 
 class Graph;
+
+namespace RenderGraph
+{
+	class Factory;
+}
 
 namespace Ui {
 	class MainWindow;
@@ -42,6 +49,10 @@ private:
 protected:
 
 	NodeEditorWindow * m_pNodeEditorWindow;
+
+	RenderGraph::Factory m_factory;
+
+	RenderGraph::Queue * m_pRenderQueue;
 
 public:
 

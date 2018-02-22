@@ -12,6 +12,7 @@ add_subdirectory(external)
 
 # Scene
 find_package(Scene REQUIRED)
+find_package(RenderGraph REQUIRED)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 

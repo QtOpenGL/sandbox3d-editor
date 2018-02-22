@@ -46,6 +46,7 @@ DrawableSurface::DrawableSurface(QWidget *parent)
 , m_bDrawObjectsAABB(false)
 , m_bDrawSceneAABB(false)
 , m_uCurrentTexture(0)
+, m_pRenderQueue(nullptr)
 {
 	setAutoFillBackground(false);
 	setFocusPolicy(Qt::StrongFocus);
@@ -139,9 +140,16 @@ void DrawableSurface::resizeGL(int w, int h)
  */
 void DrawableSurface::paintGL(void)
 {
-	const mat4x4 & matView = m_camera.getViewMatrix();
+	if (nullptr != m_pRenderQueue)
+	{
+		m_pRenderQueue->render();
+	}
+	else // TODO : remove this
+	{
+		const mat4x4 & matView = m_camera.getViewMatrix();
 
-	g_RendererWrapper.onUpdate(matView);
+		g_RendererWrapper.onUpdate(matView);
+	}
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
@@ -210,6 +218,8 @@ void DrawableSurface::paintGL(void)
 	const float fov = 75.0f;
 	float ratio = width()/(float)height();
 	const mat4x4 matProjection = _perspective(fov, ratio, 0.01f, 100.0f);
+
+	const mat4x4 & matView = m_camera.getViewMatrix(); // TODO : get camera from scene
 
 	if (m_bDrawObjectsAABB)
 	{
