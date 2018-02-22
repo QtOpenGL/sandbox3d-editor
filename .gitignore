@@ -27,9 +27,10 @@
 *.out
 *.app
 
+# CMake
+build/*
+.vs/*
+
+# Linux
 *~
 
-build/*
-build-*/*
-data/meshes/*
-data/sprites/*
