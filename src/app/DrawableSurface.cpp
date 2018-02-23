@@ -102,6 +102,24 @@ void DrawableSurface::setCurrentTexture(const QString & strFinalTextureId)
 }
 
 /**
+ * @brief DrawableSurface::setRenderQueue
+ * @param pRenderQueue
+ */
+void DrawableSurface::setRenderQueue(RenderGraph::Queue * pRenderQueue)
+{
+	m_pRenderQueue = pRenderQueue;
+}
+
+/**
+ * @brief DrawableSurface::getRenderQueue
+ * @return
+ */
+RenderGraph::Queue * DrawableSurface::getRenderQueue(void)
+{
+	return(m_pRenderQueue);
+}
+
+/**
  * @brief initializeGL
  */
 void DrawableSurface::initializeGL(void)

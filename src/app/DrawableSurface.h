@@ -32,6 +32,11 @@ public:
 
 	void	setCurrentTexture	(const QString & strFinalTextureId);
 
+	//
+	// Render Queue
+	void					setRenderQueue		(RenderGraph::Queue * pRenderQueue);
+	RenderGraph::Queue *	getRenderQueue		(void);
+
 protected:
 
 	void	initializeGL		(void);
