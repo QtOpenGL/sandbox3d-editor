@@ -1,15 +1,15 @@
 #pragma once
 
 #include <QMainWindow>
-#include <QColorDialog>
-
-#include "NodeEditorWindow.h"
 
 #include "RenderGraph.h"
 
 class QFileDialog;
 class QUndoStack;
 class QUndoView;
+
+class AboutDialog;
+class NodeEditorWindow;
 
 class DrawableSurface;
 
@@ -47,6 +47,8 @@ private:
 	QUndoView * m_pUndoView;
 
 protected:
+
+	AboutDialog * m_pAboutDialog;
 
 	NodeEditorWindow * m_pNodeEditorWindow;
 

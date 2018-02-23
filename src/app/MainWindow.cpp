@@ -1,6 +1,9 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+#include "AboutDialog.h"
+#include "NodeEditorWindow.h"
+
 #include "DrawableSurface.h"
 #include "RendererWrapper.h"
 #include "SerializeGraph.h"
@@ -74,6 +77,10 @@ MainWindow::MainWindow(QWidget * pParent)
 		m_pNodeEditorWindow = new NodeEditorWindow(this);
 		connect(m_pNodeEditorWindow, SIGNAL(graphSaved(const Graph &)), this, SLOT(onGraphSaved(const Graph &)));
 		connect(m_pNodeEditorWindow, SIGNAL(graphLoaded(const Graph &)), this, SLOT(onGraphLoaded(const Graph &)));
+	}
+
+	{
+		m_pAboutDialog = new AboutDialog(this);
 	}
 
 	QSettings settings;
@@ -307,7 +314,7 @@ void MainWindow::on_actionHelp_triggered()
  */
 void MainWindow::on_actionAbout_triggered()
 {
-	// TODO : show about window
+	m_pAboutDialog->show();
 }
 
 /**
