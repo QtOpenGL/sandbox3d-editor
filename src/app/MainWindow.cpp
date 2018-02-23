@@ -14,6 +14,8 @@
 #include <QFileDialog>
 #include <QFileSystemWatcher>
 
+#include <QDesktopServices>
+
 extern RendererWrapper g_RendererWrapper;
 
 /**
@@ -306,7 +308,7 @@ void MainWindow::on_actionShowCommandList_triggered()
  */
 void MainWindow::on_actionHelp_triggered()
 {
-	// TODO : open link
+	QDesktopServices::openUrl(QUrl("https://github.com/magestik/sandbox3d-editor"));
 }
 
 /**
