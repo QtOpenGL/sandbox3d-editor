@@ -12,6 +12,6 @@ target_link_libraries(Sandbox3D-Editor PRIVATE scene)
 target_link_libraries(Sandbox3D-Editor PRIVATE RenderGraph Graph)
 target_include_directories(Sandbox3D-Editor PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../")
 
-if (CMAKE_BUILD_TYPE MATCHES Debug)
+if (CMAKE_BUILD_TYPE MATCHES Debug AND NOT WIN32)
         target_link_libraries(Sandbox3D-Editor PUBLIC glBreak)
-endif(CMAKE_BUILD_TYPE MATCHES Debug)
+endif(CMAKE_BUILD_TYPE MATCHES Debug AND NOT WIN32)
