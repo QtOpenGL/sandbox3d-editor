@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-find_package(Qt5 COMPONENTS Core)
+find_package(Qt5 COMPONENTS Core REQUIRED)
 
 if(Qt5_POSITION_INDEPENDENT_CODE)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
