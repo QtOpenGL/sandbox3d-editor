@@ -15,3 +15,8 @@ target_include_directories(Sandbox3D-Editor PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}
 if (CMAKE_BUILD_TYPE MATCHES Debug AND NOT WIN32)
         target_link_libraries(Sandbox3D-Editor PUBLIC glBreak)
 endif(CMAKE_BUILD_TYPE MATCHES Debug AND NOT WIN32)
+
+if (WIN32)
+	find_program(WINDEPLOYQT_EXECUTABLE NAMES windeployqt HINTS C:\\Qt\\5.10.1\\msvc2017_64\\bin) # default Qt 5.10.1 (VS2017) install path / TODO : detect this path automatically
+    add_custom_command(TARGET Sandbox3D-Editor POST_BUILD COMMAND ${WINDEPLOYQT_EXECUTABLE} $<TARGET_FILE:Sandbox3D-Editor>)
+endif(WIN32)
