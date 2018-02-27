@@ -108,31 +108,49 @@ QPainterPath NodeTexture::shape(void) const
 void NodeTexture::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
 	QOpenGLContext * pContext = QOpenGLContext::currentContext();
-	QOpenGLFunctions_3_0 * glFuncs = pContext->versionFunctions<QOpenGLFunctions_3_0>();
+	
+	QSurfaceFormat format = pContext->format();
 
-	if (!glFuncs)
+	QPair<int,int> version = format.version();
+	QSurfaceFormat::OpenGLContextProfile profile = format.profile();
+
+	// it seems that Qt currently uses a CompatibilityProfile internally
+	// not sure why ... but just ensure it, in case this changes in the future
+	if (profile == QSurfaceFormat::CompatibilityProfile)
 	{
-		return;
+		if (version.first < 3)
+		{
+			// unsupported
+		}
+		else if (version.first == 3 && version.second == 0)
+		{
+			// Historically, Mesa always returns a 3.0 context when asking a CompatibilityProfile
+			// This is about to change (February 2018) but just handle OpenGL 3.0 context correctly
+			QOpenGLFunctions_3_0 * glFuncs = pContext->versionFunctions<QOpenGLFunctions_3_0>();
+
+			if (glFuncs)
+			{
+				glFuncs->glEnable(GL_TEXTURE_2D);
+				glFuncs->glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+				glFuncs->glBindTexture(GL_TEXTURE_2D, texture);
+				glFuncs->glBegin(GL_QUADS);
+				glFuncs->glTexCoord2d(0.0, 1.0); glFuncs->glVertex2d(0.0, 0.0);
+				glFuncs->glTexCoord2d(1.0, 1.0); glFuncs->glVertex2d(0.0 + width, 0.0);
+				glFuncs->glTexCoord2d(1.0, 0.0); glFuncs->glVertex2d(0.0 + width, 0.0 + height);
+				glFuncs->glTexCoord2d(0.0, 0.0); glFuncs->glVertex2d(0.0, 0.0 + height);
+				glFuncs->glEnd();
+			}
+		}
+		else
+		{
+			// TODO
+		}
 	}
+
+	painter->endNativePainting();
 
 	double border = 1.0;
 	QRectF rect = QRectF(0.0, 0.0, width, height);
-
-	painter->beginNativePainting();
-
-	// Draw Render Target using OpenGL
-	// MUST use old OpenGL because it seems that QGraphicsView does NOT support OpenGL > 3
-	glFuncs->glEnable(GL_TEXTURE_2D);
-	glFuncs->glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glFuncs->glBindTexture(GL_TEXTURE_2D, texture);
-	glFuncs->glBegin(GL_QUADS);
-	glFuncs->glTexCoord2d(0.0,1.0); glFuncs->glVertex2d(0.0,			0.0);
-	glFuncs->glTexCoord2d(1.0,1.0); glFuncs->glVertex2d(0.0 + width,	0.0);
-	glFuncs->glTexCoord2d(1.0,0.0); glFuncs->glVertex2d(0.0 + width,	0.0 + height);
-	glFuncs->glTexCoord2d(0.0,0.0); glFuncs->glVertex2d(0.0,			0.0 + height);
-	glFuncs->glEnd();
-
-	painter->endNativePainting();
 
 	QPen pen;
 
