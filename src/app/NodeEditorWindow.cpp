@@ -98,75 +98,76 @@ const char * GLenumToString(unsigned int e)
 {
 	switch(e)
 	{
-		case GL_R8: return("GL_R8"); break;
-		case GL_RG8: return("GL_RG8"); break;
-		case GL_RGBA8: return("GL_RGBA8"); break;
+	case GL_R8: return("GL_R8"); break;
+	case GL_RG8: return("GL_RG8"); break;
+	case GL_RGBA8: return("GL_RGBA8"); break;
 
-		case GL_R16: return("GL_R16"); break;
-		case GL_RG16: return("GL_RG16"); break;
-		case GL_RGBA16: return("GL_RGBA16"); break;
+	case GL_R16: return("GL_R16"); break;
+	case GL_RG16: return("GL_RG16"); break;
+	case GL_RGBA16: return("GL_RGBA16"); break;
 
-		case GL_R16F: return("GL_R16F"); break;
-		case GL_RG16F: return("GL_RG16F"); break;
-		case GL_RGBA16F: return("GL_RGBA16F"); break;
+	case GL_R16F: return("GL_R16F"); break;
+	case GL_RG16F: return("GL_RG16F"); break;
+	case GL_RGBA16F: return("GL_RGBA16F"); break;
 
-		case GL_R32F: return("GL_R32F"); break;
-		case GL_RG32F: return("GL_RG32F"); break;
-		case GL_RGBA32F: return("GL_RGBA32F"); break;
+	case GL_R32F: return("GL_R32F"); break;
+	case GL_RG32F: return("GL_RG32F"); break;
+	case GL_RGBA32F: return("GL_RGBA32F"); break;
 
-		case GL_R8I: return("GL_R8I"); break;
-		case GL_RG8I: return("GL_RG8I"); break;
-		case GL_RGBA8I: return("GL_RGBA8I"); break;
+	case GL_R8I: return("GL_R8I"); break;
+	case GL_RG8I: return("GL_RG8I"); break;
+	case GL_RGBA8I: return("GL_RGBA8I"); break;
 
-		case GL_R16I: return("GL_R16I"); break;
-		case GL_RG16I: return("GL_RG16I"); break;
-		case GL_RGBA16I: return("GL_RGBA16I"); break;
+	case GL_R16I: return("GL_R16I"); break;
+	case GL_RG16I: return("GL_RG16I"); break;
+	case GL_RGBA16I: return("GL_RGBA16I"); break;
 
-		case GL_R32I: return("GL_R32I"); break;
-		case GL_RG32I: return("GL_RG32I"); break;
-		case GL_RGBA32I: return("GL_RGBA32I"); break;
+	case GL_R32I: return("GL_R32I"); break;
+	case GL_RG32I: return("GL_RG32I"); break;
+	case GL_RGBA32I: return("GL_RGBA32I"); break;
 
-		case GL_R8UI: return("GL_R8UI"); break;
-		case GL_RG8UI: return("GL_RG8UI"); break;
-		case GL_RGBA8UI: return("GL_RGBA8UI"); break;
+	case GL_R8UI: return("GL_R8UI"); break;
+	case GL_RG8UI: return("GL_RG8UI"); break;
+	case GL_RGBA8UI: return("GL_RGBA8UI"); break;
 
-		case GL_R16UI: return("GL_R16UI"); break;
-		case GL_RG16UI: return("GL_RG16UI"); break;
-		case GL_RGBA16UI: return("GL_RGBA16UI"); break;
+	case GL_R16UI: return("GL_R16UI"); break;
+	case GL_RG16UI: return("GL_RG16UI"); break;
+	case GL_RGBA16UI: return("GL_RGBA16UI"); break;
 
-		case GL_R32UI: return("GL_R32UI"); break;
-		case GL_RG32UI: return("GL_RG32UI"); break;
-		case GL_RGBA32UI: return("GL_RGBA32UI"); break;
+	case GL_R32UI: return("GL_R32UI"); break;
+	case GL_RG32UI: return("GL_RG32UI"); break;
+	case GL_RGBA32UI: return("GL_RGBA32UI"); break;
 
-		case GL_RGB10_A2: return("GL_RGB10_A2"); break;
-		case GL_RGB10_A2UI: return("GL_RGB10_A2UI"); break;
-		case GL_R11F_G11F_B10F: return("GL_R11F_G11F_B10F"); break;
-		case GL_SRGB8_ALPHA8: return("GL_SRGB8_ALPHA8"); break;
+	case GL_RGB10_A2: return("GL_RGB10_A2"); break;
+	case GL_RGB10_A2UI: return("GL_RGB10_A2UI"); break;
+	case GL_R11F_G11F_B10F: return("GL_R11F_G11F_B10F"); break;
+	case GL_SRGB8_ALPHA8: return("GL_SRGB8_ALPHA8"); break;
 
-		case GL_DEPTH_COMPONENT16: return("GL_DEPTH_COMPONENT16"); break;
-		case GL_DEPTH_COMPONENT24: return("GL_DEPTH_COMPONENT24"); break;
-		case GL_DEPTH_COMPONENT32F: return("GL_DEPTH_COMPONENT32F"); break;
-		case GL_DEPTH24_STENCIL8: return("GL_DEPTH24_STENCIL8"); break;
-		case GL_DEPTH32F_STENCIL8: return("GL_DEPTH32F_STENCIL8"); break;
-		case GL_STENCIL_INDEX8: return("GL_STENCIL_INDEX8"); break;
+	case GL_DEPTH_COMPONENT16: return("GL_DEPTH_COMPONENT16"); break;
+	case GL_DEPTH_COMPONENT24: return("GL_DEPTH_COMPONENT24"); break;
+	case GL_DEPTH_COMPONENT32F: return("GL_DEPTH_COMPONENT32F"); break;
+	case GL_DEPTH24_STENCIL8: return("GL_DEPTH24_STENCIL8"); break;
+	case GL_DEPTH32F_STENCIL8: return("GL_DEPTH32F_STENCIL8"); break;
+	case GL_STENCIL_INDEX8: return("GL_STENCIL_INDEX8"); break;
 	}
 
 	return("");
 }
 
 /**
- * @brief Constructor
- * @param Main Window
- */
+* @brief Constructor
+* @param Main Window
+*/
 NodeEditorWindow::NodeEditorWindow(MainWindow * pMainWindow)
-: QDialog(pMainWindow)
-, ui(new Ui::NodeEditorWindow)
-, m_pView(nullptr)
-, m_pScene(nullptr)
+	: QDialog(pMainWindow)
+	, ui(new Ui::NodeEditorWindow)
+	, m_pView(nullptr)
+	, m_pScene(nullptr)
+	, m_lastContextMenuPos(0, 0)
 {
 	ui->setupUi(this); // created with Qt Designer
 
-	// Custom Widgets
+					   // Custom Widgets
 	m_pMenuBar				= new QMenuBar(this); // can't add a Menu bar from Designer
 	m_pStatusBar			= new QStatusBar(this); // can't add a Status bar from Designer
 
@@ -241,16 +242,16 @@ NodeEditorWindow::NodeEditorWindow(MainWindow * pMainWindow)
 }
 
 /**
- * @brief Destructor
- */
+* @brief Destructor
+*/
 NodeEditorWindow::~NodeEditorWindow(void)
 {
 	// nothing here
 }
 
 /**
- * @brief NodeEditorWindow::init
- */
+* @brief NodeEditorWindow::init
+*/
 void NodeEditorWindow::init(void)
 {
 	// Load current Render Graph
@@ -273,9 +274,9 @@ void NodeEditorWindow::init(void)
 }
 
 /**
- * @brief NodeEditorWindow::closeEvent
- * @param event
- */
+* @brief NodeEditorWindow::closeEvent
+* @param event
+*/
 void NodeEditorWindow::closeEvent(QCloseEvent * pEvent)
 {
 	(void)pEvent;
@@ -286,9 +287,9 @@ void NodeEditorWindow::closeEvent(QCloseEvent * pEvent)
 }
 
 /**
- * @brief NodeEditorWindow::contextMenuEvent
- * @param event
- */
+* @brief NodeEditorWindow::contextMenuEvent
+* @param event
+*/
 void NodeEditorWindow::contextMenuEvent(QContextMenuEvent * pEvent)
 {
 	QGraphicsItem * item = m_pView->itemAt(pEvent->pos());
@@ -299,24 +300,25 @@ void NodeEditorWindow::contextMenuEvent(QContextMenuEvent * pEvent)
 	{
 		switch (item->type())
 		{
-			case GraphWidget::Node::Type:
-			{
-				item->setSelected(true);
+		case GraphWidget::Node::Type:
+		{
+			item->setSelected(true);
 
-				m_pContextMenuNode->exec(pEvent->globalPos());
-			}
-			break;
+			m_pContextMenuNode->exec(pEvent->globalPos());
+		}
+		break;
 		}
 	}
 	else
 	{
+		m_lastContextMenuPos = pEvent->globalPos();
 		m_pContextMenuScene->exec(pEvent->globalPos());
 	}
 }
 
 /**
- * @brief NodeEditorWindow::loadNodeDescriptors
- */
+* @brief NodeEditorWindow::loadNodeDescriptors
+*/
 void NodeEditorWindow::loadNodeDescriptors(void)
 {
 	bool successful = true;
@@ -354,9 +356,9 @@ void NodeEditorWindow::loadNodeDescriptors(void)
 }
 
 /**
- * @brief NodeEditorWindow::loadGraph
- * @return
- */
+* @brief NodeEditorWindow::loadGraph
+* @return
+*/
 bool NodeEditorWindow::loadGraph(void)
 {
 	Graph G;
@@ -468,10 +470,10 @@ bool NodeEditorWindow::loadGraph(void)
 }
 
 /**
- * @brief NodeEditorWindow::createGraph
- * @param G
- * @return
- */
+* @brief NodeEditorWindow::createGraph
+* @param G
+* @return
+*/
 bool NodeEditorWindow::createGraph(Graph & G)
 {
 	G.setType("RenderGraph");
@@ -485,51 +487,51 @@ bool NodeEditorWindow::createGraph(Graph & G)
 	{
 		switch (item->type())
 		{
-			case GraphWidget::Node::Type:
+		case GraphWidget::Node::Type:
+		{
+			GraphWidget::Node * pNodeItem = static_cast<GraphWidget::Node*>(item);
+			assert(nullptr != pNodeItem);
+
+			char szId [16];
+			sprintf(szId, "%lld", uintptr_t(pNodeItem));
+
+			Node * pNode = new Node(szId);
+			assert(nullptr != pNode);
+			G.addNode(pNode);
+
+			std::string & strNodeType = m_mapNodeType[pNodeItem];
+
+			pNode->setType(strNodeType.c_str());
+
+			if (strNodeType == "operation")
 			{
-				GraphWidget::Node * pNodeItem = static_cast<GraphWidget::Node*>(item);
-				assert(nullptr != pNodeItem);
-
-				char szId [16];
-				sprintf(szId, "%lld", uintptr_t(pNodeItem));
-
-				Node * pNode = new Node(szId);
-				assert(nullptr != pNode);
-				G.addNode(pNode);
-
-				std::string & strNodeType = m_mapNodeType[pNodeItem];
-
-				pNode->setType(strNodeType.c_str());
-
-				if (strNodeType == "operation")
-				{
-					pNode->setLabel(((GraphWidget::NodePass*)pNodeItem)->getTitle().toLocal8Bit());
-					pNode->addMetaData("subtype", (const char*)m_mapOperationNodes[pNodeItem]->identifier.toLocal8Bit());
-				}
-				else if (strNodeType == "texture")
-				{
-					pNode->addMetaData("format", GLenumToString(m_mapTextureNodes[pNodeItem]));
-				}
-
-				char szPosX [16];
-				sprintf(szPosX, "%f", pNodeItem->pos().x());
-				pNode->addMetaData("xloc", szPosX);
-
-				char szPosY [16];
-				sprintf(szPosY, "%f", pNodeItem->pos().y());
-				pNode->addMetaData("yloc", szPosY);
-
-				char szWidth [16];
-				sprintf(szWidth, "%f", pNodeItem->getWidth());
-				pNode->addMetaData("width", szWidth);
-
-				char szHeight [16];
-				sprintf(szHeight, "%f", pNodeItem->getHeight());
-				pNode->addMetaData("height", szHeight);
-
-				mapUID[uintptr_t(pNodeItem)] = pNode;
+				pNode->setLabel(((GraphWidget::NodePass*)pNodeItem)->getTitle().toLocal8Bit());
+				pNode->addMetaData("subtype", (const char*)m_mapOperationNodes[pNodeItem]->identifier.toLocal8Bit());
 			}
-			break;
+			else if (strNodeType == "texture")
+			{
+				pNode->addMetaData("format", GLenumToString(m_mapTextureNodes[pNodeItem]));
+			}
+
+			char szPosX [16];
+			sprintf(szPosX, "%f", pNodeItem->pos().x());
+			pNode->addMetaData("xloc", szPosX);
+
+			char szPosY [16];
+			sprintf(szPosY, "%f", pNodeItem->pos().y());
+			pNode->addMetaData("yloc", szPosY);
+
+			char szWidth [16];
+			sprintf(szWidth, "%f", pNodeItem->getWidth());
+			pNode->addMetaData("width", szWidth);
+
+			char szHeight [16];
+			sprintf(szHeight, "%f", pNodeItem->getHeight());
+			pNode->addMetaData("height", szHeight);
+
+			mapUID[uintptr_t(pNodeItem)] = pNode;
+		}
+		break;
 		}
 	}
 
@@ -537,34 +539,34 @@ bool NodeEditorWindow::createGraph(Graph & G)
 	{
 		switch (item->type())
 		{
-			case GraphWidget::Edge::Type:
-			{
-				GraphWidget::Edge * pEdgeItem = static_cast<GraphWidget::Edge*>(item);
-				assert(nullptr != pEdgeItem);
+		case GraphWidget::Edge::Type:
+		{
+			GraphWidget::Edge * pEdgeItem = static_cast<GraphWidget::Edge*>(item);
+			assert(nullptr != pEdgeItem);
 
-				// Source
-				Node * pNodeSource = mapUID[uintptr_t(pEdgeItem->getSourceNode())];
-				assert(nullptr != pNodeSource);
+			// Source
+			Node * pNodeSource = mapUID[uintptr_t(pEdgeItem->getSourceNode())];
+			assert(nullptr != pNodeSource);
 
-				// Target
-				Node * pNodeTarget = mapUID[uintptr_t(pEdgeItem->getDestinationNode())];
-				assert(nullptr != pNodeTarget);
+			// Target
+			Node * pNodeTarget = mapUID[uintptr_t(pEdgeItem->getDestinationNode())];
+			assert(nullptr != pNodeTarget);
 
-				Edge * pEdge = new Edge(pNodeSource, pNodeTarget);
-				assert(nullptr != pEdge);
-				G.addEdge(pEdge);
+			Edge * pEdge = new Edge(pNodeSource, pNodeTarget);
+			assert(nullptr != pEdge);
+			G.addEdge(pEdge);
 
-				pEdge->setDirected(true);
+			pEdge->setDirected(true);
 
-				char szSourceId [16];
-				sprintf(szSourceId, "%d", pEdgeItem->getSourceIndex());
-				pEdge->addMetaData("source_id", szSourceId);
+			char szSourceId [16];
+			sprintf(szSourceId, "%d", pEdgeItem->getSourceIndex());
+			pEdge->addMetaData("source_id", szSourceId);
 
-				char szTargetId [16];
-				sprintf(szTargetId, "%d", pEdgeItem->getDestinationIndex());
-				pEdge->addMetaData("target_id", szTargetId);
-			}
-			break;
+			char szTargetId [16];
+			sprintf(szTargetId, "%d", pEdgeItem->getDestinationIndex());
+			pEdge->addMetaData("target_id", szTargetId);
+		}
+		break;
 		}
 	}
 
@@ -572,8 +574,8 @@ bool NodeEditorWindow::createGraph(Graph & G)
 }
 
 /**
- * @brief NodeEditorWindow::createDefaultNodes
- */
+* @brief NodeEditorWindow::createDefaultNodes
+*/
 GraphWidget::Node * NodeEditorWindow::createPresentNode(void)
 {
 	GraphWidget::NodeFinal * n = new GraphWidget::NodeFinal();
@@ -586,9 +588,9 @@ GraphWidget::Node * NodeEditorWindow::createPresentNode(void)
 }
 
 /**
- * @brief NodeEditorWindow::createNode
- * @param desc
- */
+* @brief NodeEditorWindow::createNode
+* @param desc
+*/
 GraphWidget::Node * NodeEditorWindow::createOperationNode(const NodeDescriptor & desc)
 {
 	GraphWidget::NodePass * n = new GraphWidget::NodePass();
@@ -620,9 +622,9 @@ GraphWidget::Node * NodeEditorWindow::createOperationNode(const NodeDescriptor &
 }
 
 /**
- * @brief NodeEditorWindow::createNode
- * @param desc
- */
+* @brief NodeEditorWindow::createNode
+* @param desc
+*/
 GraphWidget::Node * NodeEditorWindow::createTextureNode(unsigned int format, unsigned int width, unsigned int height)
 {
 	GraphWidget::Node * n = new GraphWidget::NodeTexture();
@@ -636,16 +638,16 @@ GraphWidget::Node * NodeEditorWindow::createTextureNode(unsigned int format, uns
 }
 
 /**
- * @brief NodeEditorWindow::onSceneFrameSwapped
- */
+* @brief NodeEditorWindow::onSceneFrameSwapped
+*/
 void NodeEditorWindow::onSceneFrameSwapped(void)
 {
 	m_pWidgetGL->update();
 }
 
 /**
- * @brief NodeEditorWindow::on_actionSave_triggered
- */
+* @brief NodeEditorWindow::on_actionSave_triggered
+*/
 void NodeEditorWindow::on_actionSave_triggered(void)
 {
 	Graph G;
@@ -661,24 +663,24 @@ void NodeEditorWindow::on_actionSave_triggered(void)
 }
 
 /**
- * @brief NodeEditorWindow::actionCreateUserDefinedNode
- */
+* @brief NodeEditorWindow::actionCreateUserDefinedNode
+*/
 void NodeEditorWindow::on_actionCreateUserDefinedNode_triggered(void)
 {
 	m_pNodeOperationCreationWindow->show();
 }
 
 /**
- * @brief NodeEditorWindow::actionCreateUserDefinedNode
- */
+* @brief NodeEditorWindow::actionCreateUserDefinedNode
+*/
 void NodeEditorWindow::on_actionCreateTextureNode_triggered(void)
 {
 	m_pNodeTextureCreationWindow->show();
 }
 
 /**
- * @brief NodeEditorWindow::on_actionRemoveNode_triggered
- */
+* @brief NodeEditorWindow::on_actionRemoveNode_triggered
+*/
 void NodeEditorWindow::on_actionRemoveNode_triggered(void)
 {
 	QList<QGraphicsItem *> list = m_pScene->selectedItems();
@@ -694,31 +696,35 @@ void NodeEditorWindow::on_actionRemoveNode_triggered(void)
 }
 
 /**
- * @brief NodeEditorWindow::createNodeFromWindow
- */
+* @brief NodeEditorWindow::createNodeFromWindow
+*/
 void NodeEditorWindow::createOperationNodeFromDialog(void)
 {
 	NodeDescriptor * pDesc = m_pNodeOperationCreationWindow->getCurrentDescriptor();
 
 	if (pDesc)
 	{
-		createOperationNode(*pDesc);
+		GraphWidget::Node * node = createOperationNode(*pDesc);
+		QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+		node->setPos(pos);
 	}
 }
 
 /**
- * @brief NodeEditorWindow::createNodeFromWindow
- */
+* @brief NodeEditorWindow::createNodeFromWindow
+*/
 void NodeEditorWindow::createTextureNodeFromDialog(void)
 {
 	unsigned int format = m_pNodeTextureCreationWindow->getCurrentFormat();
 
-	createTextureNode(format, 1024, 1024);
+	GraphWidget::Node * node = createTextureNode(format, 1024, 1024);
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
 }
 
 /**
- * @brief NodeEditorWindow::updateTextures
- */
+* @brief NodeEditorWindow::updateTextures
+*/
 void NodeEditorWindow::updateTextures(void)
 {
 	extern RendererWrapper g_RendererWrapper;
@@ -729,26 +735,26 @@ void NodeEditorWindow::updateTextures(void)
 	{
 		switch (item->type())
 		{
-			case GraphWidget::Node::Type:
+		case GraphWidget::Node::Type:
+		{
+			GraphWidget::Node * pNodeItem = static_cast<GraphWidget::Node*>(item);
+			assert(nullptr != pNodeItem);
+
+			std::string & strNodeType = m_mapNodeType[pNodeItem];
+
+			if (strNodeType == "texture")
 			{
-				GraphWidget::Node * pNodeItem = static_cast<GraphWidget::Node*>(item);
-				assert(nullptr != pNodeItem);
+				GraphWidget::NodeTexture * pNodeTextureItem = (GraphWidget::NodeTexture*)pNodeItem;
 
-				std::string & strNodeType = m_mapNodeType[pNodeItem];
+				char szId [16];
+				sprintf(szId, "%lld", uintptr_t(pNodeItem));
 
-				if (strNodeType == "texture")
-				{
-					GraphWidget::NodeTexture * pNodeTextureItem = (GraphWidget::NodeTexture*)pNodeItem;
+				GLuint textureId = g_RendererWrapper.GetRenderTexture(szId);
 
-					char szId [16];
-					sprintf(szId, "%lld", uintptr_t(pNodeItem));
-
-					GLuint textureId = g_RendererWrapper.GetRenderTexture(szId);
-
-					pNodeTextureItem->setTexture(textureId);
-				}
+				pNodeTextureItem->setTexture(textureId);
 			}
-			break;
+		}
+		break;
 		}
 	}
 }

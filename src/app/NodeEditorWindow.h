@@ -77,6 +77,8 @@ protected:
 	NodeOperationCreationWindow *	m_pNodeOperationCreationWindow;
 	NodeTextureCreationWindow *		m_pNodeTextureCreationWindow;
 
+	QPoint m_lastContextMenuPos;
+
 	std::map<const GraphWidget::Node*, const NodeDescriptor*> m_mapOperationNodes;
 	std::map<const GraphWidget::Node*, unsigned int> m_mapTextureNodes;
 	std::map<const GraphWidget::Node*, std::string> m_mapNodeType;
