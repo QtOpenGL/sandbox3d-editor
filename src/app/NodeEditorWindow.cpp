@@ -21,9 +21,9 @@
 
 #include <algorithm>
 
-#include "Graph/Graph.h"
-#include "Graph/Node.h"
-#include "Graph/Edge.h"
+#include "Graph.h"
+#include "Node.h"
+#include "Edge.h"
 
 #include "GraphWidget/View.h"
 #include "GraphWidget/Edge.h"
