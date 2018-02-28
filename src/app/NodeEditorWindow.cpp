@@ -311,7 +311,7 @@ void NodeEditorWindow::contextMenuEvent(QContextMenuEvent * pEvent)
 	}
 	else
 	{
-		m_lastContextMenuPos = pEvent->globalPos();
+		m_lastContextMenuPos = mapFromGlobal(pEvent->globalPos());
 		m_pContextMenuScene->exec(pEvent->globalPos());
 	}
 }
