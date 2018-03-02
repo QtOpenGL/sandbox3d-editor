@@ -2,6 +2,9 @@
 
 #include "Node.h"
 
+class QOpenGLShaderProgram;
+class QOpenGLBuffer;
+
 namespace GraphWidget
 {
 
@@ -31,6 +34,17 @@ protected:
 	QRectF			boundingRect	(void) const override;
 	QPainterPath	shape			(void) const override;
     void			paint			(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) override;
+
+public: // Resources
+
+	static bool initResources(void);
+	static bool releaseResources(void);
+
+protected:
+
+	static QOpenGLShaderProgram * shader;
+	static QOpenGLBuffer * vertexPositionBuffer;
+	static QOpenGLBuffer * vertexTexCoordsBuffer;
 
 private:
 
