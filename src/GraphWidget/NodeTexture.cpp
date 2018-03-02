@@ -93,20 +93,21 @@ bool NodeTexture::initResources(void)
 					"#version 150\n"
 					"uniform mat4x4 transform;"
 					"in vec2 position;\n"
-					"in vec2 color;\n"
-					"out vec2 fragColor;\n"
+					"in vec2 texCoord;\n"
+					"out vec2 uv;\n"
 					"void main() {\n"
-					"    fragColor = color;\n"
+					"    uv = texCoord;\n"
 					"    gl_Position = transform * vec4(position, 0.0, 1.0);\n"
 					"}\n"
 				);
 				
 				shader->addShaderFromSourceCode(QOpenGLShader::Fragment,
 					"#version 150\n"
-					"in vec2 fragColor;\n"
-					"out vec4 color;\n"
+					"in vec2 uv;\n"
+					"out vec3 color;\n"
+					"uniform sampler2D texSampler;\n"
 					"void main() {\n"
-					"    color = vec4(fragColor.xy, 0.0, 1.0);\n"
+					"    color = texture(texSampler, uv).rgb;\n"
 					"}\n"
 				);
 
@@ -120,8 +121,8 @@ bool NodeTexture::initResources(void)
 				vertexPositionBuffer->release();
 
 				vertexTexCoordsBuffer->bind();
-				shader->enableAttributeArray("color");
-				shader->setAttributeBuffer("color", GL_FLOAT, 0, 2);
+				shader->enableAttributeArray("texCoord");
+				shader->setAttributeBuffer("texCoord", GL_FLOAT, 0, 2);
 				vertexTexCoordsBuffer->release();
 
 				shader->release();
@@ -322,6 +323,8 @@ void NodeTexture::paint(QPainter * painter, const QStyleOptionGraphicsItem * opt
 
 				const QMatrix4x4 transform = projection * translation * scale;
 				shader->setUniformValue("transform", transform);
+
+				glFuncs->glBindTexture(GL_TEXTURE_2D, texture);
 
 				glFuncs->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 				
