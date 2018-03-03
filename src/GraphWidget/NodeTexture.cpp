@@ -248,6 +248,8 @@ void NodeTexture::paint(QPainter * painter, const QStyleOptionGraphicsItem * opt
 	// this introduces some weird cases that we need to handle
 	// we have different cases to handle to ensure maximum compatibility
 
+	painter->beginNativePainting();
+
 	// check version first
 	if (version.first < 3)
 	{
