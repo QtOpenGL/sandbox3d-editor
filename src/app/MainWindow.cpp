@@ -11,6 +11,8 @@
 #include <QSettings>
 #include <QFileDialog>
 
+#include <QSplitter>
+
 #include <QDesktopServices>
 
 extern RendererWrapper g_RendererWrapper;
@@ -47,11 +49,12 @@ MainWindow::MainWindow(QWidget * pParent)
 		m_pUndoView = new QUndoView(m_pUndoStack);
 		m_pUndoView->setWindowTitle(tr("Command List"));
 		m_pUndoView->setAttribute(Qt::WA_QuitOnClose, false);
-
 	}
 
+	m_pSplitter = new QSplitter(this);
+	setCentralWidget(m_pSplitter);
 	m_pDrawable = new DrawableSurface(this);
-	setCentralWidget(m_pDrawable);
+	m_pSplitter->addWidget(m_pDrawable);
 
 	{
 		m_pFileChooser = new QFileDialog(this );

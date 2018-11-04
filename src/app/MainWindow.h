@@ -7,6 +7,7 @@
 class QFileDialog;
 class QUndoStack;
 class QUndoView;
+class QSplitter;
 
 class AboutDialog;
 class NodeEditorWindow;
@@ -45,6 +46,8 @@ private:
 
 	QUndoStack * m_pUndoStack;
 	QUndoView * m_pUndoView;
+
+	QSplitter * m_pSplitter;
 
 protected:
 
