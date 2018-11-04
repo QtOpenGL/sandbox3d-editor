@@ -257,8 +257,8 @@ void NodeTexture::paint(QPainter * painter, const QStyleOptionGraphicsItem * opt
 	}
 	else if (version.first == 3 && version.second == 0)
 	{
-		// Historically, Mesa always returns a 3.0 context when asking a CompatibilityProfile
-		// This is about to change (February 2018) but just handle OpenGL 3.0 context correctly
+		// Historically, Mesa returned a 3.0 context when asking a CompatibilityProfile
+		// Just keep this "old" code for a while
 		QOpenGLFunctions_3_0 * glFuncs = pContext->versionFunctions<QOpenGLFunctions_3_0>();
 
 		if (glFuncs)
@@ -301,8 +301,8 @@ void NodeTexture::paint(QPainter * painter, const QStyleOptionGraphicsItem * opt
 				shader->setAttributeBuffer("position", GL_FLOAT, 0, 2);
 
 				vertexTexCoordsBuffer->bind();
-				shader->enableAttributeArray("color");
-				shader->setAttributeBuffer("color", GL_FLOAT, 0, 2);
+				shader->enableAttributeArray("texCoord");
+				shader->setAttributeBuffer("texCoord", GL_FLOAT, 0, 2);
 				
 				QGraphicsView * v = scene()->views().first(); // FIXME : need a better way to get the view
 
