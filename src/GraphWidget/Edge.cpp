@@ -68,6 +68,17 @@ unsigned int Edge::getDestinationIndex(void) const
 }
 
 /**
+ * @brief Edge::disconnectNodes
+ * @return
+ */
+bool Edge::disconnectNodes(void) const
+{
+	m_pDestination->setEdge(nullptr);
+	m_pSource->removeAllEdges();
+	return(true);
+}
+
+/**
  * @brief Edge::boundingRect
  * @return
  */

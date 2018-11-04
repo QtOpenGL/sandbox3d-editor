@@ -32,6 +32,8 @@ public:
 	unsigned int getSourceIndex(void) const;
 	unsigned int getDestinationIndex(void) const;
 
+	bool disconnectNodes(void) const;
+
 protected:
 
 	//
