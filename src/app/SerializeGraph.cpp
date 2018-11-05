@@ -1,8 +1,8 @@
 #include "SerializeGraph.h"
 
-#include "Graph/Graph.h"
-#include "Graph/Node.h"
-#include "Graph/Edge.h"
+#include "Graph.h"
+#include "Node.h"
+#include "Edge.h"
 
 #include <algorithm>
 
@@ -94,7 +94,7 @@ bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & des
 		{
 			aNodesTexture.push_back(node);
 		}
-		else if (node->getType() == "operation")
+		else if (node->getType() == "pass")
 		{
 			++operations;
 		}
@@ -166,7 +166,7 @@ bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & des
 
 	for (Node * node : queue)
 	{
-		if (node->getType() == "operation")
+		if (node->getType() == "pass")
 		{
 			std::vector<Edge*> outEdges;
 			graph.getEdgeFrom(node, outEdges);
@@ -218,7 +218,7 @@ bool SerializeGraph(const Graph & graph, const std::vector<NodeDescriptor> & des
 	{
 		Node * node = *it;
 
-		if (node->getType() == "operation")
+		if (node->getType() == "pass")
 		{
 			const std::string & strSubType = node->getMetaData("subtype");
 

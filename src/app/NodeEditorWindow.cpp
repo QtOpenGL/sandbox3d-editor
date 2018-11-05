@@ -397,7 +397,7 @@ bool NodeEditorWindow::loadGraph(void)
 		// Create Node
 		GraphWidget::Node * n = nullptr;
 
-		if ("operation" == strType)
+		if ("pass" == strType)
 		{
 			const std::string & strSubType = pNode->getMetaData("subtype");
 			const char * szSubType = strSubType.c_str();
@@ -503,7 +503,7 @@ bool NodeEditorWindow::createGraph(Graph & G)
 
 			pNode->setType(strNodeType.c_str());
 
-			if (strNodeType == "operation")
+			if (strNodeType == "pass")
 			{
 				pNode->setLabel(((GraphWidget::NodePass*)pNodeItem)->getTitle().toLocal8Bit());
 				pNode->addMetaData("subtype", (const char*)m_mapOperationNodes[pNodeItem]->identifier.toLocal8Bit());
@@ -616,7 +616,7 @@ GraphWidget::Node * NodeEditorWindow::createOperationNode(const NodeDescriptor &
 	}
 
 	m_mapOperationNodes.insert(std::pair<const GraphWidget::Node*, const NodeDescriptor*>(n, &desc));
-	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "operation"));
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "pass"));
 
 	return(n);
 }
