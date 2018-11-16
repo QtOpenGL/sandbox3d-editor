@@ -105,6 +105,9 @@ private slots:
 	// Window menu
 	void on_actionShowRenderGraphEditor_triggered(void);
 	void on_actionShowCommandList_triggered(void);
+	void on_actionSplitLeftRight_triggered(void);
+	void on_actionSplitTopBottom_triggered(void);
+	void on_actionRemoveSplit_triggered(void);
 
 	//
 	// Help menu

@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>1280</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -73,6 +73,10 @@
     </property>
     <addaction name="actionShowRenderGraphEditor"/>
     <addaction name="actionShowCommandList"/>
+    <addaction name="separator"/>
+    <addaction name="actionSplitLeftRight"/>
+    <addaction name="actionSplitTopBottom"/>
+    <addaction name="actionRemoveSplit"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -371,6 +375,27 @@
   <action name="actionShowCommandList">
    <property name="text">
     <string>Command List</string>
+   </property>
+  </action>
+  <action name="actionSplitLeftRight">
+   <property name="text">
+    <string>Split (Left/Right)</string>
+   </property>
+   <property name="toolTip">
+    <string>Split (Left/Right)</string>
+   </property>
+  </action>
+  <action name="actionSplitTopBottom">
+   <property name="text">
+    <string>Split (Top/Bottom)</string>
+   </property>
+  </action>
+  <action name="actionRemoveSplit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Remove Split</string>
    </property>
   </action>
  </widget>

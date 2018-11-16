@@ -304,6 +304,42 @@ void MainWindow::on_actionShowCommandList_triggered()
 }
 
 /**
+ * @brief MainWindow::on_actionSplitLeftRight_triggered
+ */
+void MainWindow::on_actionSplitLeftRight_triggered(void)
+{
+	m_pSplitter->setOrientation(Qt::Horizontal);
+	m_pSplitter->addWidget(new QOpenGLWidget());
+	ui->actionSplitLeftRight->setDisabled(true);
+	ui->actionSplitTopBottom->setDisabled(true);
+	ui->actionRemoveSplit->setDisabled(false);
+}
+
+/**
+ * @brief MainWindow::on_actionSplitTopBottom_triggered
+ */
+void MainWindow::on_actionSplitTopBottom_triggered(void)
+{
+	m_pSplitter->setOrientation(Qt::Vertical);
+	m_pSplitter->addWidget(new QOpenGLWidget());
+	ui->actionSplitLeftRight->setDisabled(true);
+	ui->actionSplitTopBottom->setDisabled(true);
+	ui->actionRemoveSplit->setDisabled(false);
+}
+
+/**
+ * @brief MainWindow::on_actionRemoveSplit_triggered
+ */
+void MainWindow::on_actionRemoveSplit_triggered(void)
+{
+	QWidget * widget = m_pSplitter->widget(1);
+	delete widget;
+	ui->actionSplitLeftRight->setDisabled(false);
+	ui->actionSplitTopBottom->setDisabled(false);
+	ui->actionRemoveSplit->setDisabled(true);
+}
+
+/**
  * @brief MainWindow::on_actionHelp_triggered
  */
 void MainWindow::on_actionHelp_triggered()
