@@ -97,6 +97,7 @@ void DrawableSurface::DrawSceneAABB(bool bEnable)
 void DrawableSurface::setRenderQueue(RenderGraph::Instance * pRenderQueue)
 {
 	m_pRenderQueue = pRenderQueue;
+	m_pRenderQueue->resize(width(), height());
 }
 
 /**
