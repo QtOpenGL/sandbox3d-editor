@@ -30,12 +30,10 @@ public:
 	void	DrawObjectsAABB		(bool bEnable);
 	void	DrawSceneAABB		(bool bEnable);
 
-	void	setCurrentTexture	(const QString & strFinalTextureId);
-
 	//
 	// Render Queue
-	void					setRenderQueue		(RenderGraph::Queue * pRenderQueue);
-	RenderGraph::Queue *	getRenderQueue		(void);
+	void					setRenderQueue		(RenderGraph::Instance * pRenderQueue);
+	RenderGraph::Instance *	getRenderQueue		(void);
 
 protected:
 
@@ -73,14 +71,12 @@ private:
 	Object * m_pSelectedObject;
 
 	//
-	// Draw
-	GLuint m_uCurrentTexture;
-
-	//
 	// Render Graph
-	RenderGraph::Queue * m_pRenderQueue;
+	RenderGraph::Instance * m_pRenderQueue;
 
 signals:
+
+	void postResizeGL(void);
 
 public slots:
 

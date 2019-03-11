@@ -6,7 +6,8 @@
 
 #include "DrawableSurface.h"
 #include "RendererWrapper.h"
-#include "SerializeGraph.h"
+
+#include "QOpenGLResourceManager.h"
 
 #include <QSettings>
 #include <QFileDialog>
@@ -360,11 +361,11 @@ void MainWindow::on_actionAbout_triggered()
  */
 void MainWindow::onGraphLoaded(const Graph & graph)
 {
-	std::string strFinalTextureId;
-	SerializeGraph(graph, m_pNodeEditorWindow->m_aNodeDescriptors, strFinalTextureId);
-	g_RendererWrapper.initQueue("/tmp/render.xml");
+	RenderGraph::Instance * pOldRenderQueue = m_pDrawable->getRenderQueue();
+	g_RendererWrapper.destroyRenderGraph(pOldRenderQueue);
+	RenderGraph::Instance * pRenderQueue = g_RendererWrapper.createRenderGraph(graph);
+	m_pDrawable->setRenderQueue(pRenderQueue);
 
-	m_pDrawable->setCurrentTexture(QString(strFinalTextureId.data()));
 	m_pDrawable->update();
 }
 
@@ -373,10 +374,10 @@ void MainWindow::onGraphLoaded(const Graph & graph)
  */
 void MainWindow::onGraphSaved(const Graph & graph)
 {
-	std::string strFinalTextureId;
-	SerializeGraph(graph, m_pNodeEditorWindow->m_aNodeDescriptors, strFinalTextureId);
-	g_RendererWrapper.initQueue("/tmp/render.xml");
+	RenderGraph::Instance * pOldRenderQueue = m_pDrawable->getRenderQueue();
+	g_RendererWrapper.destroyRenderGraph(pOldRenderQueue);
+	RenderGraph::Instance * pRenderQueue = g_RendererWrapper.createRenderGraph(graph);
+	m_pDrawable->setRenderQueue(pRenderQueue);
 
-	m_pDrawable->setCurrentTexture(QString(strFinalTextureId.data()));
 	m_pDrawable->update();
 }

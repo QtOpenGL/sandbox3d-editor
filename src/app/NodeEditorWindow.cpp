@@ -39,57 +39,57 @@
 
 GLenum StringToGLenum(const char * szEnumName)
 {
-	if (!strcmp(szEnumName, "GL_R8")) return(GL_R8);
-	else if (!strcmp(szEnumName, "GL_RG8")) return(GL_RG8);
-	else if (!strcmp(szEnumName, "GL_RGBA8")) return(GL_RGBA8);
+	if (!strcmp(szEnumName, "R8")) return(GL_R8);
+	else if (!strcmp(szEnumName, "RG8")) return(GL_RG8);
+	else if (!strcmp(szEnumName, "RGBA8")) return(GL_RGBA8);
 
-	else if (!strcmp(szEnumName, "GL_R16")) return(GL_R16);
-	else if (!strcmp(szEnumName, "GL_RG16")) return(GL_RG16);
-	else if (!strcmp(szEnumName, "GL_RGBA16")) return(GL_RGBA16);
+	else if (!strcmp(szEnumName, "R16")) return(GL_R16);
+	else if (!strcmp(szEnumName, "RG16")) return(GL_RG16);
+	else if (!strcmp(szEnumName, "RGBA16")) return(GL_RGBA16);
 
-	else if (!strcmp(szEnumName, "GL_R16F")) return(GL_R16F);
-	else if (!strcmp(szEnumName, "GL_RG16F")) return(GL_RG16F);
-	else if (!strcmp(szEnumName, "GL_RGBA16F")) return(GL_RGBA16F);
+	else if (!strcmp(szEnumName, "R16F")) return(GL_R16F);
+	else if (!strcmp(szEnumName, "RG16F")) return(GL_RG16F);
+	else if (!strcmp(szEnumName, "RGBA16F")) return(GL_RGBA16F);
 
-	else if (!strcmp(szEnumName, "GL_R32F")) return(GL_R32F);
-	else if (!strcmp(szEnumName, "GL_RG32F")) return(GL_RG32F);
-	else if (!strcmp(szEnumName, "GL_RGBA32F")) return(GL_RGBA32F);
+	else if (!strcmp(szEnumName, "R32F")) return(GL_R32F);
+	else if (!strcmp(szEnumName, "RG32F")) return(GL_RG32F);
+	else if (!strcmp(szEnumName, "RGBA32F")) return(GL_RGBA32F);
 
-	else if (!strcmp(szEnumName, "GL_R8I")) return(GL_R8I);
-	else if (!strcmp(szEnumName, "GL_RG8I")) return(GL_RG8I);
-	else if (!strcmp(szEnumName, "GL_RGBA8I")) return(GL_RGBA8I);
+	else if (!strcmp(szEnumName, "R8I")) return(GL_R8I);
+	else if (!strcmp(szEnumName, "RG8I")) return(GL_RG8I);
+	else if (!strcmp(szEnumName, "RGBA8I")) return(GL_RGBA8I);
 
-	else if (!strcmp(szEnumName, "GL_R16I")) return(GL_R16I);
-	else if (!strcmp(szEnumName, "GL_RG16I")) return(GL_RG16I);
-	else if (!strcmp(szEnumName, "GL_RGBA16I")) return(GL_RGBA16I);
+	else if (!strcmp(szEnumName, "R16I")) return(GL_R16I);
+	else if (!strcmp(szEnumName, "RG16I")) return(GL_RG16I);
+	else if (!strcmp(szEnumName, "RGBA16I")) return(GL_RGBA16I);
 
-	else if (!strcmp(szEnumName, "GL_R32I")) return(GL_R32I);
-	else if (!strcmp(szEnumName, "GL_RG32I")) return(GL_RG32I);
-	else if (!strcmp(szEnumName, "GL_RGBA32I")) return(GL_RGBA32I);
+	else if (!strcmp(szEnumName, "R32I")) return(GL_R32I);
+	else if (!strcmp(szEnumName, "RG32I")) return(GL_RG32I);
+	else if (!strcmp(szEnumName, "RGBA32I")) return(GL_RGBA32I);
 
-	else if (!strcmp(szEnumName, "GL_R8UI")) return(GL_R8UI);
-	else if (!strcmp(szEnumName, "GL_RG8UI")) return(GL_RG8UI);
-	else if (!strcmp(szEnumName, "GL_RGBA8UI")) return(GL_RGBA8UI);
+	else if (!strcmp(szEnumName, "R8UI")) return(GL_R8UI);
+	else if (!strcmp(szEnumName, "RG8UI")) return(GL_RG8UI);
+	else if (!strcmp(szEnumName, "RGBA8UI")) return(GL_RGBA8UI);
 
-	else if (!strcmp(szEnumName, "GL_R16UI")) return(GL_R16UI);
-	else if (!strcmp(szEnumName, "GL_RG16UI")) return(GL_RG16UI);
-	else if (!strcmp(szEnumName, "GL_RGBA16UI")) return(GL_RGBA16UI);
+	else if (!strcmp(szEnumName, "R16UI")) return(GL_R16UI);
+	else if (!strcmp(szEnumName, "RG16UI")) return(GL_RG16UI);
+	else if (!strcmp(szEnumName, "RGBA16UI")) return(GL_RGBA16UI);
 
-	else if (!strcmp(szEnumName, "GL_R32UI")) return(GL_R32UI);
-	else if (!strcmp(szEnumName, "GL_RG32UI")) return(GL_RG32UI);
-	else if (!strcmp(szEnumName, "GL_RGBA32UI")) return(GL_RGBA32UI);
+	else if (!strcmp(szEnumName, "R32UI")) return(GL_R32UI);
+	else if (!strcmp(szEnumName, "RG32UI")) return(GL_RG32UI);
+	else if (!strcmp(szEnumName, "RGBA32UI")) return(GL_RGBA32UI);
 
-	else if (!strcmp(szEnumName, "GL_RGB10_A2")) return(GL_RGB10_A2);
-	else if (!strcmp(szEnumName, "GL_RGB10_A2UI")) return(GL_RGB10_A2UI);
-	else if (!strcmp(szEnumName, "GL_R11F_G11F_B10F")) return(GL_R11F_G11F_B10F);
-	else if (!strcmp(szEnumName, "GL_SRGB8_ALPHA8")) return(GL_SRGB8_ALPHA8);
+	else if (!strcmp(szEnumName, "RGB10_A2")) return(GL_RGB10_A2);
+	else if (!strcmp(szEnumName, "RGB10_A2UI")) return(GL_RGB10_A2UI);
+	else if (!strcmp(szEnumName, "R11F_G11F_B10F")) return(GL_R11F_G11F_B10F);
+	else if (!strcmp(szEnumName, "SRGB8_ALPHA8")) return(GL_SRGB8_ALPHA8);
 
-	else if (!strcmp(szEnumName, "GL_DEPTH_COMPONENT16")) return(GL_DEPTH_COMPONENT16);
-	else if (!strcmp(szEnumName, "GL_DEPTH_COMPONENT24")) return(GL_DEPTH_COMPONENT24);
-	else if (!strcmp(szEnumName, "GL_DEPTH_COMPONENT32F")) return(GL_DEPTH_COMPONENT32F);
-	else if (!strcmp(szEnumName, "GL_DEPTH24_STENCIL8")) return(GL_DEPTH24_STENCIL8);
-	else if (!strcmp(szEnumName, "GL_DEPTH32F_STENCIL8")) return(GL_DEPTH32F_STENCIL8);
-	else if (!strcmp(szEnumName, "GL_STENCIL_INDEX8")) return(GL_STENCIL_INDEX8);
+	else if (!strcmp(szEnumName, "DEPTH_COMPONENT16")) return(GL_DEPTH_COMPONENT16);
+	else if (!strcmp(szEnumName, "DEPTH_COMPONENT24")) return(GL_DEPTH_COMPONENT24);
+	else if (!strcmp(szEnumName, "DEPTH_COMPONENT32F")) return(GL_DEPTH_COMPONENT32F);
+	else if (!strcmp(szEnumName, "DEPTH24_STENCIL8")) return(GL_DEPTH24_STENCIL8);
+	else if (!strcmp(szEnumName, "DEPTH32F_STENCIL8")) return(GL_DEPTH32F_STENCIL8);
+	else if (!strcmp(szEnumName, "STENCIL_INDEX8")) return(GL_STENCIL_INDEX8);
 
 	return(0);
 }
@@ -98,57 +98,57 @@ const char * GLenumToString(unsigned int e)
 {
 	switch(e)
 	{
-	case GL_R8: return("GL_R8"); break;
-	case GL_RG8: return("GL_RG8"); break;
-	case GL_RGBA8: return("GL_RGBA8"); break;
+	case GL_R8: return("R8"); break;
+	case GL_RG8: return("RG8"); break;
+	case GL_RGBA8: return("RGBA8"); break;
 
-	case GL_R16: return("GL_R16"); break;
-	case GL_RG16: return("GL_RG16"); break;
-	case GL_RGBA16: return("GL_RGBA16"); break;
+	case GL_R16: return("R16"); break;
+	case GL_RG16: return("RG16"); break;
+	case GL_RGBA16: return("RGBA16"); break;
 
-	case GL_R16F: return("GL_R16F"); break;
-	case GL_RG16F: return("GL_RG16F"); break;
-	case GL_RGBA16F: return("GL_RGBA16F"); break;
+	case GL_R16F: return("R16F"); break;
+	case GL_RG16F: return("RG16F"); break;
+	case GL_RGBA16F: return("RGBA16F"); break;
 
-	case GL_R32F: return("GL_R32F"); break;
-	case GL_RG32F: return("GL_RG32F"); break;
-	case GL_RGBA32F: return("GL_RGBA32F"); break;
+	case GL_R32F: return("R32F"); break;
+	case GL_RG32F: return("RG32F"); break;
+	case GL_RGBA32F: return("RGBA32F"); break;
 
-	case GL_R8I: return("GL_R8I"); break;
-	case GL_RG8I: return("GL_RG8I"); break;
-	case GL_RGBA8I: return("GL_RGBA8I"); break;
+	case GL_R8I: return("R8I"); break;
+	case GL_RG8I: return("RG8I"); break;
+	case GL_RGBA8I: return("RGBA8I"); break;
 
-	case GL_R16I: return("GL_R16I"); break;
-	case GL_RG16I: return("GL_RG16I"); break;
-	case GL_RGBA16I: return("GL_RGBA16I"); break;
+	case GL_R16I: return("R16I"); break;
+	case GL_RG16I: return("RG16I"); break;
+	case GL_RGBA16I: return("RGBA16I"); break;
 
-	case GL_R32I: return("GL_R32I"); break;
-	case GL_RG32I: return("GL_RG32I"); break;
-	case GL_RGBA32I: return("GL_RGBA32I"); break;
+	case GL_R32I: return("R32I"); break;
+	case GL_RG32I: return("RG32I"); break;
+	case GL_RGBA32I: return("RGBA32I"); break;
 
-	case GL_R8UI: return("GL_R8UI"); break;
-	case GL_RG8UI: return("GL_RG8UI"); break;
-	case GL_RGBA8UI: return("GL_RGBA8UI"); break;
+	case GL_R8UI: return("R8UI"); break;
+	case GL_RG8UI: return("RG8UI"); break;
+	case GL_RGBA8UI: return("RGBA8UI"); break;
 
-	case GL_R16UI: return("GL_R16UI"); break;
-	case GL_RG16UI: return("GL_RG16UI"); break;
-	case GL_RGBA16UI: return("GL_RGBA16UI"); break;
+	case GL_R16UI: return("R16UI"); break;
+	case GL_RG16UI: return("RG16UI"); break;
+	case GL_RGBA16UI: return("RGBA16UI"); break;
 
-	case GL_R32UI: return("GL_R32UI"); break;
-	case GL_RG32UI: return("GL_RG32UI"); break;
-	case GL_RGBA32UI: return("GL_RGBA32UI"); break;
+	case GL_R32UI: return("R32UI"); break;
+	case GL_RG32UI: return("RG32UI"); break;
+	case GL_RGBA32UI: return("RGBA32UI"); break;
 
-	case GL_RGB10_A2: return("GL_RGB10_A2"); break;
-	case GL_RGB10_A2UI: return("GL_RGB10_A2UI"); break;
-	case GL_R11F_G11F_B10F: return("GL_R11F_G11F_B10F"); break;
-	case GL_SRGB8_ALPHA8: return("GL_SRGB8_ALPHA8"); break;
+	case GL_RGB10_A2: return("RGB10_A2"); break;
+	case GL_RGB10_A2UI: return("RGB10_A2UI"); break;
+	case GL_R11F_G11F_B10F: return("R11F_G11F_B10F"); break;
+	case GL_SRGB8_ALPHA8: return("SRGB8_ALPHA8"); break;
 
-	case GL_DEPTH_COMPONENT16: return("GL_DEPTH_COMPONENT16"); break;
-	case GL_DEPTH_COMPONENT24: return("GL_DEPTH_COMPONENT24"); break;
-	case GL_DEPTH_COMPONENT32F: return("GL_DEPTH_COMPONENT32F"); break;
-	case GL_DEPTH24_STENCIL8: return("GL_DEPTH24_STENCIL8"); break;
-	case GL_DEPTH32F_STENCIL8: return("GL_DEPTH32F_STENCIL8"); break;
-	case GL_STENCIL_INDEX8: return("GL_STENCIL_INDEX8"); break;
+	case GL_DEPTH_COMPONENT16: return("DEPTH_COMPONENT16"); break;
+	case GL_DEPTH_COMPONENT24: return("DEPTH_COMPONENT24"); break;
+	case GL_DEPTH_COMPONENT32F: return("DEPTH_COMPONENT32F"); break;
+	case GL_DEPTH24_STENCIL8: return("DEPTH24_STENCIL8"); break;
+	case GL_DEPTH32F_STENCIL8: return("DEPTH32F_STENCIL8"); break;
+	case GL_STENCIL_INDEX8: return("STENCIL_INDEX8"); break;
 	}
 
 	return("");
@@ -167,7 +167,7 @@ NodeEditorWindow::NodeEditorWindow(MainWindow * pMainWindow)
 {
 	ui->setupUi(this); // created with Qt Designer
 
-					   // Custom Widgets
+	// Custom Widgets
 	m_pMenuBar				= new QMenuBar(this); // can't add a Menu bar from Designer
 	m_pStatusBar			= new QStatusBar(this); // can't add a Status bar from Designer
 
@@ -224,6 +224,7 @@ NodeEditorWindow::NodeEditorWindow(MainWindow * pMainWindow)
 	connect(m_pNodeTextureCreationWindow, SIGNAL(accepted()), this, SLOT(createTextureNodeFromDialog()));
 
 	connect(pMainWindow->m_pDrawable, &QOpenGLWidget::frameSwapped, this, &NodeEditorWindow::onSceneFrameSwapped);
+	connect(pMainWindow->m_pDrawable, &DrawableSurface::postResizeGL, this, &NodeEditorWindow::updateTextures);
 
 	QSettings settings;
 	{
@@ -749,7 +750,7 @@ void NodeEditorWindow::updateTextures(void)
 				char szId [16];
 				sprintf(szId, "%lld", uintptr_t(pNodeItem));
 
-				GLuint textureId = g_RendererWrapper.GetRenderTexture(szId);
+				GLuint textureId = static_cast<MainWindow*>(parent())->m_pDrawable->getRenderQueue()->getRenderTexture(szId);
 
 				pNodeTextureItem->setTexture(textureId);
 			}

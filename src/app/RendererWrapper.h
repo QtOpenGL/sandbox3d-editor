@@ -6,6 +6,8 @@
 #include <Vector.h>
 #include <Matrix.h>
 
+#include "RenderGraph.h"
+
 class Scene;
 
 class RendererWrapper
@@ -36,19 +38,15 @@ public:
 	void		onUpdate			(const mat4x4 & mView);
 
 	//
-	// ...
-	void		initQueue			(const char * szFilename);
-	void		releaseQueue		(void);
+	// Render Graph management
+	RenderGraph::Instance *	createRenderGraph(const Graph & graph);
+	void destroyRenderGraph(RenderGraph::Instance * pInstance) const;
 
 	//
 	// Scene management
 	Scene &			getScene			(void);
 	const Scene &	getScene			(void) const;
 	bool			importToScene		(const char * szFilename);
-
-	//
-	// ...
-	unsigned int /*GLuint*/ GetRenderTexture(const char * name) const;
 
 	//
 	// ...
@@ -71,23 +69,20 @@ public:
 
 protected:
 
+	RenderGraph::Factory m_factory;
+
 	Scene * m_pScene;
 
 private:
 
 	typedef bool (*renderer_onLoad_function)(const char * baseDirectory);
 
-	typedef bool (*renderer_onInit_function)(Scene & scene);
+	typedef bool (*renderer_onInit_function)(Scene & scene, RenderGraph::Factory & factory);
 	typedef bool (*renderer_onRelease_function)(void);
 
 	typedef void (*renderer_onReady_function)(void);
 	typedef void (*renderer_onResize_function)(unsigned int width, unsigned int height);
 	typedef void (*renderer_onUpdate_function)(const mat4x4 & matView);
-
-	typedef void (*renderer_initQueue_function)(const char * szFilename);
-	typedef void (*renderer_releaseQueue_function)(void);
-
-	typedef unsigned int (*renderer_getRenderTexture_function)(const char * szName);
 
 	struct Plugin
 	{
@@ -99,11 +94,6 @@ private:
 			OnReady = nullptr;
 			OnResize = nullptr;
 			OnUpdate = nullptr;
-
-			InitQueue = nullptr;
-			ReleaseQueue = nullptr;
-
-			GetRenderTexture = nullptr;
 		}
 
 		QString name;
@@ -115,15 +105,12 @@ private:
 		renderer_onReady_function OnReady;
 		renderer_onResize_function OnResize;
 		renderer_onUpdate_function OnUpdate;
-
-		renderer_initQueue_function InitQueue;
-		renderer_releaseQueue_function ReleaseQueue;
-
-		renderer_getRenderTexture_function GetRenderTexture;
 	};
 
 	QVector<Plugin*> m_aPlugins;
 
 	QVector<QString> m_aNodeDirectories;
 
+	unsigned int m_iWidth;
+	unsigned int m_iHeight;
 };

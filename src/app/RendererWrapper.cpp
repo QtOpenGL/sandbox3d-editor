@@ -10,6 +10,8 @@
 
 #include <QtXml/QtXml>
 
+#include "QOpenGLResourceManager.h"
+
 /**
  * @brief RendererWrapper::RendererWrapper
  */
@@ -87,7 +89,7 @@ bool RendererWrapper::init(void)
 	{
 		if (plugin->OnInit)
 		{
-			if (!plugin->OnInit(*m_pScene))
+			if (!plugin->OnInit(*m_pScene, m_factory))
 			{
 				bSuccess = false;
 			}
@@ -161,11 +163,6 @@ bool RendererWrapper::loadPlugin(const QString & name, const QString & lib, cons
 	plugin->OnResize = (renderer_onResize_function)plugin->library.resolve("renderer_onResize");
 	plugin->OnUpdate = (renderer_onUpdate_function)plugin->library.resolve("renderer_onUpdate");
 
-	plugin->InitQueue = (renderer_initQueue_function)plugin->library.resolve("renderer_initQueue");
-	plugin->ReleaseQueue = (renderer_releaseQueue_function)plugin->library.resolve("renderer_releaseQueue");
-
-	plugin->GetRenderTexture = (renderer_getRenderTexture_function)plugin->library.resolve("renderer_getRenderTexture");
-
 	m_aPlugins.append(plugin);
 
 	m_aNodeDirectories.append(nodesDirectory);
@@ -195,6 +192,9 @@ void RendererWrapper::onReady(void)
  */
 void RendererWrapper::onResize(unsigned int width, unsigned int height)
 {
+	m_iWidth = width;
+	m_iHeight = height;
+
 	for (Plugin * plugin : m_aPlugins)
 	{
 		if (plugin->OnResize)
@@ -221,55 +221,20 @@ void RendererWrapper::onUpdate(const mat4x4 & mView)
 }
 
 /**
- * @brief RendererWrapper::initQueue
- * @param szFilename
- */
-void RendererWrapper::initQueue(const char * szFilename)
-{
-	for (Plugin * plugin : m_aPlugins)
-	{
-		if (plugin->InitQueue)
-		{
-			plugin->InitQueue(szFilename);
-		}
-	}
-}
-
-/**
- * @brief RendererWrapper::releaseQueue
- */
-void RendererWrapper::releaseQueue(void)
-{
-	for (Plugin * plugin : m_aPlugins)
-	{
-		if (plugin->ReleaseQueue)
-		{
-			plugin->ReleaseQueue();
-		}
-	}
-}
-
-/**
- * @brief RendererWrapper::GetRenderTexture
- * @param name
+ * @brief RendererWrapper::createRenderGraph
  * @return
  */
-GLuint RendererWrapper::GetRenderTexture(const char * name) const
+RenderGraph::Instance *	RendererWrapper::createRenderGraph(const Graph & graph)
 {
-	for (Plugin * plugin : m_aPlugins)
-	{
-		if (plugin->GetRenderTexture)
-		{
-			GLuint textureId = plugin->GetRenderTexture(name);
+	return m_factory.createInstanceFromGraph(graph);
+}
 
-			if (textureId != 0)
-			{
-				return(textureId);
-			}
-		}
-	}
-
-	return(0);
+/**
+ * @brief RendererWrapper::destroyRenderGraph
+ */
+void RendererWrapper::destroyRenderGraph(RenderGraph::Instance * pInstance) const
+{
+	m_factory.destroyInstance(pInstance);
 }
 
 /**

@@ -45,7 +45,6 @@ DrawableSurface::DrawableSurface(QWidget *parent)
 , m_pSelectedObject(nullptr)
 , m_bDrawObjectsAABB(false)
 , m_bDrawSceneAABB(false)
-, m_uCurrentTexture(0)
 , m_pRenderQueue(nullptr)
 {
 	setAutoFillBackground(false);
@@ -92,20 +91,10 @@ void DrawableSurface::DrawSceneAABB(bool bEnable)
 }
 
 /**
- * @brief DrawableSurface::setCurrentTexture
- * @param strFinalTextureId
- */
-void DrawableSurface::setCurrentTexture(const QString & strFinalTextureId)
-{
-	std::string strFinalTextureIdStd = strFinalTextureId.toStdString();
-	m_uCurrentTexture = g_RendererWrapper.GetRenderTexture(strFinalTextureIdStd.c_str());
-}
-
-/**
  * @brief DrawableSurface::setRenderQueue
  * @param pRenderQueue
  */
-void DrawableSurface::setRenderQueue(RenderGraph::Queue * pRenderQueue)
+void DrawableSurface::setRenderQueue(RenderGraph::Instance * pRenderQueue)
 {
 	m_pRenderQueue = pRenderQueue;
 }
@@ -114,7 +103,7 @@ void DrawableSurface::setRenderQueue(RenderGraph::Queue * pRenderQueue)
  * @brief DrawableSurface::getRenderQueue
  * @return
  */
-RenderGraph::Queue * DrawableSurface::getRenderQueue(void)
+RenderGraph::Instance * DrawableSurface::getRenderQueue(void)
 {
 	return(m_pRenderQueue);
 }
@@ -136,8 +125,6 @@ void DrawableSurface::initializeGL(void)
 	glDisable(GL_BLEND);
 
 	g_RendererWrapper.onReady();
-
-	g_RendererWrapper.initQueue("/tmp/render.xml");
 }
 
 /**
@@ -149,8 +136,15 @@ void DrawableSurface::resizeGL(int w, int h)
 {
 	g_RendererWrapper.onResize(w, h);
 
+	if (nullptr != m_pRenderQueue)
+	{
+		m_pRenderQueue->resize(w, h);
+	}
+
 	QOpenGLResourceManager & manager = QOpenGLResourceManager::instance();
 	manager.onResize(QSize(w, h));
+
+	emit postResizeGL();
 }
 
 /**
@@ -158,15 +152,13 @@ void DrawableSurface::resizeGL(int w, int h)
  */
 void DrawableSurface::paintGL(void)
 {
+	const mat4x4 & matView = m_camera.getViewMatrix();
+
+	g_RendererWrapper.onUpdate(matView);
+
 	if (nullptr != m_pRenderQueue)
 	{
-		m_pRenderQueue->render();
-	}
-	else // TODO : remove this
-	{
-		const mat4x4 & matView = m_camera.getViewMatrix();
-
-		g_RendererWrapper.onUpdate(matView);
+		m_pRenderQueue->execute();
 	}
 
 	glDisable(GL_DEPTH_TEST);
@@ -201,16 +193,25 @@ void DrawableSurface::paintGL(void)
 	}
 #endif // ENABLE_PICKBUFFER
 
+	glViewport(0, 0, size().width(), size().height());
+
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, defaultFramebufferObject());
 
-	if (0 != m_uCurrentTexture)
+	if (m_pRenderQueue)
 	{
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_pRenderQueue->getDefaultFramebuffer());
+
+		glBlitFramebuffer(0, 0, size().width(), size().height(), 0, 0, size().width(), size().height(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+#if 0
 		manager.bindQuadResources();
 
-		glBindTexture(GL_TEXTURE_2D, m_uCurrentTexture);
+		glBindTexture(GL_TEXTURE_2D, QOpenGLResourceManager::instance().mainTextureObject());
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		manager.unbindQuadResources();
+#endif // 0
 	}
 
 #if ENABLE_PICKBUFFER
@@ -236,8 +237,6 @@ void DrawableSurface::paintGL(void)
 	const float fov = 75.0f;
 	float ratio = width()/(float)height();
 	const mat4x4 matProjection = _perspective(fov, ratio, 0.01f, 100.0f);
-
-	const mat4x4 & matView = m_camera.getViewMatrix(); // TODO : get camera from scene
 
 	if (m_bDrawObjectsAABB)
 	{

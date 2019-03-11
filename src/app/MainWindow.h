@@ -55,9 +55,7 @@ protected:
 
 	NodeEditorWindow * m_pNodeEditorWindow;
 
-	RenderGraph::Factory m_factory;
-
-	RenderGraph::Queue * m_pRenderQueue;
+	RenderGraph::Instance * m_pRenderQueue;
 
 public:
 
