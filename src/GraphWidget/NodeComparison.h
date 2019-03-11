@@ -5,22 +5,19 @@
 namespace GraphWidget
 {
 
-class NodePass : public Node
+class NodeComparison : public Node
 {
 public:
 
 	//
 	// Constructor / Destructor
-    explicit			NodePass		(void);
-	virtual				~NodePass		(void) override;
+	explicit			NodeComparison		(void);
+	virtual				~NodeComparison		(void) override;
 
 	//
 	// API
-	void				setTitle		(const QString & strTitle);
-	const QString &		getTitle		(void) const;
 
-	void				addInput		(const QString & strName, unsigned int mask);
-	void				addOutput		(const QString & strName, unsigned int mask);
+	// ...
 
 	virtual ConnectorInput *	getInputConnector	(unsigned int index) override;
 	virtual ConnectorOutput *	getOutputConnector	(unsigned int index) override;
@@ -38,11 +35,9 @@ protected:
 
 private:
 
-	QString						title;
-	QList<ConnectorInput*>		inputList;
-	QList<QString>				inputNameList;
-	QList<ConnectorOutput*>		outputList;
-	QList<QString>				outputNameList;
+	ConnectorInput *			input1;
+	ConnectorInput *			input2;
+	ConnectorOutput *			output;
 
 public:
 

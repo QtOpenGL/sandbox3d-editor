@@ -8,6 +8,7 @@
 #define TYPE_TEXTURE_BIT 4
 #define TYPE_FLOAT_BIT 8
 #define TYPE_INT_BIT 16
+#define TYPE_BOOL_BIT 32
 
 namespace GraphWidget
 {

@@ -12,9 +12,9 @@ static NodeDescriptor::DataType DataTypeFromString(const QString & str)
 	{
 		return(NodeDescriptor::Texture);
 	}
-	else if (str == "Constant")
+	else if (str == "Float")
 	{
-		return(NodeDescriptor::Constant);
+		return(NodeDescriptor::Float);
 	}
 
 	return(NodeDescriptor::UnknownDataType);

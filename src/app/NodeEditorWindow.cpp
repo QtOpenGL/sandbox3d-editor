@@ -27,10 +27,13 @@
 
 #include "GraphWidget/View.h"
 #include "GraphWidget/Edge.h"
+#include "GraphWidget/Connector.h"
 #include "GraphWidget/Node.h"
 #include "GraphWidget/NodeTexture.h"
 #include "GraphWidget/NodePass.h"
 #include "GraphWidget/NodeFinal.h"
+#include "GraphWidget/NodeComparison.h"
+#include "GraphWidget/NodeFloat.h"
 
 #define GRAPH_FILE_PATH "data/render-graph.json"
 
@@ -215,6 +218,8 @@ NodeEditorWindow::NodeEditorWindow(MainWindow * pMainWindow)
 	// Actions
 	m_pContextMenuScene->addAction(ui->actionCreateUserDefinedNode);
 	m_pContextMenuScene->addAction(ui->actionCreateTextureNode);
+	m_pContextMenuScene->addAction(ui->actionCreateComparisonNode);
+	m_pContextMenuScene->addAction(ui->actionCreateFloatNode);
 	m_pContextMenuNode->addAction(ui->actionRemoveNode);
 
 	addAction(ui->actionRemoveNode);
@@ -301,13 +306,13 @@ void NodeEditorWindow::contextMenuEvent(QContextMenuEvent * pEvent)
 	{
 		switch (item->type())
 		{
-		case GraphWidget::Node::Type:
-		{
-			item->setSelected(true);
+			case GraphWidget::Node::Type:
+			{
+				item->setSelected(true);
 
-			m_pContextMenuNode->exec(pEvent->globalPos());
-		}
-		break;
+				m_pContextMenuNode->exec(pEvent->globalPos());
+			}
+			break;
 		}
 	}
 	else
@@ -408,12 +413,21 @@ bool NodeEditorWindow::loadGraph(void)
 
 			n = createOperationNode(*it);
 		}
+		else if ("comparison" == strType)
+		{
+			n = createComparisonNode();
+		}
 		else if ("texture" == strType)
 		{
 			const std::string & strFormat = pNode->getMetaData("format");
 			unsigned int iFormat = StringToGLenum(strFormat.c_str());
 
 			n = createTextureNode(iFormat, 1024, 1024);
+		}
+		else if ("float" == strType)
+		{
+			const std::string & strValue = pNode->getMetaData("value");
+			n = createFloatNode(atof(strValue.c_str()));
 		}
 		else if ("present" == strType)
 		{
@@ -513,6 +527,10 @@ bool NodeEditorWindow::createGraph(Graph & G)
 			{
 				pNode->addMetaData("format", GLenumToString(m_mapTextureNodes[pNodeItem]));
 			}
+			else if (strNodeType == "float")
+			{
+				pNode->addMetaData("value", ((GraphWidget::NodeFloat*)pNodeItem)->getValue());
+			}
 
 			char szPosX [16];
 			sprintf(szPosX, "%f", pNodeItem->pos().x());
@@ -540,34 +558,34 @@ bool NodeEditorWindow::createGraph(Graph & G)
 	{
 		switch (item->type())
 		{
-		case GraphWidget::Edge::Type:
-		{
-			GraphWidget::Edge * pEdgeItem = static_cast<GraphWidget::Edge*>(item);
-			assert(nullptr != pEdgeItem);
+			case GraphWidget::Edge::Type:
+			{
+				GraphWidget::Edge * pEdgeItem = static_cast<GraphWidget::Edge*>(item);
+				assert(nullptr != pEdgeItem);
 
-			// Source
-			Node * pNodeSource = mapUID[uintptr_t(pEdgeItem->getSourceNode())];
-			assert(nullptr != pNodeSource);
+				// Source
+				Node * pNodeSource = mapUID[uintptr_t(pEdgeItem->getSourceNode())];
+				assert(nullptr != pNodeSource);
 
-			// Target
-			Node * pNodeTarget = mapUID[uintptr_t(pEdgeItem->getDestinationNode())];
-			assert(nullptr != pNodeTarget);
+				// Target
+				Node * pNodeTarget = mapUID[uintptr_t(pEdgeItem->getDestinationNode())];
+				assert(nullptr != pNodeTarget);
 
-			Edge * pEdge = new Edge(pNodeSource, pNodeTarget);
-			assert(nullptr != pEdge);
-			G.addEdge(pEdge);
+				Edge * pEdge = new Edge(pNodeSource, pNodeTarget);
+				assert(nullptr != pEdge);
+				G.addEdge(pEdge);
 
-			pEdge->setDirected(true);
+				pEdge->setDirected(true);
 
-			char szSourceId [16];
-			sprintf(szSourceId, "%d", pEdgeItem->getSourceIndex());
-			pEdge->addMetaData("source_id", szSourceId);
+				char szSourceId [16];
+				sprintf(szSourceId, "%d", pEdgeItem->getSourceIndex());
+				pEdge->addMetaData("source_id", szSourceId);
 
-			char szTargetId [16];
-			sprintf(szTargetId, "%d", pEdgeItem->getDestinationIndex());
-			pEdge->addMetaData("target_id", szTargetId);
-		}
-		break;
+				char szTargetId [16];
+				sprintf(szTargetId, "%d", pEdgeItem->getDestinationIndex());
+				pEdge->addMetaData("target_id", szTargetId);
+			}
+			break;
 		}
 	}
 
@@ -604,7 +622,19 @@ GraphWidget::Node * NodeEditorWindow::createOperationNode(const NodeDescriptor &
 
 	for (const NodeDescriptor::Input & input : desc.inputs)
 	{
-		n->addInput(input.name); //, nullptr, input_index
+		if (input.type == NodeDescriptor::Texture)
+		{
+			n->addInput(input.name, TYPE_TEXTURE_BIT); //, nullptr, input_index
+		}
+		else if (input.type == NodeDescriptor::Float)
+		{
+			n->addInput(input.name, TYPE_FLOAT_BIT); //, nullptr, input_index
+		}
+		else
+		{
+			assert(false);
+		}
+
 		++input_index;
 	}
 
@@ -612,7 +642,19 @@ GraphWidget::Node * NodeEditorWindow::createOperationNode(const NodeDescriptor &
 
 	for (const NodeDescriptor::Output & output : desc.outputs)
 	{
-		n->addOutput(output.name); //, nullptr, output_index
+		if (output.type == NodeDescriptor::Texture)
+		{
+			n->addOutput(output.name, TYPE_TEXTURE_BIT); //, nullptr, output_index
+		}
+		else if (output.type == NodeDescriptor::Float)
+		{
+			n->addOutput(output.name, TYPE_FLOAT_BIT); //, nullptr, output_index
+		}
+		else
+		{
+			assert(false);
+		}
+
 		++output_index;
 	}
 
@@ -634,6 +676,37 @@ GraphWidget::Node * NodeEditorWindow::createTextureNode(unsigned int format, uns
 
 	m_mapTextureNodes.insert(std::pair<const GraphWidget::Node*, unsigned int>(n, format));
 	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "texture"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createComparisonNode
+ * @return
+ */
+GraphWidget::Node *	NodeEditorWindow::createComparisonNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeComparison();
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "comparison"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createFloatNode
+ * @param value
+ * @return
+ */
+GraphWidget::Node *	NodeEditorWindow::createFloatNode(float value)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeFloat(value);
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "float"));
 
 	return(n);
 }
@@ -677,6 +750,26 @@ void NodeEditorWindow::on_actionCreateUserDefinedNode_triggered(void)
 void NodeEditorWindow::on_actionCreateTextureNode_triggered(void)
 {
 	m_pNodeTextureCreationWindow->show();
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateComparisonNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateComparisonNode_triggered(void)
+{
+	GraphWidget::Node * node = createComparisonNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateFloatNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateFloatNode_triggered()
+{
+	GraphWidget::Node * node = createFloatNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
 }
 
 /**
@@ -736,26 +829,26 @@ void NodeEditorWindow::updateTextures(void)
 	{
 		switch (item->type())
 		{
-		case GraphWidget::Node::Type:
-		{
-			GraphWidget::Node * pNodeItem = static_cast<GraphWidget::Node*>(item);
-			assert(nullptr != pNodeItem);
-
-			std::string & strNodeType = m_mapNodeType[pNodeItem];
-
-			if (strNodeType == "texture")
+			case GraphWidget::Node::Type:
 			{
-				GraphWidget::NodeTexture * pNodeTextureItem = (GraphWidget::NodeTexture*)pNodeItem;
+				GraphWidget::Node * pNodeItem = static_cast<GraphWidget::Node*>(item);
+				assert(nullptr != pNodeItem);
 
-				char szId [16];
-				sprintf(szId, "%lld", uintptr_t(pNodeItem));
+				std::string & strNodeType = m_mapNodeType[pNodeItem];
 
-				GLuint textureId = static_cast<MainWindow*>(parent())->m_pDrawable->getRenderQueue()->getRenderTexture(szId);
+				if (strNodeType == "texture")
+				{
+					GraphWidget::NodeTexture * pNodeTextureItem = (GraphWidget::NodeTexture*)pNodeItem;
 
-				pNodeTextureItem->setTexture(textureId);
+					char szId [16];
+					sprintf(szId, "%lld", uintptr_t(pNodeItem));
+
+					GLuint textureId = static_cast<MainWindow*>(parent())->m_pDrawable->getRenderQueue()->getRenderTexture(szId);
+
+					pNodeTextureItem->setTexture(textureId);
+				}
 			}
-		}
-		break;
+			break;
 		}
 	}
 }

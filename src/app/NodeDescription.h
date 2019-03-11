@@ -12,7 +12,7 @@ struct NodeDescriptor
 	{
 		UnknownDataType,
 		Texture,
-		Constant
+		Float,
 	};
 
 	struct Input

@@ -89,6 +89,16 @@
     <string>Create a texture node</string>
    </property>
   </action>
+  <action name="actionCreateComparisonNode">
+   <property name="text">
+    <string>Create Comparison Node</string>
+   </property>
+  </action>
+  <action name="actionCreateFloatNode">
+   <property name="text">
+    <string>Create Float Node</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

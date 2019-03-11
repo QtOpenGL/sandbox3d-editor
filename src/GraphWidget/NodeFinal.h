@@ -14,7 +14,7 @@ public:
 	//
 	// Constructor / Destructor
     explicit	NodeFinal		(void);
-	virtual		~NodeFinal		(void);
+	virtual		~NodeFinal		(void) override;
 
 	//
 	// API

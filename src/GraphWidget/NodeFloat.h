@@ -8,18 +8,21 @@ class QOpenGLBuffer;
 namespace GraphWidget
 {
 
-class NodeTexture : public Node
+class NodeFloat : public QObject, public Node
 {
+	Q_OBJECT
+
 public:
 
 	//
 	// Constructor / Destructor
-    explicit	NodeTexture			(void);
-	virtual		~NodeTexture		(void) override;
+	explicit	NodeFloat			(float defaultValue = 0.0f);
+	virtual		~NodeFloat			(void) override;
 
 	//
 	// API
-	void		setTexture(unsigned int id) { texture = id; }
+	void		setValue(float v) { value = v; }
+	float		getValue(void) const { return value; }
 
 	virtual ConnectorInput *	getInputConnector	(unsigned int index) override;
 	virtual ConnectorOutput *	getOutputConnector	(unsigned int index) override;
@@ -35,27 +38,20 @@ protected:
 	QPainterPath	shape			(void) const override;
     void			paint			(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) override;
 
-public: // Resources
+private slots:
 
-	static bool initResources(void);
-	static bool releaseResources(void);
-
-protected:
-
-	static QOpenGLShaderProgram * shader;
-	static QOpenGLBuffer * vertexPositionBuffer;
-	static QOpenGLBuffer * vertexTexCoordsBuffer;
+	void updateValue(const QString & strText);
 
 private:
 
-	unsigned int				texture;
-	QList<ConnectorInput*>		inputList;
+	float value;
+
 	ConnectorOutput *			output;
 
 public:
 
-	static const qreal width;
-	static const qreal height;
+	static qreal width;
+	static qreal height;
 };
 
 }

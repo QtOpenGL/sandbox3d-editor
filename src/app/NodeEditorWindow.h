@@ -54,6 +54,8 @@ protected:
 	GraphWidget::Node *	createPresentNode		(void);
 	GraphWidget::Node *	createOperationNode		(const NodeDescriptor & desc);
 	GraphWidget::Node *	createTextureNode		(unsigned int fomat, unsigned int width, unsigned int height);
+	GraphWidget::Node *	createComparisonNode	(void);
+	GraphWidget::Node *	createFloatNode			(float value = 0.0f);
 
 	void				updateTextures			(void);
 
@@ -98,6 +100,8 @@ public slots:
 
 	void on_actionCreateUserDefinedNode_triggered();
 	void on_actionCreateTextureNode_triggered();
+	void on_actionCreateComparisonNode_triggered();
+	void on_actionCreateFloatNode_triggered();
 	void on_actionRemoveNode_triggered();
 
 	void createOperationNodeFromDialog();

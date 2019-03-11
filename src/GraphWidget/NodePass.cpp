@@ -53,13 +53,13 @@ const QString & NodePass::getTitle(void) const
  * @brief NodePass::addInput
  * @param strName
  */
-void NodePass::addInput(const QString & strName)
+void NodePass::addInput(const QString & strName, unsigned int mask)
 {
 	unsigned int count = inputList.count();
 
 	ConnectorInput * pConnector = new ConnectorInput(this, count);
 	pConnector->setPos(0.0, 40.0 + 15.0 + 25.0 * count);
-	pConnector->setMask(READ_BIT | TYPE_TEXTURE_BIT);
+	pConnector->setMask(READ_BIT | mask);
 	inputList << pConnector;
 	inputNameList << strName;
 }
@@ -68,13 +68,13 @@ void NodePass::addInput(const QString & strName)
  * @brief NodePass::addOutput
  * @param strName
  */
-void NodePass::addOutput(const QString & strName)
+void NodePass::addOutput(const QString & strName, unsigned int mask)
 {
 	unsigned int count = outputList.count();
 
 	ConnectorOutput * pConnector = new ConnectorOutput(this, count);
 	pConnector->setPos(width, 40.0 + 15.0 + 25.0 * count);
-	pConnector->setMask(WRITE_BIT | TYPE_TEXTURE_BIT);
+	pConnector->setMask(WRITE_BIT | mask);
 	outputList << pConnector;
 	outputNameList << strName;
 }
