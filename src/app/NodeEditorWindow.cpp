@@ -707,7 +707,7 @@ GraphWidget::Node * NodeEditorWindow::createTextureNode(unsigned int format, uns
  */
 GraphWidget::Node *	NodeEditorWindow::createAdditionNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator("+");
+	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::ADDITION);
 
 	m_pScene->addItem(n);
 
@@ -722,7 +722,7 @@ GraphWidget::Node *	NodeEditorWindow::createAdditionNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createSubtractionNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator("-");
+	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::SUBTRACTION);
 
 	m_pScene->addItem(n);
 
@@ -737,7 +737,7 @@ GraphWidget::Node * NodeEditorWindow::createSubtractionNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createMultiplicationNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator("\u00D7"); // *
+	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::MULTIPLICATION);
 
 	m_pScene->addItem(n);
 
@@ -752,7 +752,7 @@ GraphWidget::Node * NodeEditorWindow::createMultiplicationNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createDivisionNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator("\u00F7"); // /
+	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::DIVISION);
 
 	m_pScene->addItem(n);
 
@@ -767,7 +767,7 @@ GraphWidget::Node * NodeEditorWindow::createDivisionNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createEqualToNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator("=");
+	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::EQUAL_TO);
 
 	m_pScene->addItem(n);
 
@@ -782,7 +782,7 @@ GraphWidget::Node * NodeEditorWindow::createEqualToNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createNotEqualToNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator("\u2260"); // >=
+	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::NOT_EQUAL_TO);
 
 	m_pScene->addItem(n);
 
@@ -797,7 +797,7 @@ GraphWidget::Node * NodeEditorWindow::createNotEqualToNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createGreaterThanNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator(">");
+	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::GREATER_THAN);
 
 	m_pScene->addItem(n);
 
@@ -812,7 +812,7 @@ GraphWidget::Node * NodeEditorWindow::createGreaterThanNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createLessThanNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator("<");
+	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::LESS_THAN);
 
 	m_pScene->addItem(n);
 
@@ -827,7 +827,7 @@ GraphWidget::Node * NodeEditorWindow::createLessThanNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createGreaterThanOrEqualToNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator("\u2265"); // >=
+	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::GREATER_THAN_OR_EQUAL_TO);
 
 	m_pScene->addItem(n);
 
@@ -842,7 +842,7 @@ GraphWidget::Node * NodeEditorWindow::createGreaterThanOrEqualToNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createLessThanOrEqualToNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator("\u2264"); // <=
+	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::LESS_THAN_OR_EQUAL_TO);
 
 	m_pScene->addItem(n);
 

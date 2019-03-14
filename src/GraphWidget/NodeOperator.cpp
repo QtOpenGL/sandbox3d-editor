@@ -14,9 +14,84 @@ qreal NodeOperator::height = 70.0;
 /**
  * @brief Constructor
  */
-NodeOperator::NodeOperator(const QString & symbol_) : Node(), symbol(symbol_)
+NodeOperator::NodeOperator(Type type) : Node()
 {
 	setCacheMode(DeviceCoordinateCache);
+
+	unsigned int mask = 0;
+
+	switch (type)
+	{
+		case ADDITION:
+		{
+			symbol = "+";
+			mask = TYPE_FLOAT_BIT;
+		}
+		break;
+
+		case SUBTRACTION:
+		{
+			symbol = "-";
+			mask = TYPE_FLOAT_BIT;
+		}
+		break;
+
+		case MULTIPLICATION:
+		{
+			symbol = "\u00D7";
+			mask = TYPE_FLOAT_BIT;
+		}
+		break;
+
+		case DIVISION:
+		{
+			symbol = "\u00F7";
+			mask = TYPE_FLOAT_BIT;
+		}
+		break;
+
+		case EQUAL_TO:
+		{
+			symbol = "=";
+			mask = TYPE_BOOL_BIT;
+		}
+		break;
+
+		case NOT_EQUAL_TO:
+		{
+			symbol = "\u2260";
+			mask = TYPE_BOOL_BIT;
+		}
+		break;
+
+		case GREATER_THAN:
+		{
+			symbol = ">";
+			mask = TYPE_BOOL_BIT;
+		}
+		break;
+
+		case GREATER_THAN_OR_EQUAL_TO:
+		{
+			symbol = "\u2265";
+			mask = TYPE_BOOL_BIT;
+		}
+		break;
+
+		case LESS_THAN:
+		{
+			symbol = "<";
+			mask = TYPE_BOOL_BIT;
+		}
+		break;
+
+		case LESS_THAN_OR_EQUAL_TO:
+		{
+			symbol = "\u2264";
+			mask = TYPE_BOOL_BIT;
+		}
+		break;
+	}
 
 	input1 = new ConnectorInput(this, 0);
 	input1->setPos(0.0f, 20.0f);
@@ -28,7 +103,7 @@ NodeOperator::NodeOperator(const QString & symbol_) : Node(), symbol(symbol_)
 
 	output = new ConnectorOutput(this, 0);
 	output->setPos(width, 35.0f);
-	output->setMask(READ_BIT | TYPE_FLOAT_BIT);
+	output->setMask(READ_BIT | mask);
 }
 
 /**

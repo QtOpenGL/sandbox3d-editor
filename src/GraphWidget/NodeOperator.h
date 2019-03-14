@@ -13,9 +13,24 @@ class NodeOperator : public Node
 
 public:
 
+	enum Type
+	{
+		ADDITION,
+		SUBTRACTION,
+		MULTIPLICATION,
+		DIVISION,
+
+		EQUAL_TO,
+		NOT_EQUAL_TO,
+		GREATER_THAN,
+		GREATER_THAN_OR_EQUAL_TO,
+		LESS_THAN,
+		LESS_THAN_OR_EQUAL_TO,
+	};
+
 	//
 	// Constructor / Destructor
-	explicit	NodeOperator			(const QString & symbol);
+	explicit	NodeOperator			(Type type);
 	virtual		~NodeOperator			(void) override;
 
 	virtual ConnectorInput *	getInputConnector	(unsigned int index) override;
