@@ -27,6 +27,7 @@ NodeFloat::NodeFloat(float defaultValue) : Node(), value(defaultValue), output(n
 	pLineEdit->resize(width - (padding * 2), height - (padding * 2));
 	pLineEdit->setAlignment(Qt::AlignRight);
 	pLineEdit->setValidator(new QDoubleValidator(this));
+	pLineEdit->setStyleSheet("QLineEdit { color: white; background: transparent; selection-background-color: rgb(0, 99, 233); border: 1px solid white; }");
 
 	QGraphicsProxyWidget * pMyProxy = new QGraphicsProxyWidget(this);
 	pMyProxy->setWidget(pLineEdit);
