@@ -94,15 +94,15 @@ NodeOperator::NodeOperator(Type type) : Node()
 	}
 
 	input1 = new ConnectorInput(this, 0);
-	input1->setPos(0.0f, 20.0f);
+	input1->setPos(0.0, 20.0);
 	input1->setMask(READ_BIT | TYPE_FLOAT_BIT);
 
 	input2 = new ConnectorInput(this, 1);
-	input2->setPos(0.0f, 50.0f);
+	input2->setPos(0.0, 50.0);
 	input2->setMask(READ_BIT | TYPE_FLOAT_BIT);
 
 	output = new ConnectorOutput(this, 0);
-	output->setPos(width, 35.0f);
+	output->setPos(width, 35.0);
 	output->setMask(READ_BIT | mask);
 }
 
