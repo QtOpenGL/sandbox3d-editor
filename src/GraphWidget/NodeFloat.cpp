@@ -12,8 +12,9 @@
 namespace GraphWidget
 {
 
-qreal NodeFloat::width = 256.0;
-qreal NodeFloat::height = 144.0;
+const qreal NodeFloat::width = 120.0;
+const qreal NodeFloat::height = 45.0f;
+const int NodeFloat::padding = 10;
 
 /**
  * @brief Constructor
@@ -23,13 +24,13 @@ NodeFloat::NodeFloat(float defaultValue) : Node(), value(defaultValue), output(n
 	setCacheMode(DeviceCoordinateCache);
 
 	QLineEdit * pLineEdit = new QLineEdit(QString::number(defaultValue));
-	pLineEdit->setValidator(new QDoubleValidator);
-	QGraphicsProxyWidget* pMyProxy = new QGraphicsProxyWidget(this);
-	pMyProxy->setWidget(pLineEdit);
-	pMyProxy->setPos(10.0f, 10.0f);
+	pLineEdit->resize(width - (padding * 2), height - (padding * 2));
+	pLineEdit->setAlignment(Qt::AlignRight);
+	pLineEdit->setValidator(new QDoubleValidator(this));
 
-	width = pLineEdit->width() + 10.0f * 2.0f;
-	height = pLineEdit->height() + 10.0f * 2.0f;
+	QGraphicsProxyWidget * pMyProxy = new QGraphicsProxyWidget(this);
+	pMyProxy->setWidget(pLineEdit);
+	pMyProxy->setPos(padding, padding);
 
 	QObject::connect(pLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateValue(const QString &)));
 

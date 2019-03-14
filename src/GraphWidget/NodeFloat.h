@@ -50,8 +50,9 @@ private:
 
 public:
 
-	static qreal width;
-	static qreal height;
+	static const qreal width;
+	static const qreal height;
+	static const int padding;
 };
 
 }
