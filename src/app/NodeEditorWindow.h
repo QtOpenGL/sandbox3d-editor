@@ -51,11 +51,23 @@ protected:
 	bool				saveGraph				(void);
 	bool				createGraph				(Graph & graph);
 
-	GraphWidget::Node *	createPresentNode		(void);
-	GraphWidget::Node *	createOperationNode		(const NodeDescriptor & desc);
-	GraphWidget::Node *	createTextureNode		(unsigned int fomat, unsigned int width, unsigned int height);
-	GraphWidget::Node *	createComparisonNode	(void);
-	GraphWidget::Node *	createFloatNode			(float value = 0.0f);
+	GraphWidget::Node *	createPresentNode				(void);
+	GraphWidget::Node *	createOperationNode				(const NodeDescriptor & desc);
+	GraphWidget::Node *	createTextureNode				(unsigned int fomat, unsigned int width, unsigned int height);
+
+	GraphWidget::Node *	createAdditionNode				(void);
+	GraphWidget::Node *	createSubtractionNode			(void);
+	GraphWidget::Node *	createMultiplicationNode		(void);
+	GraphWidget::Node *	createDivisionNode				(void);
+
+	GraphWidget::Node *	createEqualToNode				(void);
+	GraphWidget::Node *	createNotEqualToNode			(void);
+	GraphWidget::Node *	createGreaterThanNode			(void);
+	GraphWidget::Node *	createLessThanNode				(void);
+	GraphWidget::Node *	createGreaterThanOrEqualToNode	(void);
+	GraphWidget::Node *	createLessThanOrEqualToNode		(void);
+
+	GraphWidget::Node *	createFloatNode					(float value = 0.0f);
 
 	void				updateTextures			(void);
 
@@ -100,7 +112,19 @@ public slots:
 
 	void on_actionCreateUserDefinedNode_triggered();
 	void on_actionCreateTextureNode_triggered();
-	void on_actionCreateComparisonNode_triggered();
+
+	void on_actionCreateAdditionNode_triggered();
+	void on_actionCreateSubtractionNode_triggered();
+	void on_actionCreateMultiplicationNode_triggered();
+	void on_actionCreateDivisionNode_triggered();
+
+	void on_actionCreateEqualToNode_triggered();
+	void on_actionCreateNotEqualToNode_triggered();
+	void on_actionCreateGreaterThanNode_triggered();
+	void on_actionCreateLessThanNode_triggered();
+	void on_actionCreateGreaterThanOrEqualToNode_triggered();
+	void on_actionCreateLessThanOrEqualToNode_triggered();
+
 	void on_actionCreateFloatNode_triggered();
 	void on_actionRemoveNode_triggered();
 

@@ -226,7 +226,7 @@ void RendererWrapper::onUpdate(const mat4x4 & mView)
  */
 RenderGraph::Instance *	RendererWrapper::createRenderGraph(const Graph & graph)
 {
-	return m_factory.createInstanceFromGraph(graph);
+	return m_factory.createInstanceFromGraph(graph, mapTextures, mapValues);
 }
 
 /**
@@ -235,6 +235,71 @@ RenderGraph::Instance *	RendererWrapper::createRenderGraph(const Graph & graph)
 void RendererWrapper::destroyRenderGraph(RenderGraph::Instance * pInstance) const
 {
 	m_factory.destroyInstance(pInstance);
+}
+
+/**
+ * @brief RendererWrapper::getRenderTexture
+ * @param pInstance
+ * @return
+ */
+unsigned int /*GLuint*/ RendererWrapper::getRenderTexture(RenderGraph::Instance * pInstance, const char * name) const
+{
+	auto it = mapTextures.find(name);
+
+	if (it != mapTextures.end())
+	{
+		return pInstance->getRenderTexture(it->second);
+	}
+
+	return 0;
+}
+
+/**
+ * @brief RendererWrapper::setConstant
+ * @param pInstance
+ * @param name
+ * @param value
+ */
+void RendererWrapper::setConstant(RenderGraph::Instance * pInstance, const char * name, unsigned int value) const
+{
+	auto it = mapValues.find(name);
+
+	if (it != mapValues.end())
+	{
+		pInstance->setConstant(it->second, value);
+	}
+}
+
+/**
+ * @brief RendererWrapper::setConstant
+ * @param pInstance
+ * @param name
+ * @param value
+ */
+void RendererWrapper::setConstant(RenderGraph::Instance * pInstance, const char * name, int value) const
+{
+	auto it = mapValues.find(name);
+
+	if (it != mapValues.end())
+	{
+		pInstance->setConstant(it->second, value);
+	}
+}
+
+/**
+ * @brief RendererWrapper::setConstant
+ * @param pInstance
+ * @param name
+ * @param value
+ */
+void RendererWrapper::setConstant(RenderGraph::Instance * pInstance, const char * name, float value) const
+{
+	auto it = mapValues.find(name);
+
+	if (it != mapValues.end())
+	{
+		pInstance->setConstant(it->second, value);
+	}
 }
 
 /**

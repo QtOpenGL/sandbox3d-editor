@@ -32,7 +32,7 @@
 #include "GraphWidget/NodeTexture.h"
 #include "GraphWidget/NodePass.h"
 #include "GraphWidget/NodeFinal.h"
-#include "GraphWidget/NodeComparison.h"
+#include "GraphWidget/NodeOperator.h"
 #include "GraphWidget/NodeFloat.h"
 
 #define GRAPH_FILE_PATH "data/render-graph.json"
@@ -218,8 +218,17 @@ NodeEditorWindow::NodeEditorWindow(MainWindow * pMainWindow)
 	// Actions
 	m_pContextMenuScene->addAction(ui->actionCreateUserDefinedNode);
 	m_pContextMenuScene->addAction(ui->actionCreateTextureNode);
-	m_pContextMenuScene->addAction(ui->actionCreateComparisonNode);
 	m_pContextMenuScene->addAction(ui->actionCreateFloatNode);
+	m_pContextMenuScene->addAction(ui->actionCreateAdditionNode);
+	m_pContextMenuScene->addAction(ui->actionCreateSubtractionNode);
+	m_pContextMenuScene->addAction(ui->actionCreateMultiplicationNode);
+	m_pContextMenuScene->addAction(ui->actionCreateDivisionNode);
+	m_pContextMenuScene->addAction(ui->actionCreateEqualToNode);
+	m_pContextMenuScene->addAction(ui->actionCreateNotEqualToNode);
+	m_pContextMenuScene->addAction(ui->actionCreateGreaterThanNode);
+	m_pContextMenuScene->addAction(ui->actionCreateLessThanNode);
+	m_pContextMenuScene->addAction(ui->actionCreateGreaterThanOrEqualToNode);
+	m_pContextMenuScene->addAction(ui->actionCreateLessThanOrEqualToNode);
 	m_pContextMenuNode->addAction(ui->actionRemoveNode);
 
 	addAction(ui->actionRemoveNode);
@@ -413,10 +422,6 @@ bool NodeEditorWindow::loadGraph(void)
 
 			n = createOperationNode(*it);
 		}
-		else if ("comparison" == strType)
-		{
-			n = createComparisonNode();
-		}
 		else if ("texture" == strType)
 		{
 			const std::string & strFormat = pNode->getMetaData("format");
@@ -428,6 +433,22 @@ bool NodeEditorWindow::loadGraph(void)
 		{
 			const std::string & strValue = pNode->getMetaData("value");
 			n = createFloatNode(atof(strValue.c_str()));
+		}
+		else if ("addition" == strType)
+		{
+			n = createAdditionNode();
+		}
+		else if ("subtraction" == strType)
+		{
+			n = createSubtractionNode();
+		}
+		else if ("multiplication" == strType)
+		{
+			n = createMultiplicationNode();
+		}
+		else if ("division" == strType)
+		{
+			n = createDivisionNode();
 		}
 		else if ("present" == strType)
 		{
@@ -681,16 +702,151 @@ GraphWidget::Node * NodeEditorWindow::createTextureNode(unsigned int format, uns
 }
 
 /**
- * @brief NodeEditorWindow::createComparisonNode
+ * @brief NodeEditorWindow::createAdditionNode
  * @return
  */
-GraphWidget::Node *	NodeEditorWindow::createComparisonNode(void)
+GraphWidget::Node *	NodeEditorWindow::createAdditionNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeComparison();
+	GraphWidget::Node * n = new GraphWidget::NodeOperator("+");
 
 	m_pScene->addItem(n);
 
-	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "comparison"));
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "addition"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createSubtractionNode
+ * @return
+ */
+GraphWidget::Node * NodeEditorWindow::createSubtractionNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperator("-");
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "subtraction"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createMultiplicationNode
+ * @return
+ */
+GraphWidget::Node * NodeEditorWindow::createMultiplicationNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperator("\u00D7"); // *
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "multiplication"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createDivisionNode
+ * @return
+ */
+GraphWidget::Node * NodeEditorWindow::createDivisionNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperator("\u00F7"); // /
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "division"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createEqualToNode
+ * @return
+ */
+GraphWidget::Node * NodeEditorWindow::createEqualToNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperator("=");
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "EQ"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createNotEqualToNode
+ * @return
+ */
+GraphWidget::Node * NodeEditorWindow::createNotEqualToNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperator("\u2260"); // >=
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "NEQ"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createGreaterThanNode
+ * @return
+ */
+GraphWidget::Node * NodeEditorWindow::createGreaterThanNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperator(">");
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "GT"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createLessThanNode
+ * @return
+ */
+GraphWidget::Node * NodeEditorWindow::createLessThanNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperator("<");
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "LT"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createGreaterThanOrEqualToNode
+ * @return
+ */
+GraphWidget::Node * NodeEditorWindow::createGreaterThanOrEqualToNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperator("\u2265"); // >=
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "GTE"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createLessThanOrEqualToNode
+ * @return
+ */
+GraphWidget::Node * NodeEditorWindow::createLessThanOrEqualToNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperator("\u2264"); // <=
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "LTE"));
 
 	return(n);
 }
@@ -753,11 +909,101 @@ void NodeEditorWindow::on_actionCreateTextureNode_triggered(void)
 }
 
 /**
- * @brief NodeEditorWindow::on_actionCreateComparisonNode_triggered
+ * @brief NodeEditorWindow::on_actionCreateAdditionNode_triggered
  */
-void NodeEditorWindow::on_actionCreateComparisonNode_triggered(void)
+void NodeEditorWindow::on_actionCreateAdditionNode_triggered()
 {
-	GraphWidget::Node * node = createComparisonNode();
+	GraphWidget::Node * node = createAdditionNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateSubtractionNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateSubtractionNode_triggered()
+{
+	GraphWidget::Node * node = createSubtractionNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateMultiplicationNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateMultiplicationNode_triggered()
+{
+	GraphWidget::Node * node = createMultiplicationNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateDivisionNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateDivisionNode_triggered()
+{
+	GraphWidget::Node * node = createDivisionNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateEqualToNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateEqualToNode_triggered()
+{
+	GraphWidget::Node * node = createEqualToNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateNotEqualToNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateNotEqualToNode_triggered()
+{
+	GraphWidget::Node * node = createNotEqualToNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateGreaterThanNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateGreaterThanNode_triggered()
+{
+	GraphWidget::Node * node = createGreaterThanNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateLessThanNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateLessThanNode_triggered()
+{
+	GraphWidget::Node * node = createLessThanNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateGreaterThanOrEqualNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateGreaterThanOrEqualToNode_triggered()
+{
+	GraphWidget::Node * node = createGreaterThanOrEqualToNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateLessThanOrEqualNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateLessThanOrEqualToNode_triggered()
+{
+	GraphWidget::Node * node = createLessThanOrEqualToNode();
 	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
 	node->setPos(pos);
 }
@@ -843,7 +1089,7 @@ void NodeEditorWindow::updateTextures(void)
 					char szId [16];
 					sprintf(szId, "%lld", uintptr_t(pNodeItem));
 
-					GLuint textureId = static_cast<MainWindow*>(parent())->m_pDrawable->getRenderQueue()->getRenderTexture(szId);
+					GLuint textureId = g_RendererWrapper.getRenderTexture(static_cast<MainWindow*>(parent())->m_pDrawable->getRenderQueue(), szId);
 
 					pNodeTextureItem->setTexture(textureId);
 				}

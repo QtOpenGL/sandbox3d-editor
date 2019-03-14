@@ -89,14 +89,65 @@
     <string>Create a texture node</string>
    </property>
   </action>
-  <action name="actionCreateComparisonNode">
-   <property name="text">
-    <string>Create Comparison Node</string>
-   </property>
-  </action>
   <action name="actionCreateFloatNode">
    <property name="text">
     <string>Create Float Node</string>
+   </property>
+  </action>
+  <action name="actionCreateAdditionNode">
+   <property name="text">
+    <string>Create Addition Node</string>
+   </property>
+  </action>
+  <action name="actionCreateSubtractionNode">
+   <property name="text">
+    <string>Create Subtraction Node</string>
+   </property>
+  </action>
+  <action name="actionCreateMultiplicationNode">
+   <property name="text">
+    <string>Create Multiplication Node</string>
+   </property>
+  </action>
+  <action name="actionCreateDivisionNode">
+   <property name="text">
+    <string>Create Division Node</string>
+   </property>
+  </action>
+  <action name="actionCreateGreaterThanNode">
+   <property name="text">
+    <string>Create GreaterThan Node</string>
+   </property>
+  </action>
+  <action name="actionCreateEqualToNode">
+   <property name="text">
+    <string>Create EqualTo Node</string>
+   </property>
+  </action>
+  <action name="actionCreateNotEqualToNode">
+   <property name="text">
+    <string>Create NotEqualTo Node</string>
+   </property>
+  </action>
+  <action name="actionCreateLessThanNode">
+   <property name="text">
+    <string>Create LessThan Node</string>
+   </property>
+  </action>
+  <action name="actionCreateGreaterThanOrEqualToNode">
+   <property name="text">
+    <string>Create GreaterThanOrEqualTo Node</string>
+   </property>
+   <property name="toolTip">
+    <string>Create GreaterThanOrEqualTo Node</string>
+   </property>
+  </action>
+  <action name="actionCreateLessThanOrEqualToNode">
+   <property name="text">
+    <string>Create LessThanOrEqualTo Node</string>
+   </property>
+   <property name="toolTip">
+    <string>Create LessThanOrEqualTo Node</string>
    </property>
   </action>
  </widget>

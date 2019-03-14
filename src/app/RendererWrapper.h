@@ -42,6 +42,11 @@ public:
 	RenderGraph::Instance *	createRenderGraph(const Graph & graph);
 	void destroyRenderGraph(RenderGraph::Instance * pInstance) const;
 
+	unsigned int /*GLuint*/ getRenderTexture(RenderGraph::Instance * pInstance, const char * name) const;
+	void setConstant(RenderGraph::Instance * pInstance, const char * name, unsigned int value) const;
+	void setConstant(RenderGraph::Instance * pInstance, const char * name, int value) const;
+	void setConstant(RenderGraph::Instance * pInstance, const char * name, float value) const;
+
 	//
 	// Scene management
 	Scene &			getScene			(void);
@@ -113,4 +118,7 @@ private:
 
 	unsigned int m_iWidth;
 	unsigned int m_iHeight;
+
+	std::map<std::string, unsigned int> mapTextures;
+	std::map<std::string, unsigned int> mapValues;
 };
