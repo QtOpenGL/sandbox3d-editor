@@ -454,6 +454,30 @@ bool NodeEditorWindow::loadGraph(void)
 		{
 			n = createPresentNode();
 		}
+		else if ("equal_to" == strType)
+		{
+			n = createEqualToNode();
+		}
+		else if ("not_equal_to" == strType)
+		{
+			n = createNotEqualToNode();
+		}
+		else if ("greater_than" == strType)
+		{
+			n = createGreaterThanNode();
+		}
+		else if ("greater_than_or_equal_to" == strType)
+		{
+			n = createGreaterThanOrEqualToNode();
+		}
+		else if ("less_than" == strType)
+		{
+			n = createLessThanNode();
+		}
+		else if ("less_than_or_equal_to" == strType)
+		{
+			n = createLessThanOrEqualToNode();
+		}
 		else
 		{
 			assert(false);
@@ -523,55 +547,55 @@ bool NodeEditorWindow::createGraph(Graph & G)
 	{
 		switch (item->type())
 		{
-		case GraphWidget::Node::Type:
-		{
-			GraphWidget::Node * pNodeItem = static_cast<GraphWidget::Node*>(item);
-			assert(nullptr != pNodeItem);
-
-			char szId [16];
-			sprintf(szId, "%lld", uintptr_t(pNodeItem));
-
-			Node * pNode = new Node(szId);
-			assert(nullptr != pNode);
-			G.addNode(pNode);
-
-			std::string & strNodeType = m_mapNodeType[pNodeItem];
-
-			pNode->setType(strNodeType.c_str());
-
-			if (strNodeType == "pass")
+			case GraphWidget::Node::Type:
 			{
-				pNode->setLabel(((GraphWidget::NodePass*)pNodeItem)->getTitle().toLocal8Bit());
-				pNode->addMetaData("subtype", (const char*)m_mapOperationNodes[pNodeItem]->identifier.toLocal8Bit());
+				GraphWidget::Node * pNodeItem = static_cast<GraphWidget::Node*>(item);
+				assert(nullptr != pNodeItem);
+
+				char szId [16];
+				sprintf(szId, "%lld", uintptr_t(pNodeItem));
+
+				Node * pNode = new Node(szId);
+				assert(nullptr != pNode);
+				G.addNode(pNode);
+
+				std::string & strNodeType = m_mapNodeType[pNodeItem];
+
+				pNode->setType(strNodeType.c_str());
+
+				if (strNodeType == "pass")
+				{
+					pNode->setLabel(((GraphWidget::NodePass*)pNodeItem)->getTitle().toLocal8Bit());
+					pNode->addMetaData("subtype", (const char*)m_mapOperationNodes[pNodeItem]->identifier.toLocal8Bit());
+				}
+				else if (strNodeType == "texture")
+				{
+					pNode->addMetaData("format", GLenumToString(m_mapTextureNodes[pNodeItem]));
+				}
+				else if (strNodeType == "float")
+				{
+					pNode->addMetaData("value", ((GraphWidget::NodeFloat*)pNodeItem)->getValue());
+				}
+
+				char szPosX [16];
+				sprintf(szPosX, "%f", pNodeItem->pos().x());
+				pNode->addMetaData("xloc", szPosX);
+
+				char szPosY [16];
+				sprintf(szPosY, "%f", pNodeItem->pos().y());
+				pNode->addMetaData("yloc", szPosY);
+
+				char szWidth [16];
+				sprintf(szWidth, "%f", pNodeItem->getWidth());
+				pNode->addMetaData("width", szWidth);
+
+				char szHeight [16];
+				sprintf(szHeight, "%f", pNodeItem->getHeight());
+				pNode->addMetaData("height", szHeight);
+
+				mapUID[uintptr_t(pNodeItem)] = pNode;
 			}
-			else if (strNodeType == "texture")
-			{
-				pNode->addMetaData("format", GLenumToString(m_mapTextureNodes[pNodeItem]));
-			}
-			else if (strNodeType == "float")
-			{
-				pNode->addMetaData("value", ((GraphWidget::NodeFloat*)pNodeItem)->getValue());
-			}
-
-			char szPosX [16];
-			sprintf(szPosX, "%f", pNodeItem->pos().x());
-			pNode->addMetaData("xloc", szPosX);
-
-			char szPosY [16];
-			sprintf(szPosY, "%f", pNodeItem->pos().y());
-			pNode->addMetaData("yloc", szPosY);
-
-			char szWidth [16];
-			sprintf(szWidth, "%f", pNodeItem->getWidth());
-			pNode->addMetaData("width", szWidth);
-
-			char szHeight [16];
-			sprintf(szHeight, "%f", pNodeItem->getHeight());
-			pNode->addMetaData("height", szHeight);
-
-			mapUID[uintptr_t(pNodeItem)] = pNode;
-		}
-		break;
+			break;
 		}
 	}
 
@@ -651,6 +675,10 @@ GraphWidget::Node * NodeEditorWindow::createOperationNode(const NodeDescriptor &
 		{
 			n->addInput(input.name, TYPE_FLOAT_BIT); //, nullptr, input_index
 		}
+		else if (input.type == NodeDescriptor::Boolean)
+		{
+			n->addInput(input.name, TYPE_BOOL_BIT); //, nullptr, input_index
+		}
 		else
 		{
 			assert(false);
@@ -670,6 +698,10 @@ GraphWidget::Node * NodeEditorWindow::createOperationNode(const NodeDescriptor &
 		else if (output.type == NodeDescriptor::Float)
 		{
 			n->addOutput(output.name, TYPE_FLOAT_BIT); //, nullptr, output_index
+		}
+		else if (output.type == NodeDescriptor::Boolean)
+		{
+			n->addOutput(output.name, TYPE_BOOL_BIT); //, nullptr, output_index
 		}
 		else
 		{
@@ -771,7 +803,7 @@ GraphWidget::Node * NodeEditorWindow::createEqualToNode(void)
 
 	m_pScene->addItem(n);
 
-	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "EQ"));
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "equal_to"));
 
 	return(n);
 }
@@ -786,7 +818,7 @@ GraphWidget::Node * NodeEditorWindow::createNotEqualToNode(void)
 
 	m_pScene->addItem(n);
 
-	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "NEQ"));
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "not_equal_to"));
 
 	return(n);
 }
@@ -801,7 +833,7 @@ GraphWidget::Node * NodeEditorWindow::createGreaterThanNode(void)
 
 	m_pScene->addItem(n);
 
-	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "GT"));
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "greater_than"));
 
 	return(n);
 }
@@ -816,7 +848,7 @@ GraphWidget::Node * NodeEditorWindow::createLessThanNode(void)
 
 	m_pScene->addItem(n);
 
-	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "LT"));
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "less_than"));
 
 	return(n);
 }
@@ -831,7 +863,7 @@ GraphWidget::Node * NodeEditorWindow::createGreaterThanOrEqualToNode(void)
 
 	m_pScene->addItem(n);
 
-	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "GTE"));
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "greater_than_or_equal_to"));
 
 	return(n);
 }
@@ -846,7 +878,7 @@ GraphWidget::Node * NodeEditorWindow::createLessThanOrEqualToNode(void)
 
 	m_pScene->addItem(n);
 
-	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "LTE"));
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "less_than_or_equal_to"));
 
 	return(n);
 }
