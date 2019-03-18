@@ -13,6 +13,7 @@ struct NodeDescriptor
 		UnknownDataType,
 		Texture,
 		Float,
+		Boolean
 	};
 
 	struct Input

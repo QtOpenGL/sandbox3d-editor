@@ -16,6 +16,10 @@ static NodeDescriptor::DataType DataTypeFromString(const QString & str)
 	{
 		return(NodeDescriptor::Float);
 	}
+	else if (str == "Boolean")
+	{
+		return(NodeDescriptor::Boolean);
+	}
 
 	return(NodeDescriptor::UnknownDataType);
 }
