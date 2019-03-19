@@ -150,6 +150,34 @@
     <string>Create LessThanOrEqualTo Node</string>
    </property>
   </action>
+  <action name="actionCreateNegationNode">
+   <property name="text">
+    <string>Create Negation Node</string>
+   </property>
+  </action>
+  <action name="actionCreateAbsoluteNode">
+   <property name="text">
+    <string>Create Absolute Node</string>
+   </property>
+  </action>
+  <action name="actionCreateNotNode">
+   <property name="text">
+    <string>Create Not Node</string>
+   </property>
+  </action>
+  <action name="actionCreateAndNode">
+   <property name="text">
+    <string>Create And Node</string>
+   </property>
+   <property name="toolTip">
+    <string>Create And Node</string>
+   </property>
+  </action>
+  <action name="actionCreateOrNode">
+   <property name="text">
+    <string>Create Or Node</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

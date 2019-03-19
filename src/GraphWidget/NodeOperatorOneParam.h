@@ -8,30 +8,23 @@ class QOpenGLBuffer;
 namespace GraphWidget
 {
 
-class NodeOperator : public Node
+class NodeOperatorOneParam : public Node
 {
 
 public:
 
 	enum Type
 	{
-		ADDITION,
-		SUBTRACTION,
-		MULTIPLICATION,
-		DIVISION,
+		NEGATION,
+		ABSOLUTE,
 
-		EQUAL_TO,
-		NOT_EQUAL_TO,
-		GREATER_THAN,
-		GREATER_THAN_OR_EQUAL_TO,
-		LESS_THAN,
-		LESS_THAN_OR_EQUAL_TO,
+		NOT,
 	};
 
 	//
 	// Constructor / Destructor
-	explicit	NodeOperator			(Type type);
-	virtual		~NodeOperator			(void) override;
+	explicit	NodeOperatorOneParam				(Type type);
+	virtual		~NodeOperatorOneParam				(void) override;
 
 	virtual ConnectorInput *	getInputConnector	(unsigned int index) override;
 	virtual ConnectorOutput *	getOutputConnector	(unsigned int index) override;
@@ -50,8 +43,7 @@ protected:
 private:
 
 	QString						symbol;
-	ConnectorInput *			input1;
-	ConnectorInput *			input2;
+	ConnectorInput *			input;
 	ConnectorOutput *			output;
 
 public:

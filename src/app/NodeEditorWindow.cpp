@@ -32,7 +32,8 @@
 #include "GraphWidget/NodeTexture.h"
 #include "GraphWidget/NodePass.h"
 #include "GraphWidget/NodeFinal.h"
-#include "GraphWidget/NodeOperator.h"
+#include "GraphWidget/NodeOperatorOneParam.h"
+#include "GraphWidget/NodeOperatorTwoParams.h"
 #include "GraphWidget/NodeFloat.h"
 
 #define GRAPH_FILE_PATH "data/render-graph.json"
@@ -223,12 +224,17 @@ NodeEditorWindow::NodeEditorWindow(MainWindow * pMainWindow)
 	m_pContextMenuScene->addAction(ui->actionCreateSubtractionNode);
 	m_pContextMenuScene->addAction(ui->actionCreateMultiplicationNode);
 	m_pContextMenuScene->addAction(ui->actionCreateDivisionNode);
+	m_pContextMenuScene->addAction(ui->actionCreateNegationNode);
+	m_pContextMenuScene->addAction(ui->actionCreateAbsoluteNode);
 	m_pContextMenuScene->addAction(ui->actionCreateEqualToNode);
 	m_pContextMenuScene->addAction(ui->actionCreateNotEqualToNode);
 	m_pContextMenuScene->addAction(ui->actionCreateGreaterThanNode);
 	m_pContextMenuScene->addAction(ui->actionCreateLessThanNode);
 	m_pContextMenuScene->addAction(ui->actionCreateGreaterThanOrEqualToNode);
 	m_pContextMenuScene->addAction(ui->actionCreateLessThanOrEqualToNode);
+	m_pContextMenuScene->addAction(ui->actionCreateNotNode);
+	m_pContextMenuScene->addAction(ui->actionCreateAndNode);
+	m_pContextMenuScene->addAction(ui->actionCreateOrNode);
 	m_pContextMenuNode->addAction(ui->actionRemoveNode);
 
 	addAction(ui->actionRemoveNode);
@@ -429,10 +435,14 @@ bool NodeEditorWindow::loadGraph(void)
 
 			n = createTextureNode(iFormat, 1024, 1024);
 		}
+		else if ("present" == strType)
+		{
+			n = createPresentNode();
+		}
 		else if ("float" == strType)
 		{
 			const std::string & strValue = pNode->getMetaData("value");
-			n = createFloatNode(atof(strValue.c_str()));
+			n = createFloatNode(float(atof(strValue.c_str())));
 		}
 		else if ("addition" == strType)
 		{
@@ -450,9 +460,13 @@ bool NodeEditorWindow::loadGraph(void)
 		{
 			n = createDivisionNode();
 		}
-		else if ("present" == strType)
+		else if ("negation" == strType)
 		{
-			n = createPresentNode();
+			n = createNegationNode();
+		}
+		else if ("absolute" == strType)
+		{
+			n = createAbsoluteNode();
 		}
 		else if ("equal_to" == strType)
 		{
@@ -477,6 +491,18 @@ bool NodeEditorWindow::loadGraph(void)
 		else if ("less_than_or_equal_to" == strType)
 		{
 			n = createLessThanOrEqualToNode();
+		}
+		else if ("not" == strType)
+		{
+			n = createNotNode();
+		}
+		else if ("and" == strType)
+		{
+			n = createAndNode();
+		}
+		else if ("or" == strType)
+		{
+			n = createOrNode();
 		}
 		else
 		{
@@ -739,7 +765,7 @@ GraphWidget::Node * NodeEditorWindow::createTextureNode(unsigned int format, uns
  */
 GraphWidget::Node *	NodeEditorWindow::createAdditionNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::ADDITION);
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorTwoParams(GraphWidget::NodeOperatorTwoParams::ADDITION);
 
 	m_pScene->addItem(n);
 
@@ -754,7 +780,7 @@ GraphWidget::Node *	NodeEditorWindow::createAdditionNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createSubtractionNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::SUBTRACTION);
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorTwoParams(GraphWidget::NodeOperatorTwoParams::SUBTRACTION);
 
 	m_pScene->addItem(n);
 
@@ -769,7 +795,7 @@ GraphWidget::Node * NodeEditorWindow::createSubtractionNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createMultiplicationNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::MULTIPLICATION);
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorTwoParams(GraphWidget::NodeOperatorTwoParams::MULTIPLICATION);
 
 	m_pScene->addItem(n);
 
@@ -784,11 +810,41 @@ GraphWidget::Node * NodeEditorWindow::createMultiplicationNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createDivisionNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::DIVISION);
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorTwoParams(GraphWidget::NodeOperatorTwoParams::DIVISION);
 
 	m_pScene->addItem(n);
 
 	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "division"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createNegationNode
+ * @return
+ */
+GraphWidget::Node * NodeEditorWindow::createNegationNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorOneParam(GraphWidget::NodeOperatorOneParam::NEGATION);
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "negation"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createAbsoluteNode
+ * @return
+ */
+GraphWidget::Node * NodeEditorWindow::createAbsoluteNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorOneParam(GraphWidget::NodeOperatorOneParam::ABSOLUTE);
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "absolute"));
 
 	return(n);
 }
@@ -799,7 +855,7 @@ GraphWidget::Node * NodeEditorWindow::createDivisionNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createEqualToNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::EQUAL_TO);
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorTwoParams(GraphWidget::NodeOperatorTwoParams::EQUAL_TO);
 
 	m_pScene->addItem(n);
 
@@ -814,7 +870,7 @@ GraphWidget::Node * NodeEditorWindow::createEqualToNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createNotEqualToNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::NOT_EQUAL_TO);
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorTwoParams(GraphWidget::NodeOperatorTwoParams::NOT_EQUAL_TO);
 
 	m_pScene->addItem(n);
 
@@ -829,7 +885,7 @@ GraphWidget::Node * NodeEditorWindow::createNotEqualToNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createGreaterThanNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::GREATER_THAN);
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorTwoParams(GraphWidget::NodeOperatorTwoParams::GREATER_THAN);
 
 	m_pScene->addItem(n);
 
@@ -844,7 +900,7 @@ GraphWidget::Node * NodeEditorWindow::createGreaterThanNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createLessThanNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::LESS_THAN);
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorTwoParams(GraphWidget::NodeOperatorTwoParams::LESS_THAN);
 
 	m_pScene->addItem(n);
 
@@ -859,7 +915,7 @@ GraphWidget::Node * NodeEditorWindow::createLessThanNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createGreaterThanOrEqualToNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::GREATER_THAN_OR_EQUAL_TO);
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorTwoParams(GraphWidget::NodeOperatorTwoParams::GREATER_THAN_OR_EQUAL_TO);
 
 	m_pScene->addItem(n);
 
@@ -874,11 +930,56 @@ GraphWidget::Node * NodeEditorWindow::createGreaterThanOrEqualToNode(void)
  */
 GraphWidget::Node * NodeEditorWindow::createLessThanOrEqualToNode(void)
 {
-	GraphWidget::Node * n = new GraphWidget::NodeOperator(GraphWidget::NodeOperator::LESS_THAN_OR_EQUAL_TO);
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorTwoParams(GraphWidget::NodeOperatorTwoParams::LESS_THAN_OR_EQUAL_TO);
 
 	m_pScene->addItem(n);
 
 	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "less_than_or_equal_to"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createNotNode
+ * @return
+ */
+GraphWidget::Node *	NodeEditorWindow::createNotNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorOneParam(GraphWidget::NodeOperatorOneParam::NOT);
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "not"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createAndNode
+ * @return
+ */
+GraphWidget::Node *	NodeEditorWindow::createAndNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorTwoParams(GraphWidget::NodeOperatorTwoParams::AND);
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "and"));
+
+	return(n);
+}
+
+/**
+ * @brief NodeEditorWindow::createOrNode
+ * @return
+ */
+GraphWidget::Node *	NodeEditorWindow::createOrNode(void)
+{
+	GraphWidget::Node * n = new GraphWidget::NodeOperatorTwoParams(GraphWidget::NodeOperatorTwoParams::OR);
+
+	m_pScene->addItem(n);
+
+	m_mapNodeType.insert(std::pair<const GraphWidget::Node*, std::string>(n, "or"));
 
 	return(n);
 }
@@ -981,6 +1082,26 @@ void NodeEditorWindow::on_actionCreateDivisionNode_triggered()
 }
 
 /**
+ * @brief NodeEditorWindow::on_actionCreateNegationNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateNegationNode_triggered()
+{
+	GraphWidget::Node * node = createNegationNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateAbsoluteNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateAbsoluteNode_triggered()
+{
+	GraphWidget::Node * node = createAbsoluteNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
  * @brief NodeEditorWindow::on_actionCreateEqualToNode_triggered
  */
 void NodeEditorWindow::on_actionCreateEqualToNode_triggered()
@@ -1036,6 +1157,36 @@ void NodeEditorWindow::on_actionCreateGreaterThanOrEqualToNode_triggered()
 void NodeEditorWindow::on_actionCreateLessThanOrEqualToNode_triggered()
 {
 	GraphWidget::Node * node = createLessThanOrEqualToNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateNotNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateNotNode_triggered()
+{
+	GraphWidget::Node * node = createNotNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateAndNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateAndNode_triggered()
+{
+	GraphWidget::Node * node = createAndNode();
+	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
+	node->setPos(pos);
+}
+
+/**
+ * @brief NodeEditorWindow::on_actionCreateOrNode_triggered
+ */
+void NodeEditorWindow::on_actionCreateOrNode_triggered()
+{
+	GraphWidget::Node * node = createOrNode();
 	QPointF pos = m_pView->mapToScene(m_lastContextMenuPos);
 	node->setPos(pos);
 }

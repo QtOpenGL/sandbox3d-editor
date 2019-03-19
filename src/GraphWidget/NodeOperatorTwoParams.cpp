@@ -1,4 +1,4 @@
-#include "NodeOperator.h"
+#include "NodeOperatorTwoParams.h"
 
 #include "ConnectorInput.h"
 #include "ConnectorOutput.h"
@@ -8,108 +8,135 @@
 namespace GraphWidget
 {
 
-qreal NodeOperator::width = 70.0;
-qreal NodeOperator::height = 70.0;
+qreal NodeOperatorTwoParams::width = 70.0;
+qreal NodeOperatorTwoParams::height = 70.0;
 
 /**
  * @brief Constructor
  */
-NodeOperator::NodeOperator(Type type) : Node()
+NodeOperatorTwoParams::NodeOperatorTwoParams(Type type) : Node()
 {
 	setCacheMode(DeviceCoordinateCache);
 
-	unsigned int mask = 0;
+	unsigned int inputMask = 0;
+	unsigned int outputMask = 0;
 
 	switch (type)
 	{
 		case ADDITION:
 		{
 			symbol = "+";
-			mask = TYPE_FLOAT_BIT;
+			inputMask = TYPE_FLOAT_BIT;
+			outputMask = TYPE_FLOAT_BIT;
 		}
 		break;
 
 		case SUBTRACTION:
 		{
 			symbol = "-";
-			mask = TYPE_FLOAT_BIT;
+			inputMask = TYPE_FLOAT_BIT;
+			outputMask = TYPE_FLOAT_BIT;
 		}
 		break;
 
 		case MULTIPLICATION:
 		{
 			symbol = "\u00D7";
-			mask = TYPE_FLOAT_BIT;
+			inputMask = TYPE_FLOAT_BIT;
+			outputMask = TYPE_FLOAT_BIT;
 		}
 		break;
 
 		case DIVISION:
 		{
 			symbol = "\u00F7";
-			mask = TYPE_FLOAT_BIT;
+			inputMask = TYPE_FLOAT_BIT;
+			outputMask = TYPE_FLOAT_BIT;
 		}
 		break;
 
 		case EQUAL_TO:
 		{
 			symbol = "=";
-			mask = TYPE_BOOL_BIT;
+			inputMask = TYPE_FLOAT_BIT;
+			outputMask = TYPE_BOOL_BIT;
 		}
 		break;
 
 		case NOT_EQUAL_TO:
 		{
 			symbol = "\u2260";
-			mask = TYPE_BOOL_BIT;
+			inputMask = TYPE_FLOAT_BIT;
+			outputMask = TYPE_BOOL_BIT;
 		}
 		break;
 
 		case GREATER_THAN:
 		{
 			symbol = ">";
-			mask = TYPE_BOOL_BIT;
+			inputMask = TYPE_FLOAT_BIT;
+			outputMask = TYPE_BOOL_BIT;
 		}
 		break;
 
 		case GREATER_THAN_OR_EQUAL_TO:
 		{
 			symbol = "\u2265";
-			mask = TYPE_BOOL_BIT;
+			inputMask = TYPE_FLOAT_BIT;
+			outputMask = TYPE_BOOL_BIT;
 		}
 		break;
 
 		case LESS_THAN:
 		{
 			symbol = "<";
-			mask = TYPE_BOOL_BIT;
+			inputMask = TYPE_FLOAT_BIT;
+			outputMask = TYPE_BOOL_BIT;
 		}
 		break;
 
 		case LESS_THAN_OR_EQUAL_TO:
 		{
 			symbol = "\u2264";
-			mask = TYPE_BOOL_BIT;
+			inputMask = TYPE_FLOAT_BIT;
+			outputMask = TYPE_BOOL_BIT;
+		}
+		break;
+
+		case AND:
+		{
+			symbol = "AND";
+			inputMask = TYPE_BOOL_BIT;
+			outputMask = TYPE_BOOL_BIT;
+		}
+		break;
+
+		case OR:
+		{
+			symbol = "OR";
+			inputMask = TYPE_BOOL_BIT;
+			outputMask = TYPE_BOOL_BIT;
 		}
 		break;
 	}
 
 	input1 = new ConnectorInput(this, 0);
 	input1->setPos(0.0, 20.0);
-	input1->setMask(READ_BIT | TYPE_FLOAT_BIT);
+	input1->setMask(READ_BIT | inputMask);
 
 	input2 = new ConnectorInput(this, 1);
 	input2->setPos(0.0, 50.0);
-	input2->setMask(READ_BIT | TYPE_FLOAT_BIT);
+	input2->setMask(READ_BIT | inputMask);
 
 	output = new ConnectorOutput(this, 0);
 	output->setPos(width, 35.0);
-	output->setMask(READ_BIT | mask);
+	output->setMask(READ_BIT | outputMask);
 }
 
 /**
  * @brief Destructor
  */
-NodeOperator::~NodeOperator(void)
+NodeOperatorTwoParams::~NodeOperatorTwoParams(void)
 {
 	// ...
 }
@@ -118,7 +145,7 @@ NodeOperator::~NodeOperator(void)
  * @brief Node::getInputConnector
  * @return
  */
-ConnectorInput * NodeOperator::getInputConnector(unsigned int index)
+ConnectorInput * NodeOperatorTwoParams::getInputConnector(unsigned int index)
 {
 	if (index == 0)
 	{
@@ -136,30 +163,30 @@ ConnectorInput * NodeOperator::getInputConnector(unsigned int index)
  * @brief Node::getOutputConnector
  * @return
  */
-ConnectorOutput * NodeOperator::getOutputConnector(unsigned int index)
+ConnectorOutput * NodeOperatorTwoParams::getOutputConnector(unsigned int index)
 {
 	if (index == 0)
 	{
-		return(output);
+		return output;
 	}
 
 	return nullptr;
 }
 
 /**
- * @brief NodeOperator::getWidth
+ * @brief NodeOperatorTwoParams::getWidth
  * @return
  */
-qreal NodeOperator::getWidth(void) const
+qreal NodeOperatorTwoParams::getWidth(void) const
 {
 	return(width);
 }
 
 /**
- * @brief NodeOperator::getHeight
+ * @brief NodeOperatorTwoParams::getHeight
  * @return
  */
-qreal NodeOperator::getHeight(void) const
+qreal NodeOperatorTwoParams::getHeight(void) const
 {
 	return(height);
 }
@@ -168,7 +195,7 @@ qreal NodeOperator::getHeight(void) const
  * @brief Destructor
  * @return
  */
-QRectF NodeOperator::boundingRect(void) const
+QRectF NodeOperatorTwoParams::boundingRect(void) const
 {
 	double border = 1.0;
 	QRectF rect = QRectF(0.0 - (border * 0.5) - Connector::radius, 0.0 - (border * 0.5) - Connector::radius, width + (border) + (Connector::radius * 2), height + (border) + (Connector::radius * 2));
@@ -176,10 +203,10 @@ QRectF NodeOperator::boundingRect(void) const
 }
 
 /**
- * @brief NodeOperator::shape
+ * @brief NodeOperatorTwoParams::shape
  * @return
  */
-QPainterPath NodeOperator::shape(void) const
+QPainterPath NodeOperatorTwoParams::shape(void) const
 {
 	QRectF rect = QRectF(0.0, 0.0, width, height);
 
@@ -194,7 +221,7 @@ QPainterPath NodeOperator::shape(void) const
  * @param option
  * @param widget
  */
-void NodeOperator::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
+void NodeOperatorTwoParams::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
 	double border = 1.0;
 	QRectF rect = QRectF(0.0, 0.0, width, height);

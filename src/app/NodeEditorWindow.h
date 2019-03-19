@@ -60,12 +60,19 @@ protected:
 	GraphWidget::Node *	createMultiplicationNode		(void);
 	GraphWidget::Node *	createDivisionNode				(void);
 
+	GraphWidget::Node *	createNegationNode				(void);
+	GraphWidget::Node *	createAbsoluteNode				(void);
+
 	GraphWidget::Node *	createEqualToNode				(void);
 	GraphWidget::Node *	createNotEqualToNode			(void);
 	GraphWidget::Node *	createGreaterThanNode			(void);
 	GraphWidget::Node *	createLessThanNode				(void);
 	GraphWidget::Node *	createGreaterThanOrEqualToNode	(void);
 	GraphWidget::Node *	createLessThanOrEqualToNode		(void);
+
+	GraphWidget::Node *	createNotNode					(void);
+	GraphWidget::Node *	createAndNode					(void);
+	GraphWidget::Node *	createOrNode					(void);
 
 	GraphWidget::Node *	createFloatNode					(float value = 0.0f);
 
@@ -118,12 +125,19 @@ public slots:
 	void on_actionCreateMultiplicationNode_triggered();
 	void on_actionCreateDivisionNode_triggered();
 
+	void on_actionCreateNegationNode_triggered();
+	void on_actionCreateAbsoluteNode_triggered();
+
 	void on_actionCreateEqualToNode_triggered();
 	void on_actionCreateNotEqualToNode_triggered();
 	void on_actionCreateGreaterThanNode_triggered();
 	void on_actionCreateLessThanNode_triggered();
 	void on_actionCreateGreaterThanOrEqualToNode_triggered();
 	void on_actionCreateLessThanOrEqualToNode_triggered();
+
+	void on_actionCreateNotNode_triggered();
+	void on_actionCreateAndNode_triggered();
+	void on_actionCreateOrNode_triggered();
 
 	void on_actionCreateFloatNode_triggered();
 	void on_actionRemoveNode_triggered();
