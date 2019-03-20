@@ -10,8 +10,14 @@ endif ()
 
 add_subdirectory(external)
 
+# OpenGL
+set(OpenGL_GL_PREFERENCE "GLVND")
+find_package(OpenGL REQUIRED)
+
 # Scene
 find_package(Scene REQUIRED)
+
+# Render Graph
 find_package(RenderGraph REQUIRED)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
