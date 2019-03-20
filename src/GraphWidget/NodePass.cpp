@@ -74,7 +74,14 @@ void NodePass::addOutput(const QString & strName, unsigned int mask)
 
 	ConnectorOutput * pConnector = new ConnectorOutput(this, count);
 	pConnector->setPos(width, 40.0 + 15.0 + 25.0 * count);
-	pConnector->setMask(WRITE_BIT | mask);
+	if (mask == TYPE_TEXTURE_BIT)
+	{
+		pConnector->setMask(WRITE_BIT | mask);
+	}
+	else
+	{
+		pConnector->setMask(READ_BIT | mask);
+	}
 	outputList << pConnector;
 	outputNameList << strName;
 }
