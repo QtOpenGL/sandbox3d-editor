@@ -120,5 +120,5 @@ private:
 	unsigned int m_iHeight;
 
 	std::map<std::string, unsigned int> mapTextures;
-	std::map<std::string, unsigned int> mapValues;
+	std::map<std::string, std::vector<unsigned int>> mapValues;
 };

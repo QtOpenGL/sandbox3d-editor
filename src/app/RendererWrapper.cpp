@@ -266,7 +266,7 @@ void RendererWrapper::setConstant(RenderGraph::Instance * pInstance, const char 
 
 	if (it != mapValues.end())
 	{
-		pInstance->setConstant(it->second, value);
+		pInstance->setConstant(it->second[0], value); // FIXME
 	}
 }
 
@@ -282,7 +282,7 @@ void RendererWrapper::setConstant(RenderGraph::Instance * pInstance, const char 
 
 	if (it != mapValues.end())
 	{
-		pInstance->setConstant(it->second, value);
+		pInstance->setConstant(it->second[0], value); // FIXME
 	}
 }
 
@@ -298,7 +298,7 @@ void RendererWrapper::setConstant(RenderGraph::Instance * pInstance, const char 
 
 	if (it != mapValues.end())
 	{
-		pInstance->setConstant(it->second, value);
+		pInstance->setConstant(it->second[0], value); // FIXME
 	}
 }
 
