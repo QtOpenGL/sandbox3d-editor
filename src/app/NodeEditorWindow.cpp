@@ -1264,7 +1264,14 @@ void NodeEditorWindow::updateTextures(void)
 					char szId [16];
 					sprintf(szId, "%lld", uintptr_t(pNodeItem));
 
-					GLuint textureId = g_RendererWrapper.getRenderTexture(static_cast<MainWindow*>(parent())->m_pDrawable->getRenderQueue(), szId);
+					GLuint textureId = 0;
+
+					RenderGraph::Instance * pInstance = static_cast<MainWindow*>(parent())->m_pDrawable->getRenderQueue();
+
+					if (pInstance)
+					{
+						textureId = g_RendererWrapper.getRenderTexture(pInstance, szId);
+					}
 
 					pNodeTextureItem->setTexture(textureId);
 				}
