@@ -317,18 +317,10 @@ void NodeEditorWindow::contextMenuEvent(QContextMenuEvent * pEvent)
 
 	m_pScene->clearSelection();
 
-	if (item)
+	if (item && item->type() == GraphWidget::Node::Type)
 	{
-		switch (item->type())
-		{
-			case GraphWidget::Node::Type:
-			{
-				item->setSelected(true);
-
-				m_pContextMenuNode->exec(pEvent->globalPos());
-			}
-			break;
-		}
+		item->setSelected(true);
+		m_pContextMenuNode->exec(pEvent->globalPos());
 	}
 	else
 	{
